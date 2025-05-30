@@ -1,0 +1,21 @@
+
+name: smart-charging-infrastructure
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    restart: unless-stopped
+    ports:
+      - ${POSTGRES_HOST_PORT:-5432}:${POSTGRES_PORT:-5432}
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+    networks:
+      - infrastructure
+       
+networks:
+  infrastructure:
+    name: infrastructure
+    driver: bridge
+    

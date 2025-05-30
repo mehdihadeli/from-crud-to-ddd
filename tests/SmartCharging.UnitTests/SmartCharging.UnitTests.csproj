@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <ExcludeFromCodeCoverage>true</ExcludeFromCodeCoverage>
+  </PropertyGroup>
+  <ItemGroup Label="Test Platforms">
+    <!--      we should have `Microsoft.NET.Test.Sdk` explicitly in each test project not in the shared because tests
+     will be skiped by ide-->
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\SmartCharging\SmartCharging.csproj" />
+    <ProjectReference Include="..\SmartCharging.TestsShared\SmartCharging.TestsShared.csproj" />
+  </ItemGroup>
+</Project>

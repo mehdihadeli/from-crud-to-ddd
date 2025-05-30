@@ -1,0 +1,28 @@
+<Solution>
+  <Folder Name="/solution items/">
+    <File Path=".csharpierrc.yaml" />
+    <File Path=".dockerignore" />
+    <File Path=".editorconfig" />
+    <File Path=".gitattributes" />
+    <File Path=".gitignore" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Build.targets" />
+    <File Path="Directory.Packages.props" />
+    <File Path="global.json" />
+    <File Path="Makefile" />
+    <File Path="README.md" />
+  </Folder>
+  <Folder Name="/solution items/deployments/" />
+  <Folder Name="/solution items/deployments/docker-compose/">
+    <File Path="deployments\docker-compose\docker-compose.yaml" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src\SmartCharging\SmartCharging.csproj" Type="Classic C#" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests\SmartCharging.EndToEndTests\SmartCharging.EndToEndTests.csproj" Type="Classic C#" />
+    <Project Path="tests\SmartCharging.IntegrationTests\SmartCharging.IntegrationTests.csproj" Type="Classic C#" />
+    <Project Path="tests\SmartCharging.TestsShared\SmartCharging.TestsShared.csproj" Type="Classic C#" />
+    <Project Path="tests\SmartCharging.UnitTests\SmartCharging.UnitTests.csproj" Type="Classic C#" />
+  </Folder>
+</Solution>
