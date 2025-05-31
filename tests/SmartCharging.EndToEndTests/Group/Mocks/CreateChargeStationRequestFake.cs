@@ -27,11 +27,7 @@ public sealed class CreateChargeStationRequestFake : Faker<AddChargeStationReque
                 .ToList();
 
             // Generate the AddChargeStation request with the specified group and connectors
-            return new AddChargeStationRequest(
-                ChargeStationId: Guid.NewGuid(),
-                Name: faker.Company.CompanyName(),
-                Connectors: connectors.AsReadOnly()
-            );
+            return new AddChargeStationRequest(Name: faker.Company.CompanyName(), Connectors: connectors.AsReadOnly());
         });
     }
 }

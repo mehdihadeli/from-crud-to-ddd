@@ -2,6 +2,9 @@ using SmartCharging.Shared.BuildingBlocks.Exceptions;
 
 namespace SmartCharging.Groups.Models.ValueObjects;
 
+// - `record` types automatically implement value-based equality based on all of their public properties. This means, in your current implementation:
+// The `Value` property (`int Value`) is used to determine equality between two `ChargeStationId` instances
+
 public record ChargeStationId
 {
     // For EF materialization - No validation

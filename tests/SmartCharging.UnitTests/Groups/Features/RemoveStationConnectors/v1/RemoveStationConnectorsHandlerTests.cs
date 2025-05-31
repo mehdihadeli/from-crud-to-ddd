@@ -40,9 +40,9 @@ public class RemoveStationConnectorsHandlerTests
 
         var removeStationConnectors =
             new SmartCharging.Groups.Features.RemoveStationConnectors.v1.RemoveStationConnectors(
-                groupId,
-                chargeStation.Id,
-                connectorIdsToRemove
+                groupId.Value,
+                chargeStation.Id.Value,
+                connectorIdsToRemove.Select(x => x.Value).ToList()
             );
 
         // Act
@@ -74,9 +74,9 @@ public class RemoveStationConnectorsHandlerTests
 
         var removeStationConnectors =
             new SmartCharging.Groups.Features.RemoveStationConnectors.v1.RemoveStationConnectors(
-                groupId,
-                chargeStationId,
-                connectorIds
+                groupId.Value,
+                chargeStationId.Value,
+                connectorIds.Select(x => x.Value).ToList()
             );
 
         // Act & Assert
@@ -111,9 +111,9 @@ public class RemoveStationConnectorsHandlerTests
         var connectorIds = new List<ConnectorId> { ConnectorId.Of(1) };
         var removeStationConnectors =
             new SmartCharging.Groups.Features.RemoveStationConnectors.v1.RemoveStationConnectors(
-                groupId,
-                chargeStationId,
-                connectorIds
+                groupId.Value,
+                chargeStationId.Value,
+                connectorIds.Select(x => x.Value).ToList()
             );
 
         // Act & Assert

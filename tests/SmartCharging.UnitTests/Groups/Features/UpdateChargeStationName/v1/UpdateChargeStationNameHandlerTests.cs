@@ -41,9 +41,9 @@ public class UpdateChargeStationNameHandlerTests
 
         var updateChargeStationName =
             new SmartCharging.Groups.Features.UpdateChargeStationName.v1.UpdateChargeStationName(
-                groupId,
-                chargeStationId,
-                newName
+                groupId.Value,
+                chargeStationId.Value,
+                newName.Value
             );
 
         // Act
@@ -74,9 +74,9 @@ public class UpdateChargeStationNameHandlerTests
 
         var updateChargeStationName =
             new SmartCharging.Groups.Features.UpdateChargeStationName.v1.UpdateChargeStationName(
-                groupId,
-                chargeStationId,
-                newName
+                groupId.Value,
+                chargeStationId.Value,
+                newName.Value
             );
 
         // Act & Assert
@@ -110,9 +110,9 @@ public class UpdateChargeStationNameHandlerTests
 
         var updateChargeStationName =
             new SmartCharging.Groups.Features.UpdateChargeStationName.v1.UpdateChargeStationName(
-                groupId,
-                chargeStationId,
-                newName
+                groupId.Value,
+                chargeStationId.Value,
+                newName.Value
             );
 
         // Act & Assert

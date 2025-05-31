@@ -5,14 +5,15 @@ using SmartCharging.Shared.BuildingBlocks.Extensions;
 
 namespace SmartCharging.Groups.Features.RemoveChargeStation.v1;
 
-public record RemoveChargeStation(GroupId GroupId, ChargeStationId ChargeStationId)
+public record RemoveChargeStation(Guid GroupId, Guid ChargeStationId)
 {
+    // - just input validation inside command static constructor and business rules or domain-level validation to the command-handler and construct the Value Objects/Entities within the command-handler
     public static RemoveChargeStation Of(Guid? groupId, Guid? chargeStationId)
     {
-        groupId.NotBeNull();
-        chargeStationId.NotBeNull();
+        groupId.NotBeNull().NotBeEmpty();
+        chargeStationId.NotBeNull().NotBeEmpty();
 
-        return new RemoveChargeStation(GroupId.Of(groupId.Value), ChargeStationId.Of(chargeStationId.Value));
+        return new RemoveChargeStation(groupId.Value, chargeStationId.Value);
     }
 }
 
@@ -22,21 +23,25 @@ public class RemoveChargeStationHandler(IUnitOfWork unitOfWork, ILogger<RemoveCh
     {
         removeChargeStation.NotBeNull();
 
-        var group = await unitOfWork.GroupRepository.GetByIdAsync(removeChargeStation.GroupId, cancellationToken);
+        // Business rules validation in value objects and entities will do in handlers, not commands, and in command we just have input validations
+        var group = await unitOfWork.GroupRepository.GetByIdAsync(
+            GroupId.Of(removeChargeStation.GroupId),
+            cancellationToken
+        );
         if (group is null)
         {
-            throw new NotFoundException($"Group with ID {removeChargeStation.GroupId.Value} not found.");
+            throw new NotFoundException($"Group with ID {removeChargeStation.GroupId} not found.");
         }
 
-        group.RemoveChargeStation(removeChargeStation.ChargeStationId);
+        group.RemoveChargeStation(ChargeStationId.Of(removeChargeStation.ChargeStationId));
 
         unitOfWork.GroupRepository.Update(group);
         await unitOfWork.CommitAsync(cancellationToken);
 
         logger.LogInformation(
             "Charge station {ChargeStationId} removed from group {GroupId}.",
-            removeChargeStation.ChargeStationId.Value,
-            removeChargeStation.GroupId.Value
+            removeChargeStation.ChargeStationId,
+            removeChargeStation.GroupId
         );
     }
 }

@@ -21,9 +21,7 @@ public class GroupGetByIdTests(
         var fakeGroup = new GroupFake().Generate(1).First();
         await SharedFixture.InsertEfDbContextAsync(fakeGroup);
 
-        var groupGetById = new SmartCharging.Groups.Features.GroupGetById.v1.GroupGetById(
-            GroupId.Of(fakeGroup.Id.Value)
-        );
+        var groupGetById = new SmartCharging.Groups.Features.GroupGetById.v1.GroupGetById(fakeGroup.Id.Value);
         var handler = Scope.ServiceProvider.GetRequiredService<GroupGetByIdHandler>();
 
         // Act
@@ -41,7 +39,7 @@ public class GroupGetByIdTests(
     internal async Task GroupGetById_WithInvalidGroupId_Should_ThrowNotFoundException()
     {
         // Arrange
-        var invalidGroupId = GroupId.Of(Guid.NewGuid());
+        var invalidGroupId = Guid.NewGuid();
         var groupGetById = new SmartCharging.Groups.Features.GroupGetById.v1.GroupGetById(invalidGroupId);
         var handler = Scope.ServiceProvider.GetRequiredService<GroupGetByIdHandler>();
 

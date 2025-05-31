@@ -6,11 +6,13 @@ using SmartCharging.Shared.BuildingBlocks.Extensions;
 
 namespace SmartCharging.Groups.Features.GroupGetById.v1;
 
-public record GroupGetById(GroupId GroupId)
+public record GroupGetById(Guid GroupId)
 {
+    // - just input validation inside command static constructor and business rules or domain-level validation to the command-handler and construct the Value Objects/Entities within the command-handler
     public static GroupGetById Of(Guid? groupId)
     {
-        return new GroupGetById(GroupId.Of(groupId));
+        groupId.NotBeNull().NotBeEmpty();
+        return new GroupGetById(groupId.Value);
     }
 }
 
@@ -20,10 +22,11 @@ public class GroupGetByIdHandler(IUnitOfWork unitOfWork)
     {
         groupGetById.NotBeNull();
 
-        var group = await unitOfWork.GroupRepository.GetByIdAsync(groupGetById.GroupId, cancellationToken);
+        // Business rules validation in value objects and entities will do in handlers, not commands, and in command we just have input validations
+        var group = await unitOfWork.GroupRepository.GetByIdAsync(GroupId.Of(groupGetById.GroupId), cancellationToken);
         if (group == null)
         {
-            throw new NotFoundException($"Group with ID {groupGetById.GroupId.Value} not found.");
+            throw new NotFoundException($"Group with ID {groupGetById.GroupId} not found.");
         }
 
         return group.ToGroupGetByIdResult();

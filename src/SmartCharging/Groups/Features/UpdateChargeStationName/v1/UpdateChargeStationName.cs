@@ -5,19 +5,16 @@ using SmartCharging.Shared.BuildingBlocks.Extensions;
 
 namespace SmartCharging.Groups.Features.UpdateChargeStationName.v1;
 
-public record UpdateChargeStationName(GroupId GroupId, ChargeStationId ChargeStationId, Name NewName)
+public record UpdateChargeStationName(Guid GroupId, Guid ChargeStationId, string NewName)
 {
+    // - just input validation inside command static constructor and business rules or domain-level validation to the command-handler and construct the Value Objects/Entities within the command-handler
     public static UpdateChargeStationName Of(Guid? groupId, Guid? chargeStationId, string? newName)
     {
-        groupId.NotBeNull();
-        chargeStationId.NotBeNull();
+        groupId.NotBeNull().NotBeEmpty();
+        chargeStationId.NotBeNull().NotBeEmpty();
         newName.NotBeNullOrWhiteSpace();
 
-        return new UpdateChargeStationName(
-            GroupId.Of(groupId.Value),
-            ChargeStationId.Of(chargeStationId.Value),
-            Name.Of(newName)
-        );
+        return new UpdateChargeStationName(groupId.Value, chargeStationId.Value, newName);
     }
 }
 
@@ -27,14 +24,21 @@ public class UpdateChargeStationNameHandler(IUnitOfWork unitOfWork, ILogger<Upda
     {
         updateChargeStationName.NotBeNull();
 
-        var group = await unitOfWork.GroupRepository.GetByIdAsync(updateChargeStationName.GroupId, cancellationToken);
+        // Business rules validation in value objects and entities will do in handlers, not commands, and in command we just have input validations
+        var group = await unitOfWork.GroupRepository.GetByIdAsync(
+            GroupId.Of(updateChargeStationName.GroupId),
+            cancellationToken
+        );
         if (group is null)
         {
-            throw new NotFoundException($"Group with ID {updateChargeStationName.GroupId.Value} not found.");
+            throw new NotFoundException($"Group with ID {updateChargeStationName.GroupId} not found.");
         }
 
         // Update the charge station name
-        group.UpdateChargeStationName(updateChargeStationName.ChargeStationId, updateChargeStationName.NewName);
+        group.UpdateChargeStationName(
+            ChargeStationId.Of(updateChargeStationName.ChargeStationId),
+            Name.Of(updateChargeStationName.NewName)
+        );
 
         unitOfWork.GroupRepository.Update(group);
         await unitOfWork.CommitAsync(cancellationToken);
@@ -42,9 +46,9 @@ public class UpdateChargeStationNameHandler(IUnitOfWork unitOfWork, ILogger<Upda
         // Log the change
         logger.LogInformation(
             "Charge station {ChargeStationId} name updated to '{NewName}' in group {GroupId}.",
-            updateChargeStationName.ChargeStationId.Value,
-            updateChargeStationName.NewName.Value,
-            updateChargeStationName.GroupId.Value
+            updateChargeStationName.ChargeStationId,
+            updateChargeStationName.NewName,
+            updateChargeStationName.GroupId
         );
     }
 }

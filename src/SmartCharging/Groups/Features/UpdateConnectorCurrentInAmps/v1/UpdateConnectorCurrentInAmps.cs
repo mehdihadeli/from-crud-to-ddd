@@ -5,13 +5,9 @@ using SmartCharging.Shared.BuildingBlocks.Extensions;
 
 namespace SmartCharging.Groups.Features.UpdateConnectorCurrentInAmps.v1;
 
-public record UpdateConnectorCurrentInAmps(
-    GroupId GroupId,
-    ChargeStationId ChargeStationId,
-    ConnectorId ConnectorId,
-    CurrentInAmps NewCurrentInAmps
-)
+public record UpdateConnectorCurrentInAmps(Guid GroupId, Guid ChargeStationId, int ConnectorId, int NewCurrentInAmps)
 {
+    // - just input validation inside command static constructor and business rules or domain-level validation to the command-handler and construct the Value Objects/Entities within the command-handler
     public static UpdateConnectorCurrentInAmps Of(
         Guid? groupId,
         Guid? chargeStationId,
@@ -19,17 +15,12 @@ public record UpdateConnectorCurrentInAmps(
         int newCurrentInAmps
     )
     {
-        groupId.NotBeNull();
-        chargeStationId.NotBeNull();
-        connectorId.NotBeNull();
-        newCurrentInAmps.NotBeNull();
+        groupId.NotBeNull().NotBeEmpty();
+        chargeStationId.NotBeNull().NotBeEmpty();
+        connectorId.NotBeNegativeOrZero();
+        newCurrentInAmps.NotBeNegativeOrZero();
 
-        return new UpdateConnectorCurrentInAmps(
-            GroupId.Of(groupId),
-            ChargeStationId.Of(chargeStationId),
-            ConnectorId.Of(connectorId),
-            CurrentInAmps.Of(newCurrentInAmps)
-        );
+        return new UpdateConnectorCurrentInAmps(groupId.Value, chargeStationId.Value, connectorId, newCurrentInAmps);
     }
 }
 
@@ -45,19 +36,20 @@ public class UpdateConnectorCurrentInAmpsHandler(
     {
         updateConnectorCurrentInAmps.NotBeNull();
 
+        // Business rules validation in value objects and entities will do in handlers, not commands, and in command we just have input validations
         var group = await unitOfWork.GroupRepository.GetByIdAsync(
-            updateConnectorCurrentInAmps.GroupId,
+            GroupId.Of(updateConnectorCurrentInAmps.GroupId),
             cancellationToken
         );
         if (group == null)
         {
-            throw new NotFoundException($"Group with ID {updateConnectorCurrentInAmps.GroupId.Value} not found.");
+            throw new NotFoundException($"Group with ID {updateConnectorCurrentInAmps.GroupId} not found.");
         }
 
         group.UpdateConnectorCurrentInAmps(
-            updateConnectorCurrentInAmps.ChargeStationId,
-            updateConnectorCurrentInAmps.ConnectorId,
-            updateConnectorCurrentInAmps.NewCurrentInAmps
+            ChargeStationId.Of(updateConnectorCurrentInAmps.ChargeStationId),
+            ConnectorId.Of(updateConnectorCurrentInAmps.ConnectorId),
+            CurrentInAmps.Of(updateConnectorCurrentInAmps.NewCurrentInAmps)
         );
 
         unitOfWork.GroupRepository.Update(group);
@@ -65,10 +57,10 @@ public class UpdateConnectorCurrentInAmpsHandler(
 
         logger.LogInformation(
             "Successfully updated Connector {ConnectorId} in ChargeStation {ChargeStationId} in Group {GroupId} to {NewCurrentInAmps} amps.",
-            updateConnectorCurrentInAmps.ConnectorId.Value,
-            updateConnectorCurrentInAmps.ChargeStationId.Value,
-            updateConnectorCurrentInAmps.GroupId.Value,
-            updateConnectorCurrentInAmps.NewCurrentInAmps.Value
+            updateConnectorCurrentInAmps.ConnectorId,
+            updateConnectorCurrentInAmps.ChargeStationId,
+            updateConnectorCurrentInAmps.GroupId,
+            updateConnectorCurrentInAmps.NewCurrentInAmps
         );
     }
 }

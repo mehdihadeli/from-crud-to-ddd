@@ -1,6 +1,5 @@
 using Microsoft.Extensions.Logging;
 using NSubstitute;
-using Shouldly;
 using SmartCharging.Groups.Contracts;
 using SmartCharging.Groups.Dtos;
 using SmartCharging.Groups.Features.AddChargeStation.v1;
@@ -44,15 +43,11 @@ public class AddChargeStationHandlerTests
             .ToList()
             .AsReadOnly();
 
-        // Create a charge station with 2 connectors
-        var chargeStation = ChargeStation.Create(chargeStationId, chargeStationName, connectors);
-
         // Mock repository behavior
         _unitOfWorkMock.GroupRepository.GetByIdAsync(Arg.Is(group.Id), Arg.Any<CancellationToken>()).Returns(group);
 
         var addChargeStation = SmartCharging.Groups.Features.AddChargeStation.v1.AddChargeStation.Of(
             groupId.Value,
-            chargeStationId.Value,
             chargeStationName.Value,
             connectors
                 .Select(c => new ConnectorDto(c.ChargeStationId.Value, c.Id.Value, c.MaxCurrentInAmps.Value))
@@ -63,7 +58,9 @@ public class AddChargeStationHandlerTests
         await _handler.Handle(addChargeStation, CancellationToken.None);
 
         // Assert
-        group.ChargeStations.ShouldContain(station => station.Id == chargeStation.Id);
+        group.ChargeStations.ShouldContain(station =>
+            station.Id == ChargeStationId.Of(addChargeStation.ChargeStationId)
+        );
 
         // Verify repository interactions
         _unitOfWorkMock.GroupRepository.Received(1).GetByIdAsync(group.Id, CancellationToken.None);
@@ -91,7 +88,6 @@ public class AddChargeStationHandlerTests
 
         var addChargeStation = SmartCharging.Groups.Features.AddChargeStation.v1.AddChargeStation.Of(
             groupId.Value,
-            chargeStationId.Value,
             chargeStationName.Value,
             connectors
                 .Select(c => new ConnectorDto(c.ChargeStationId.Value, c.Id.Value, c.MaxCurrentInAmps.Value))
@@ -147,7 +143,6 @@ public class AddChargeStationHandlerTests
 
         var addChargeStation = SmartCharging.Groups.Features.AddChargeStation.v1.AddChargeStation.Of(
             groupId.Value,
-            chargeStationId.Value,
             chargeStationName.Value,
             connectors
                 .Select(c => new ConnectorDto(c.ChargeStationId.Value, c.Id.Value, c.MaxCurrentInAmps.Value))

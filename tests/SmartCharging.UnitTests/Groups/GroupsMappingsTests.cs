@@ -97,6 +97,7 @@ public class GroupsMappingsTests
     {
         // Arrange
         var chargeStationId = Guid.NewGuid();
+        var groupId = Guid.NewGuid();
         var chargeStationDto = new ChargeStationDto(
             ChargeStationId: chargeStationId,
             Name: "Test Charge Station",

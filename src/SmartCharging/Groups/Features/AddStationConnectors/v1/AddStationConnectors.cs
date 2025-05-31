@@ -7,27 +7,26 @@ using SmartCharging.Shared.BuildingBlocks.Extensions;
 
 namespace SmartCharging.Groups.Features.AddStationConnectors.v1;
 
-public record AddStationConnectors(
-    GroupId GroupId,
-    ChargeStationId ChargeStationId,
-    IReadOnlyCollection<Connector> Connectors
-)
+public record AddStationConnectors(Guid GroupId, Guid ChargeStationId, IReadOnlyCollection<ConnectorDto> Connectors)
 {
+    // - just input validation inside command static constructor and business rules or domain-level validation to the command-handler and construct the Value Objects/Entities within the command-handler
+    // - we can also use FluentValidation for validate basic input validation, not domain validations
+    // - `Command` is an application-layer construct designed to transfer and input validation raw user input into the system not to execute domain-level logic which are in ValueObjects/Entities
+    // - If we use VO Any change in **Value Objects** (e.g., added properties or altered constructors) may affects to the `Command` behavior.
+    // - If we use entities and value objects inside command, we're mixing Domain Validation with Input Validation
+    // - If commands are exposed over external boundaries (e.g., messaging queues), embedding **Value Objects** directly into the command can introduce challenges with serialization and deserialization
+
     public static AddStationConnectors Of(
         Guid? groupId,
         Guid? chargeStationId,
         IReadOnlyCollection<ConnectorDto>? connectors
     )
     {
-        groupId.NotBeNull();
-        chargeStationId.NotBeNull();
+        groupId.NotBeNull().NotBeEmpty();
+        chargeStationId.NotBeNull().NotBeEmpty();
         connectors.NotBeNull();
 
-        return new AddStationConnectors(
-            GroupId.Of(groupId.Value),
-            ChargeStationId.Of(chargeStationId.Value),
-            connectors.ToConnectors()
-        );
+        return new AddStationConnectors(groupId.Value, chargeStationId.Value, connectors);
     }
 }
 
@@ -40,11 +39,18 @@ public class AddConnectorsHandler(IUnitOfWork unitOfWork, ILogger<AddConnectorsH
     {
         addStationConnectors.NotBeNull();
 
-        var group = await unitOfWork.GroupRepository.GetByIdAsync(addStationConnectors.GroupId, cancellationToken);
+        // Business rules validation in value objects and entities will do in handlers, not commands, and in command we just have input validations
+        var group = await unitOfWork.GroupRepository.GetByIdAsync(
+            GroupId.Of(addStationConnectors.GroupId),
+            cancellationToken
+        );
         if (group is null)
-            throw new NotFoundException($"Group with ID {addStationConnectors.GroupId.Value} not found.");
+            throw new NotFoundException($"Group with ID {addStationConnectors.GroupId} not found.");
 
-        group.AddConnectors(addStationConnectors.ChargeStationId, addStationConnectors.Connectors.ToList());
+        group.AddConnectors(
+            ChargeStationId.Of(addStationConnectors.ChargeStationId),
+            addStationConnectors.Connectors.ToConnectors()
+        );
 
         unitOfWork.GroupRepository.Update(group);
         await unitOfWork.CommitAsync(cancellationToken);
@@ -53,10 +59,10 @@ public class AddConnectorsHandler(IUnitOfWork unitOfWork, ILogger<AddConnectorsH
             "Connectors successfully added to ChargeStation {ChargeStationId} in Group {GroupId}. Added Connectors: {Connectors}",
             addStationConnectors.ChargeStationId,
             addStationConnectors.GroupId,
-            string.Join(", ", addStationConnectors.Connectors.Select(c => c.Id.Value))
+            string.Join(", ", addStationConnectors.Connectors.Select(c => c.ConnectorId))
         );
 
-        return new AddStationConnectorsResult(addStationConnectors.Connectors.ToConnectorsDto());
+        return new AddStationConnectorsResult(addStationConnectors.Connectors);
     }
 }
 

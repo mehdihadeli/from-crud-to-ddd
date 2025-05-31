@@ -36,7 +36,11 @@ public class UpdateGroupHandlerTests
 
         _unitOfWorkMock.GroupRepository.GetByIdAsync(Arg.Is(groupId), Arg.Any<CancellationToken>()).Returns(group);
 
-        var updateGroup = new SmartCharging.Groups.Features.UpdateGroup.v1.UpdateGroup(groupId, newName, newCapacity);
+        var updateGroup = new SmartCharging.Groups.Features.UpdateGroup.v1.UpdateGroup(
+            groupId.Value,
+            newName.Value,
+            newCapacity.Value
+        );
 
         // Act
         await _handler.Handle(updateGroup, CancellationToken.None);
@@ -66,7 +70,11 @@ public class UpdateGroupHandlerTests
             .GroupRepository.GetByIdAsync(Arg.Is(groupId), Arg.Any<CancellationToken>())
             .Returns((Group)null!);
 
-        var updateGroup = new SmartCharging.Groups.Features.UpdateGroup.v1.UpdateGroup(groupId, newName, newCapacity);
+        var updateGroup = new SmartCharging.Groups.Features.UpdateGroup.v1.UpdateGroup(
+            groupId.Value,
+            newName.Value,
+            newCapacity.Value
+        );
 
         // Act & Assert
         var exception = await Should.ThrowAsync<NotFoundException>(() =>

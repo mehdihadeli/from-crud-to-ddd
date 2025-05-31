@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Logging;
 using NSubstitute;
-using Shouldly;
+using SmartCharging.Groups;
 using SmartCharging.Groups.Contracts;
 using SmartCharging.Groups.Features.CreateGroup.v1;
 using SmartCharging.Groups.Models;
@@ -27,9 +27,9 @@ public class CreateGroupHandlerTests
     public async Task Handle_WithValidData_CreatesGroupSuccessfullyAndCommits()
     {
         // Arrange
-        var groupName = Name.Of("Valid Group");
-        var capacityInAmps = CurrentInAmps.Of(300);
-        var chargeStation = new ChargeStationFake(numberOfConnectors: 3).Generate();
+        var groupName = "Valid Group";
+        var capacityInAmps = 300;
+        var chargeStation = new ChargeStationFake(numberOfConnectors: 3).Generate().ToChargeStationDto();
 
         var createGroup = new SmartCharging.Groups.Features.CreateGroup.v1.CreateGroup(
             Name: groupName,
@@ -42,16 +42,16 @@ public class CreateGroupHandlerTests
 
         // Assert
         result.ShouldNotBeNull();
-        result.GroupId.ShouldBe(createGroup.GroupId.Value);
+        result.GroupId.ShouldBe(createGroup.GroupId);
 
         // Verify repository interactions
         await _unitOfWorkMock
             .GroupRepository.Received(1)
             .AddAsync(
                 Arg.Is<Group>(g =>
-                    g.Name == groupName
-                    && g.CapacityInAmps == capacityInAmps
-                    && g.ChargeStations.Single() == chargeStation
+                    g.Name == Name.Of(groupName)
+                    && g.CapacityInAmps == CurrentInAmps.Of(capacityInAmps)
+                    && g.ChargeStations.Single().Id == chargeStation.ToChargeStation().Id
                 ),
                 CancellationToken.None
             );
@@ -67,9 +67,9 @@ public class CreateGroupHandlerTests
     public async Task Handle_WhenCommitFails_ThrowsException()
     {
         // Arrange: Simulate failure during commit
-        var groupName = Name.Of("Group with Commit Failure");
-        var capacityInAmps = CurrentInAmps.Of(400);
-        var chargeStation = new ChargeStationFake(numberOfConnectors: 1).Generate();
+        var groupName = "Group with Commit Failure";
+        var capacityInAmps = 400;
+        var chargeStation = new ChargeStationFake(numberOfConnectors: 1).Generate().ToChargeStationDto();
 
         var createGroup = new SmartCharging.Groups.Features.CreateGroup.v1.CreateGroup(
             Name: groupName,

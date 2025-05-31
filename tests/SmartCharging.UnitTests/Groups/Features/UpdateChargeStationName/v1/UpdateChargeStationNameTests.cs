@@ -21,9 +21,9 @@ public class UpdateChargeStationNameTests
 
         // Assert
         result.ShouldNotBeNull();
-        result.GroupId.Value.ShouldBe(groupId);
-        result.ChargeStationId.Value.ShouldBe(chargeStationId);
-        result.NewName.Value.ShouldBe(newName);
+        result.GroupId.ShouldBe(groupId);
+        result.ChargeStationId.ShouldBe(chargeStationId);
+        result.NewName.ShouldBe(newName);
     }
 
     [Fact]

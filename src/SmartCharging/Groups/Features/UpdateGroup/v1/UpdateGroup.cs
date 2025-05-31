@@ -5,11 +5,15 @@ using SmartCharging.Shared.BuildingBlocks.Extensions;
 
 namespace SmartCharging.Groups.Features.UpdateGroup.v1;
 
-public record UpdateGroup(GroupId GroupId, Name Name, CurrentInAmps CapacityInAmps)
+public record UpdateGroup(Guid GroupId, string Name, int CapacityInAmps)
 {
     public static UpdateGroup Of(Guid? groupId, string? name, int capacityInAmps)
     {
-        return new UpdateGroup(GroupId.Of(groupId), Name.Of(name), CurrentInAmps.Of(capacityInAmps));
+        groupId.NotBeNull().NotBeEmpty();
+        name.NotBeEmptyOrNull();
+        capacityInAmps.NotBeNegativeOrZero();
+
+        return new UpdateGroup(groupId.Value, name, capacityInAmps);
     }
 }
 
@@ -19,12 +23,13 @@ public class UpdateGroupHandler(IUnitOfWork unitOfWork, ILogger<UpdateGroupHandl
     {
         updateGroup.NotBeNull();
 
-        var group = await unitOfWork.GroupRepository.GetByIdAsync(updateGroup.GroupId, cancellationToken);
+        // Business rules validation in value objects and entities will do in handlers, not commands, and in command we just have input validations
+        var group = await unitOfWork.GroupRepository.GetByIdAsync(GroupId.Of(updateGroup.GroupId), cancellationToken);
 
         if (group == null)
-            throw new NotFoundException($"Group with ID {updateGroup.GroupId.Value} not found.");
+            throw new NotFoundException($"Group with ID {updateGroup.GroupId} not found.");
 
-        group.UpdateGroup(updateGroup.Name, updateGroup.CapacityInAmps);
+        group.UpdateGroup(Name.Of(updateGroup.Name), CurrentInAmps.Of(updateGroup.CapacityInAmps));
 
         unitOfWork.GroupRepository.Update(group);
         await unitOfWork.CommitAsync(cancellationToken);

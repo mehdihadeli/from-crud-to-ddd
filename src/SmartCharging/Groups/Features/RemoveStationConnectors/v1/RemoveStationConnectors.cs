@@ -5,28 +5,21 @@ using SmartCharging.Shared.BuildingBlocks.Extensions;
 
 namespace SmartCharging.Groups.Features.RemoveStationConnectors.v1;
 
-public record RemoveStationConnectors(
-    GroupId GroupId,
-    ChargeStationId ChargeStationId,
-    IEnumerable<ConnectorId> ConnectorIds
-)
+public record RemoveStationConnectors(Guid GroupId, Guid ChargeStationId, IReadOnlyCollection<int> ConnectorIds)
 {
+    // - just input validation inside command static constructor and business rules or domain-level validation to the command-handler and construct the Value Objects/Entities within the command-handler
     public static RemoveStationConnectors Of(
         Guid? groupId,
         Guid? chargeStationId,
         RemoveStationConnectorsRequest? request
     )
     {
-        groupId.NotBeNull();
-        chargeStationId.NotBeNull();
         request.NotBeNull();
+        groupId.NotBeNull().NotBeEmpty();
+        chargeStationId.NotBeNull().NotBeEmpty();
         request.ConnectorIds.NotBeNull();
 
-        return new RemoveStationConnectors(
-            GroupId.Of(groupId),
-            ChargeStationId.Of(chargeStationId),
-            request.ConnectorIds.Select(ConnectorId.Of).ToList()
-        );
+        return new RemoveStationConnectors(groupId.Value, chargeStationId.Value, request.ConnectorIds.ToList());
     }
 }
 
@@ -36,22 +29,29 @@ public class RemoveStationConnectorsHandler(IUnitOfWork unitOfWork, ILogger<Remo
     {
         removeStationConnectors.NotBeNull();
 
-        var group = await unitOfWork.GroupRepository.GetByIdAsync(removeStationConnectors.GroupId, cancellationToken);
+        // Business rules validation in value objects and entities will do in handlers, not commands, and in command we just have input validations
+        var group = await unitOfWork.GroupRepository.GetByIdAsync(
+            GroupId.Of(removeStationConnectors.GroupId),
+            cancellationToken
+        );
         if (group is null)
         {
-            throw new NotFoundException($"Group with ID {removeStationConnectors.GroupId.Value} not found.");
+            throw new NotFoundException($"Group with ID {removeStationConnectors.GroupId} not found.");
         }
 
-        group.RemoveConnectors(removeStationConnectors.ChargeStationId, removeStationConnectors.ConnectorIds.ToList());
+        group.RemoveConnectors(
+            ChargeStationId.Of(removeStationConnectors.ChargeStationId),
+            removeStationConnectors.ConnectorIds.Select(ConnectorId.Of).ToList()
+        );
 
         unitOfWork.GroupRepository.Update(group);
         await unitOfWork.CommitAsync(cancellationToken);
 
         logger.LogInformation(
             "Connectors successfully removed from ChargeStation {ChargeStationId} in Group {GroupId}. Removed Connectors: {ConnectorIds}",
-            removeStationConnectors.ChargeStationId.Value,
-            removeStationConnectors.GroupId.Value,
-            string.Join(", ", removeStationConnectors.ConnectorIds.Select(id => id.Value))
+            removeStationConnectors.ChargeStationId,
+            removeStationConnectors.GroupId,
+            string.Join(", ", removeStationConnectors.ConnectorIds.Select(id => id))
         );
     }
 }

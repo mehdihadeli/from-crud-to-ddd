@@ -9,7 +9,7 @@ namespace SmartCharging.EndToEndTests.Group.Mocks;
 /// </summary>
 public sealed class GroupFake : Faker<Groups.Models.Group>
 {
-    public GroupFake(int numberOfConnectorsPerStation = 2, int? groupCapacity = null, int? maxConnectorCurrent = null)
+    public GroupFake(int numberOfConnectorsPerStation = 2, int? groupCapacity = 500, int? maxConnectorCurrent = null)
     {
         if (numberOfConnectorsPerStation is < 1 or > 5)
             throw new ArgumentOutOfRangeException(

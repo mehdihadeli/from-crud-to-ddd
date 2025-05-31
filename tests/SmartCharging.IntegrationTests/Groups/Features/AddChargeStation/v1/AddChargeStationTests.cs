@@ -31,7 +31,6 @@ public class AddChargeStationTests(
         var newChargeStation = new ChargeStationFake(3).Generate();
         var addChargeStation = SmartCharging.Groups.Features.AddChargeStation.v1.AddChargeStation.Of(
             fakeGroup.Id.Value,
-            newChargeStation.Id.Value,
             newChargeStation.Name.Value,
             newChargeStation.Connectors.ToConnectorsDto()
         );
@@ -39,7 +38,7 @@ public class AddChargeStationTests(
         var handler = Scope.ServiceProvider.GetRequiredService<AddChargeStationHandler>();
 
         // Act
-        await handler.Handle(addChargeStation, CancellationToken.None);
+        var chargeStationId = await handler.Handle(addChargeStation, CancellationToken.None);
 
         // Assert
         var updatedGroup = await SharedFixture.ExecuteEfDbContextAsync(async db =>
@@ -51,9 +50,12 @@ public class AddChargeStationTests(
         });
 
         updatedGroup.ShouldNotBeNull();
-        updatedGroup.ChargeStations.Count.ShouldBe(2);
-        updatedGroup.ChargeStations.Last().Id.ShouldBe(newChargeStation.Id);
-        updatedGroup.ChargeStations.Last().Connectors.Count.ShouldBe(3);
+        var firstChargeStation = updatedGroup.ChargeStations.FirstOrDefault(x =>
+            x.Id.Value == addChargeStation.ChargeStationId
+        );
+        firstChargeStation.ShouldNotBeNull();
+        firstChargeStation.Id.Value.ShouldBe(chargeStationId);
+        firstChargeStation.Connectors.Count.ShouldBe(3);
     }
 
     [Fact]
@@ -65,7 +67,6 @@ public class AddChargeStationTests(
 
         var addChargeStation = SmartCharging.Groups.Features.AddChargeStation.v1.AddChargeStation.Of(
             nonExistentGroupId,
-            newChargeStation.Id.Value,
             newChargeStation.Name.Value,
             newChargeStation.Connectors.ToConnectorsDto()
         );
@@ -78,37 +79,5 @@ public class AddChargeStationTests(
         );
 
         exception.Message.ShouldBe($"Group with ID {nonExistentGroupId} not found.");
-    }
-
-    [Fact]
-    internal async Task AddChargeStation_WithDuplicateId_Should_ThrowDomainException()
-    {
-        // Arrange
-        var fakeGroup = new GroupFake(numberOfConnectorsPerStation: 3).Generate();
-
-        await SharedFixture.ExecuteEfDbContextAsync(async db =>
-        {
-            await db.Groups.AddAsync(fakeGroup);
-            await db.SaveChangesAsync();
-        });
-
-        // Use the same ChargeStation ID as an existing station within the group
-        var duplicateChargeStation = fakeGroup.ChargeStations.First();
-
-        var addChargeStation = SmartCharging.Groups.Features.AddChargeStation.v1.AddChargeStation.Of(
-            fakeGroup.Id.Value,
-            duplicateChargeStation.Id.Value,
-            "Duplicate Charge Station",
-            duplicateChargeStation.Connectors.ToConnectorsDto()
-        );
-
-        var handler = Scope.ServiceProvider.GetRequiredService<AddChargeStationHandler>();
-
-        // Act & Assert
-        var exception = await Should.ThrowAsync<DomainException>(() =>
-            handler.Handle(addChargeStation, CancellationToken.None)
-        );
-
-        exception.Message.ShouldBe("Charge station with this ID already exists in the group");
     }
 }

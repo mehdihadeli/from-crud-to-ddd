@@ -7,43 +7,49 @@ using SmartCharging.Shared.BuildingBlocks.Extensions;
 
 namespace SmartCharging.Groups.Features.AddChargeStation.v1;
 
-public record AddChargeStation(GroupId GroupId, ChargeStation ChargeStation)
+public record AddChargeStation(Guid GroupId, string Name, IReadOnlyCollection<ConnectorDto> Connectors)
 {
-    public static AddChargeStation Of(
-        Guid? groupId,
-        Guid? chargeStationId,
-        string? name,
-        IReadOnlyCollection<ConnectorDto>? connectors
-    )
+    // - just input validation inside command static constructor and business rules or domain-level validation to the command-handler and construct the Value Objects/Entities within the command-handler
+    // - we can also use FluentValidation for validate basic input validation, not domain validations
+    // - `Command` is an application-layer construct designed to transfer and input validation raw user input into the system not to execute domain-level logic which are in ValueObjects/Entities
+    // - If we use VO Any change in **Value Objects** (e.g., added properties or altered constructors) may affects to the `Command` behavior.
+    // - If we use entities and value objects inside command, we're mixing Domain Validation with Input Validation
+    // - If commands are exposed over external boundaries (e.g., messaging queues), embedding **Value Objects** directly into the command can introduce challenges with serialization and deserialization
+
+    public static AddChargeStation Of(Guid? groupId, string? name, IReadOnlyCollection<ConnectorDto>? connectors)
     {
-        groupId.NotBeNull();
-        chargeStationId.NotBeNull();
-        name.NotBeNull();
+        groupId.NotBeNull().NotBeEmpty();
+        name.NotBeEmptyOrNull();
         connectors.NotBeNull();
 
-        var chargeStation = ChargeStation.Create(
-            ChargeStationId.Of(chargeStationId),
-            Name.Of(name),
-            connectors.ToConnectors()
-        );
-
-        return new AddChargeStation(GroupId.Of(groupId.Value), chargeStation);
+        return new AddChargeStation(groupId.Value, name, connectors.ToList());
     }
+
+    public Guid ChargeStationId { get; } = Guid.CreateVersion7();
 }
 
 public class AddChargeStationHandler(IUnitOfWork unitOfWork, ILogger<AddChargeStationHandler> logger)
 {
-    public async Task Handle(AddChargeStation addChargeStation, CancellationToken cancellationToken)
+    public async Task<Guid> Handle(AddChargeStation addChargeStation, CancellationToken cancellationToken)
     {
         addChargeStation.NotBeNull();
 
-        var group = await unitOfWork.GroupRepository.GetByIdAsync(addChargeStation.GroupId, cancellationToken);
+        // Business rules validation in value objects and entities will do in handlers, not commands, and in command we just have input validations
+        var group = await unitOfWork.GroupRepository.GetByIdAsync(
+            GroupId.Of(addChargeStation.GroupId),
+            cancellationToken
+        );
         if (group is null)
         {
-            throw new NotFoundException($"Group with ID {addChargeStation.GroupId.Value} not found.");
+            throw new NotFoundException($"Group with ID {addChargeStation.GroupId} not found.");
         }
 
-        group.AddChargeStation(addChargeStation.ChargeStation);
+        var chargeStation = ChargeStation.Create(
+            ChargeStationId.Of(addChargeStation.ChargeStationId),
+            Name.Of(addChargeStation.Name),
+            addChargeStation.Connectors.ToConnectors()
+        );
+        group.AddChargeStation(chargeStation);
 
         // Mark the group as updated
         unitOfWork.GroupRepository.Update(group);
@@ -51,9 +57,11 @@ public class AddChargeStationHandler(IUnitOfWork unitOfWork, ILogger<AddChargeSt
 
         logger.LogInformation(
             "Charge station {ChargeStationId} with {ConnectorCount} connectors added to group {GroupId}.",
-            addChargeStation.ChargeStation.Id.Value,
-            addChargeStation.ChargeStation.Connectors.Count,
-            addChargeStation.GroupId.Value
+            addChargeStation.ChargeStationId,
+            addChargeStation.Connectors.Count,
+            addChargeStation.GroupId
         );
+
+        return addChargeStation.ChargeStationId;
     }
 }

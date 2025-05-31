@@ -1,4 +1,3 @@
-using Shouldly;
 using SmartCharging.Shared.BuildingBlocks.Exceptions;
 
 namespace SmartCharging.UnitTests.Groups.Features.GroupGetById.v1;
@@ -16,7 +15,7 @@ public class GroupGetByIdTests
 
         // Assert
         result.ShouldNotBeNull();
-        result.GroupId.Value.ShouldBe(validGuid);
+        result.GroupId.ShouldBe(validGuid);
     }
 
     [Fact]
@@ -28,6 +27,6 @@ public class GroupGetByIdTests
         // Act & Assert
         Should
             .Throw<ValidationException>(() => SmartCharging.Groups.Features.GroupGetById.v1.GroupGetById.Of(nullGuid))
-            .Message.ShouldContain("Group ID cannot be null or empty");
+            .Message.ShouldContain("groupId cannot be null or empty.");
     }
 }

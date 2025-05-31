@@ -19,8 +19,8 @@ public class RemoveChargeStationTests
 
         // Assert
         result.ShouldNotBeNull();
-        result.GroupId.Value.ShouldBe(groupId);
-        result.ChargeStationId.Value.ShouldBe(chargeStationId);
+        result.GroupId.ShouldBe(groupId);
+        result.ChargeStationId.ShouldBe(chargeStationId);
     }
 
     [Fact]

@@ -20,13 +20,15 @@ public static class AddChargeStationEndpoint
                 {
                     var addChargeStation = AddChargeStation.Of(
                         groupId,
-                        request.ChargeStationId,
                         request.Name,
                         request.Connectors?.ToList().AsReadOnly()
                     );
-                    await handler.Handle(addChargeStation, cancellationToken);
+                    var chargeStationId = await handler.Handle(addChargeStation, cancellationToken);
 
-                    return Results.Created($"/api/groups/{groupId}/charge-stations/{request.ChargeStationId}", null);
+                    return Results.Created(
+                        $"/api/groups/{groupId}/charge-stations/{chargeStationId}",
+                        new AddChargeStationResponse(chargeStationId)
+                    );
                 }
             )
             .WithName(nameof(AddChargeStation))
@@ -43,4 +45,6 @@ public static class AddChargeStationEndpoint
     }
 }
 
-public record AddChargeStationRequest(Guid? ChargeStationId, string? Name, IEnumerable<ConnectorDto>? Connectors);
+public record AddChargeStationRequest(string? Name, IEnumerable<ConnectorDto>? Connectors);
+
+public record AddChargeStationResponse(Guid ChargeStationId);

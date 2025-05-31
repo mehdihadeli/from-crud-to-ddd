@@ -22,10 +22,10 @@ public class RemoveStationConnectorsTests
 
         // Assert
         result.ShouldNotBeNull();
-        result.GroupId.Value.ShouldBe(groupId);
-        result.ChargeStationId.Value.ShouldBe(chargeStationId);
+        result.GroupId.ShouldBe(groupId);
+        result.ChargeStationId.ShouldBe(chargeStationId);
         result.ConnectorIds.ShouldNotBeNull();
-        result.ConnectorIds.Select(c => c.Value).ShouldBe(request.ConnectorIds);
+        result.ConnectorIds.Select(c => c).ShouldBe(request.ConnectorIds);
     }
 
     [Fact]

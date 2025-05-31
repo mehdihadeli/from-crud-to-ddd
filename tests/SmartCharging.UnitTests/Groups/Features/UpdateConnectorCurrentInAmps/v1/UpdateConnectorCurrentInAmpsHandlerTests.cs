@@ -44,10 +44,10 @@ public class UpdateConnectorCurrentInAmpsHandlerTests
 
         var updateConnectorCurrentInAmps =
             new SmartCharging.Groups.Features.UpdateConnectorCurrentInAmps.v1.UpdateConnectorCurrentInAmps(
-                groupId,
-                chargeStationId,
-                connectorId,
-                newCurrent
+                groupId.Value,
+                chargeStationId.Value,
+                connectorId.Value,
+                newCurrent.Value
             );
 
         // Act
@@ -80,10 +80,10 @@ public class UpdateConnectorCurrentInAmpsHandlerTests
 
         var updateConnectorCurrentInAmps =
             new SmartCharging.Groups.Features.UpdateConnectorCurrentInAmps.v1.UpdateConnectorCurrentInAmps(
-                groupId,
-                chargeStationId,
-                connectorId,
-                newCurrent
+                groupId.Value,
+                chargeStationId.Value,
+                connectorId.Value,
+                newCurrent.Value
             );
 
         // Act & Assert
@@ -119,10 +119,10 @@ public class UpdateConnectorCurrentInAmpsHandlerTests
 
         var updateConnectorCurrentInAmps =
             new SmartCharging.Groups.Features.UpdateConnectorCurrentInAmps.v1.UpdateConnectorCurrentInAmps(
-                groupId,
-                chargeStationId,
-                connectorId,
-                newCurrent
+                groupId.Value,
+                chargeStationId.Value,
+                connectorId.Value,
+                newCurrent.Value
             );
 
         // Act & Assert
@@ -162,10 +162,10 @@ public class UpdateConnectorCurrentInAmpsHandlerTests
 
         var updateConnectorCurrentInAmps =
             new SmartCharging.Groups.Features.UpdateConnectorCurrentInAmps.v1.UpdateConnectorCurrentInAmps(
-                groupId,
-                chargeStationId,
-                connectorId,
-                newCurrent
+                groupId.Value,
+                chargeStationId.Value,
+                connectorId.Value,
+                newCurrent.Value
             );
 
         // Act & Assert

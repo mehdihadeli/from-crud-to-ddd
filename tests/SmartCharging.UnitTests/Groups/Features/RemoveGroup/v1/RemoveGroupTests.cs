@@ -15,7 +15,7 @@ public class RemoveGroupTests
 
         // Assert
         result.ShouldNotBeNull();
-        result.GroupId.Value.ShouldBe(groupId);
+        result.GroupId.ShouldBe(groupId);
     }
 
     [Fact]
@@ -27,6 +27,6 @@ public class RemoveGroupTests
         // Act & Assert
         Should
             .Throw<ValidationException>(() => SmartCharging.Groups.Features.RemoveGroup.v1.RemoveGroup.Of(nullGroupId))
-            .Message.ShouldContain("Group ID cannot be null or empty");
+            .Message.ShouldContain("groupId cannot be null or empty.");
     }
 }

@@ -31,7 +31,6 @@ public class AddChargeStationTests(
 
         var newChargeStationId = Guid.NewGuid();
         var request = new AddChargeStationRequest(
-            ChargeStationId: newChargeStationId,
             Name: "Test Charge Station",
             Connectors: new List<ConnectorDto>
             {
@@ -42,9 +41,11 @@ public class AddChargeStationTests(
 
         // Act
         var addResponse = await SharedFixture.GuestClient.PostAsJsonAsync(addChargeStationRoute, request);
-
-        // Assert
         addResponse.StatusCode.ShouldBe(HttpStatusCode.Created);
+
+        var responseContent = await addResponse.Content.ReadFromJsonAsync<AddChargeStationResponse>();
+        responseContent.ShouldNotBeNull();
+        responseContent.ChargeStationId.ShouldNotBe(Guid.Empty);
 
         // Verify the charge station exists in the database
         var updatedGroup = await SharedFixture.ExecuteEfDbContextAsync(async db =>
@@ -56,13 +57,15 @@ public class AddChargeStationTests(
         });
 
         updatedGroup.ShouldNotBeNull();
-        // one station exist in the group, and the other is added via the AddChargeStation endpoint
         updatedGroup.ChargeStations.Count.ShouldBe(2);
-        var chargeStation = updatedGroup.ChargeStations.Last();
-        chargeStation.Id.Value.ShouldBe(request.ChargeStationId.Value);
+
+        var chargeStation = updatedGroup.ChargeStations.FirstOrDefault(cs =>
+            cs.Id.Value == responseContent.ChargeStationId
+        );
+        chargeStation.ShouldNotBeNull();
         chargeStation.Name.Value.ShouldBe(request.Name);
-        // connectors for the new added charge station which is 2
         chargeStation.Connectors.Count.ShouldBe(2);
+        chargeStation.Connectors.Select(c => c.Id.Value).ShouldBe(new[] { 2, 3 });
     }
 
     [Fact]
@@ -72,15 +75,9 @@ public class AddChargeStationTests(
         var nonExistentGroupId = Guid.NewGuid();
         var addChargeStationRoute = Constants.Routes.Groups.AddChargeStation(nonExistentGroupId);
 
-        var newChargeStationId = Guid.NewGuid();
         var request = new AddChargeStationRequest(
-            ChargeStationId: newChargeStationId,
             Name: "Test Charge Station",
-            Connectors: new List<ConnectorDto>
-            {
-                new ConnectorDto(newChargeStationId, 1, 32),
-                new ConnectorDto(newChargeStationId, 2, 40),
-            }
+            Connectors: new List<ConnectorDto> { new(nonExistentGroupId, 1, 32), new(nonExistentGroupId, 2, 40) }
         );
 
         // Act - Attempt to add a charge station to a non-existent group
@@ -88,39 +85,5 @@ public class AddChargeStationTests(
 
         // Assert - Validate the response is 404 Not Found
         addResponse.StatusCode.ShouldBe(HttpStatusCode.NotFound);
-    }
-
-    [Fact]
-    internal async Task AddChargeStation_WithDuplicateId_Should_ReturnConflict()
-    {
-        // Arrange
-        var fakeGroup = new GroupFake(numberOfConnectorsPerStation: 1).Generate();
-        await SharedFixture.ExecuteEfDbContextAsync(async db =>
-        {
-            await db.Groups.AddAsync(fakeGroup);
-            await db.SaveChangesAsync();
-        });
-
-        var groupId = fakeGroup.Id.Value;
-        var addChargeStationRoute = Constants.Routes.Groups.AddChargeStation(groupId);
-
-        var duplicateStationId = fakeGroup.ChargeStations.First().Id.Value;
-
-        var request = new AddChargeStationRequest(
-            // Duplicate ID
-            ChargeStationId: duplicateStationId,
-            Name: "Duplicate Charge Station",
-            Connectors: new List<ConnectorDto>
-            {
-                new ConnectorDto(duplicateStationId, 1, 32),
-                new ConnectorDto(duplicateStationId, 2, 40),
-            }
-        );
-
-        // Act - Attempt to add a charge station with an existing ID
-        var addResponse = await SharedFixture.GuestClient.PostAsJsonAsync(addChargeStationRoute, request);
-
-        // Assert - Validate the response is 409 Conflict
-        addResponse.StatusCode.ShouldBe(HttpStatusCode.Conflict);
     }
 }

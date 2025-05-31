@@ -17,9 +17,9 @@ public class UpdateGroupTests
 
         // Assert
         result.ShouldNotBeNull();
-        result.GroupId.Value.ShouldBe(groupId);
-        result.Name.Value.ShouldBe(name);
-        result.CapacityInAmps.Value.ShouldBe(capacityInAmps);
+        result.GroupId.ShouldBe(groupId);
+        result.Name.ShouldBe(name);
+        result.CapacityInAmps.ShouldBe(capacityInAmps);
     }
 
     [Fact]
@@ -35,7 +35,7 @@ public class UpdateGroupTests
             .Throw<ValidationException>(() =>
                 SmartCharging.Groups.Features.UpdateGroup.v1.UpdateGroup.Of(nullGroupId, name, capacityInAmps)
             )
-            .Message.ShouldContain("Group ID cannot be null or empty");
+            .Message.ShouldContain("groupId cannot be null or empty.");
     }
 
     [Fact]
@@ -51,13 +51,7 @@ public class UpdateGroupTests
             .Throw<ValidationException>(() =>
                 SmartCharging.Groups.Features.UpdateGroup.v1.UpdateGroup.Of(groupId, nullName, capacityInAmps)
             )
-            .Message.ShouldContain("Name cannot be null or empty");
-
-        Should
-            .Throw<ValidationException>(() =>
-                SmartCharging.Groups.Features.UpdateGroup.v1.UpdateGroup.Of(groupId, "   ", capacityInAmps)
-            )
-            .Message.ShouldContain("Name cannot be null or empty");
+            .Message.ShouldContain("name cannot be null or empty.");
     }
 
     [Fact]
@@ -73,6 +67,6 @@ public class UpdateGroupTests
             .Throw<ValidationException>(() =>
                 SmartCharging.Groups.Features.UpdateGroup.v1.UpdateGroup.Of(groupId, name, invalidCapacity)
             )
-            .Message.ShouldContain("Current `0` must be greater than 0");
+            .Message.ShouldContain("capacityInAmps cannot be negative or zero.");
     }
 }

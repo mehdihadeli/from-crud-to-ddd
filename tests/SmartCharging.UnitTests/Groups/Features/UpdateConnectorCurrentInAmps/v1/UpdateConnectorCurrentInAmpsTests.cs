@@ -23,10 +23,10 @@ public class UpdateConnectorCurrentInAmpsTests
 
         // Assert
         result.ShouldNotBeNull();
-        result.GroupId.Value.ShouldBe(groupId);
-        result.ChargeStationId.Value.ShouldBe(chargeStationId);
-        result.ConnectorId.Value.ShouldBe(connectorId);
-        result.NewCurrentInAmps.Value.ShouldBe(newCurrent);
+        result.GroupId.ShouldBe(groupId);
+        result.ChargeStationId.ShouldBe(chargeStationId);
+        result.ConnectorId.ShouldBe(connectorId);
+        result.NewCurrentInAmps.ShouldBe(newCurrent);
     }
 
     [Fact]
@@ -91,7 +91,7 @@ public class UpdateConnectorCurrentInAmpsTests
                     0
                 )
             ) // Invalid: Current cannot be zero
-            .Message.ShouldContain("Current `0` must be greater than 0");
+            .Message.ShouldContain("newCurrentInAmps cannot be negative or zero.");
     }
 
     [Fact]
@@ -113,6 +113,6 @@ public class UpdateConnectorCurrentInAmpsTests
                     newCurrent
                 )
             )
-            .Message.ShouldContain("Connector ID must be between 1 and 5; it is currently '-1'");
+            .Message.ShouldContain("connectorId cannot be negative or zero.");
     }
 }
