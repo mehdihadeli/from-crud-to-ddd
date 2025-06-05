@@ -2,6 +2,7 @@ using SmartCharging.Groups.Contracts;
 using SmartCharging.Groups.Dtos;
 using SmartCharging.Groups.Models;
 using SmartCharging.Groups.Models.ValueObjects;
+using SmartCharging.Shared.Application.Data;
 using SmartCharging.Shared.BuildingBlocks.Exceptions;
 using SmartCharging.Shared.BuildingBlocks.Extensions;
 
@@ -22,7 +23,7 @@ public record AddChargeStation(Guid GroupId, string Name, IReadOnlyCollection<Co
         name.NotBeEmptyOrNull();
         connectors.NotBeNull();
 
-        return new AddChargeStation(groupId.Value, name, connectors.ToList());
+        return new AddChargeStation(groupId.Value, name, connectors);
     }
 
     public Guid ChargeStationId { get; } = Guid.CreateVersion7();

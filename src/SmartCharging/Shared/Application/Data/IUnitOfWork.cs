@@ -1,4 +1,6 @@
-namespace SmartCharging.Groups.Contracts;
+using SmartCharging.Groups.Contracts;
+
+namespace SmartCharging.Shared.Application.Data;
 
 public interface IUnitOfWork : IDisposable
 {

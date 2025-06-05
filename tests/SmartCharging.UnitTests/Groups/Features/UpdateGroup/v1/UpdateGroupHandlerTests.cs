@@ -4,6 +4,7 @@ using SmartCharging.Groups.Contracts;
 using SmartCharging.Groups.Features.UpdateGroup.v1;
 using SmartCharging.Groups.Models;
 using SmartCharging.Groups.Models.ValueObjects;
+using SmartCharging.Shared.Application.Data;
 using SmartCharging.Shared.BuildingBlocks.Exceptions;
 
 namespace SmartCharging.UnitTests.Groups.Features.UpdateGroup.v1;

@@ -1,7 +1,6 @@
-using SmartCharging.Groups.Contracts;
 using SmartCharging.Groups.Dtos;
-using SmartCharging.Groups.Models;
 using SmartCharging.Groups.Models.ValueObjects;
+using SmartCharging.Shared.Application.Data;
 using SmartCharging.Shared.BuildingBlocks.Exceptions;
 using SmartCharging.Shared.BuildingBlocks.Extensions;
 

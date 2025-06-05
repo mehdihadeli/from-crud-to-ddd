@@ -5,6 +5,7 @@ using SmartCharging.Groups.Dtos;
 using SmartCharging.Groups.Features.AddChargeStation.v1;
 using SmartCharging.Groups.Models;
 using SmartCharging.Groups.Models.ValueObjects;
+using SmartCharging.Shared.Application.Data;
 using SmartCharging.Shared.BuildingBlocks.Exceptions;
 
 namespace SmartCharging.UnitTests.Groups.Features.AddChargeStation.v1;
