@@ -1,54 +1,86 @@
+using SmartCharging.Groups.Contracts;
 using SmartCharging.Groups.Dtos;
 using SmartCharging.Groups.Models;
-using SmartCharging.Groups.Models.ValueObjects;
+using SmartCharging.Shared.Application.Contratcs;
 using SmartCharging.Shared.Application.Data;
+using SmartCharging.Shared.BuildingBlocks.Exceptions;
 using SmartCharging.Shared.BuildingBlocks.Extensions;
 
 namespace SmartCharging.Groups.Features.CreateGroup.v1;
 
 public record CreateGroup(string Name, int CapacityInAmps, ChargeStationDto? ChargeStation)
 {
-    // - just input validation inside command static constructor and business rules or domain-level validation to the command-handler and construct the Value Objects/Entities within the command-handler
-    // - we can also use FluentValidation for validate basic input validation, not domain validations
-    // - `Command` is an application-layer construct designed to transfer and input validation raw user input into the system not to execute domain-level logic which are in ValueObjects/Entities
-    // - If we use VO Any change in **Value Objects** (e.g., added properties or altered constructors) may affects to the `Command` behavior.
-    // - If we use entities and value objects inside command, we're mixing Domain Validation with Input Validation
-    // - If commands are exposed over external boundaries (e.g., messaging queues), embedding **Value Objects** directly into the command can introduce challenges with serialization and deserialization
+    public Guid GroupId { get; } = Guid.CreateVersion7();
+
     public static CreateGroup Of(string? name, int capacityInAmps, ChargeStationDto? chargeStation)
     {
-        name.NotBeEmptyOrNull();
-        capacityInAmps.NotBeNegativeOrZero();
+        if (string.IsNullOrWhiteSpace(name))
+            throw new ValidationException("Name cannot be null or empty");
+
+        if (name.Length > 100)
+            throw new ValidationException("Name cannot be longer than 100 characters");
+
+        if (capacityInAmps <= 0)
+            throw new ValidationException($"Current `{capacityInAmps}` must be greater than 0");
 
         return new CreateGroup(name, capacityInAmps, chargeStation);
     }
+};
 
-    public Guid GroupId { get; } = Guid.CreateVersion7();
-}
-
-public class CreateGroupHandler(IUnitOfWork unitOfWork, ILogger<CreateGroupHandler> logger)
+public class CreateGroupHandler(
+    IUnitOfWork unitOfWork,
+    ILogger<CreateGroupHandler> logger,
+    IBusinessRuleValidator ruleValidator
+)
 {
     public async Task<CreateGroupResult> Handle(CreateGroup createGroup, CancellationToken cancellationToken)
     {
         createGroup.NotBeNull();
+        var group = new Group
+        {
+            Id = createGroup.GroupId,
+            Name = createGroup.Name,
+            CapacityInAmps = createGroup.CapacityInAmps,
+        };
 
-        // Business rules validation in value objects and entities will do in handlers, not commands, and in command we just have input validations
-        var group = Group.Create(
-            GroupId.Of(createGroup.GroupId),
-            Name.Of(createGroup.Name),
-            CurrentInAmps.Of(createGroup.CapacityInAmps),
-            createGroup.ChargeStation?.ToChargeStation()
-        );
+        if (createGroup.ChargeStation is not null)
+        {
+            AddChargeStation(group, createGroup.ChargeStation, ruleValidator);
+        }
 
         await unitOfWork.GroupRepository.AddAsync(group, cancellationToken);
         await unitOfWork.CommitAsync(cancellationToken);
 
         logger.LogInformation(
             "Created group {GroupId} with {StationCount} stations",
-            group.Id.Value,
+            group.Id,
             group.ChargeStations.Count
         );
 
-        return new CreateGroupResult(group.Id.Value);
+        return new CreateGroupResult(group.Id);
+    }
+
+    private static void AddChargeStation(
+        Group group,
+        ChargeStationDto chargeStationDto,
+        IBusinessRuleValidator ruleValidator
+    )
+    {
+        chargeStationDto.NotBeNull();
+
+        var chargeStation = chargeStationDto.ToChargeStation();
+
+        // Validate charge station uniqueness
+        ruleValidator.ValidateChargeStationUniqueness(group, chargeStation.Id);
+
+        // Validate connector configuration
+        ruleValidator.ValidateConnectorConfiguration(chargeStation.Connectors);
+
+        // Validate group capacity for the new station
+        ruleValidator.ValidateCapacityForAdditions(group, chargeStation.GetTotalCurrent());
+
+        // Add the charge station to the group
+        group.ChargeStations.Add(chargeStation);
     }
 }
 

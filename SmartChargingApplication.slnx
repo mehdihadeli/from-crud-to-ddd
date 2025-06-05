@@ -28,10 +28,4 @@
   <Folder Name="/src/">
     <Project Path="src\SmartCharging\SmartCharging.csproj" Type="Classic C#" />
   </Folder>
-  <Folder Name="/tests/">
-    <Project Path="tests\SmartCharging.EndToEndTests\SmartCharging.EndToEndTests.csproj" Type="Classic C#" />
-    <Project Path="tests\SmartCharging.IntegrationTests\SmartCharging.IntegrationTests.csproj" Type="Classic C#" />
-    <Project Path="tests\SmartCharging.TestsShared\SmartCharging.TestsShared.csproj" Type="Classic C#" />
-    <Project Path="tests\SmartCharging.UnitTests\SmartCharging.UnitTests.csproj" Type="Classic C#" />
-  </Folder>
 </Solution>

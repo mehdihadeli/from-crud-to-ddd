@@ -1,8 +1,6 @@
-using Humanizer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SmartCharging.Groups.Models;
-using SmartCharging.Groups.Models.ValueObjects;
 
 namespace SmartCharging.Shared.Application.Data.EntityConfigurations;
 
@@ -10,31 +8,10 @@ public class ConnectorConfiguration : IEntityTypeConfiguration<Connector>
 {
     public void Configure(EntityTypeBuilder<Connector> builder)
     {
-        builder.ToTable(nameof(Connector).Pluralize().Underscore());
+        builder.HasKey(c => c.Id);
 
-        builder
-            .Property(cc => cc.Id)
-            // Id is not based on StronglyTypedIdValueConverterSelector because it is `int` and not `Guid`
-            .HasConversion(id => id.Value, value => ConnectorId.Of(value))
-            .ValueGeneratedNever()
-            .IsRequired();
+        builder.Property(c => c.MaxCurrentInAmps).IsRequired();
 
-        // Define composite primary key: ChargeStationId + ConnectorId
-        // Connector has integer Identifier unique within the context of a charge station
-        builder.HasKey(c => new { c.ChargeStationId, c.Id });
-
-        builder
-            .Property(c => c.ChargeStationId)
-            .HasConversion(id => id.Value, value => ChargeStationId.Of(value))
-            .IsRequired();
-
-        // Owned type configuration for MaxCurrentInAmps
-        builder.OwnsOne(
-            c => c.MaxCurrentInAmps,
-            mc =>
-            {
-                mc.Property(p => p.Value).HasColumnName(nameof(Connector.MaxCurrentInAmps).Underscore());
-            }
-        );
+        builder.Property(c => c.ChargeStationId).IsRequired();
     }
 }

@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace SmartCharging.Shared.BuildingBlocks.EF;
 
@@ -31,8 +30,6 @@ public static class Extensions
                     )
                     .UseSnakeCaseNamingConvention()
                     .ConfigureWarnings(warnings => warnings.Ignore(RelationalEventId.PendingModelChangesWarning));
-
-                options.ReplaceService<IValueConverterSelector, StronglyTypedIdValueConverterSelector<Guid>>();
             }
         );
 

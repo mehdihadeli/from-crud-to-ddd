@@ -1,7 +1,9 @@
 using SmartCharging.Groups;
 using SmartCharging.Groups.Contracts;
 using SmartCharging.Groups.Models;
+using SmartCharging.Shared.Application.Contratcs;
 using SmartCharging.Shared.Application.Data;
+using SmartCharging.Shared.Application.Services;
 using SmartCharging.Shared.BuildingBlocks.EF;
 using SmartCharging.Shared.BuildingBlocks.Repository;
 
@@ -34,6 +36,8 @@ public static class ApplicationConfig
         builder.AddRepositories(typeof(ChargeStation).Assembly);
 
         builder.AddGroupsServices();
+
+        builder.Services.AddSingleton<IBusinessRuleValidator, BusinessRuleValidator>();
 
         return builder;
     }

@@ -1,7 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using SmartCharging.Shared.BuildingBlocks.EF;
 
 namespace SmartCharging.Shared.Application.Data;
 
@@ -34,8 +32,6 @@ public class CatalogDbContextDesignFactory : IDesignTimeDbContextFactory<SmartCh
                 }
             )
             .UseSnakeCaseNamingConvention();
-
-        optionsBuilder.ReplaceService<IValueConverterSelector, StronglyTypedIdValueConverterSelector<Guid>>();
 
         return (SmartChargingDbContext)Activator.CreateInstance(typeof(SmartChargingDbContext), optionsBuilder.Options);
     }

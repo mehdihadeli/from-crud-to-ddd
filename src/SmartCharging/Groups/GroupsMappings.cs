@@ -1,31 +1,27 @@
 using SmartCharging.Groups.Dtos;
 using SmartCharging.Groups.Features.GroupGetById.v1;
 using SmartCharging.Groups.Models;
-using SmartCharging.Groups.Models.ValueObjects;
+using SmartCharging.Shared.BuildingBlocks.Exceptions;
 using SmartCharging.Shared.BuildingBlocks.Extensions;
 
 namespace SmartCharging.Groups;
 
 public static class GroupsMappings
 {
-    public static ChargeStation ToChargeStation(this ChargeStationDto chargeStationDto)
+    public static ChargeStation ToChargeStation(this ChargeStationDto? chargeStationDto)
     {
-        chargeStationDto.Connectors.NotBeNull();
+        chargeStationDto.NotBeNull();
 
-        var connectors = chargeStationDto.Connectors.Select(x =>
-            Connector.Create(
-                ConnectorId.Of(x.ConnectorId),
-                CurrentInAmps.Of(x.MaxCurrentInAmps),
-                ChargeStationId.Of(chargeStationDto.ChargeStationId)
-            )
-        );
-        var chargeStation = ChargeStation.Create(
-            ChargeStationId.Of(chargeStationDto.ChargeStationId),
-            Name.Of(chargeStationDto.Name),
-            connectors.ToList().AsReadOnly()
-        );
+        ValidateChargeStationDto(chargeStationDto);
 
-        return chargeStation;
+        var connectors = chargeStationDto.Connectors.Select(c => c.ToConnector()).ToList();
+        return new ChargeStation
+        {
+            Name = chargeStationDto.Name,
+            Id = chargeStationDto.ChargeStationId,
+            GroupId = chargeStationDto.GroupId,
+            Connectors = connectors,
+        };
     }
 
     public static ChargeStationDto ToChargeStationDto(this ChargeStation chargeStation)
@@ -33,8 +29,9 @@ public static class GroupsMappings
         chargeStation.NotBeNull();
 
         return new ChargeStationDto(
-            ChargeStationId: chargeStation.Id.Value,
-            Name: chargeStation.Name.Value,
+            GroupId: chargeStation.GroupId,
+            ChargeStationId: chargeStation.Id,
+            Name: chargeStation.Name,
             Connectors: chargeStation.Connectors.Select(c => c.ToConnectorDto()).ToList().AsReadOnly()
         );
     }
@@ -42,14 +39,17 @@ public static class GroupsMappings
     public static Connector ToConnector(this ConnectorDto connectorDto)
     {
         connectorDto.NotBeNull();
-        return Connector.Create(
-            ConnectorId.Of(connectorDto.ConnectorId),
-            CurrentInAmps.Of(connectorDto.MaxCurrentInAmps),
-            ChargeStationId.Of(connectorDto.ChargeStationId)
-        );
+        ValidateConnectorDto(connectorDto);
+
+        return new Connector
+        {
+            MaxCurrentInAmps = connectorDto.MaxCurrentInAmps,
+            ChargeStationId = connectorDto.ChargeStationId,
+            Id = connectorDto.ConnectorId,
+        };
     }
 
-    public static IReadOnlyCollection<Connector> ToConnectors(this IReadOnlyCollection<ConnectorDto>? connectorsDto)
+    public static IList<Connector> ToConnectors(this IReadOnlyCollection<ConnectorDto> connectorsDto)
     {
         connectorsDto.NotBeNull();
 
@@ -60,15 +60,14 @@ public static class GroupsMappings
     {
         connector.NotBeNull();
 
-        ChargeStationId connectorChargeStationId = connector.ChargeStationId;
         return new ConnectorDto(
-            ConnectorId: connector.Id.Value,
-            MaxCurrentInAmps: connector.MaxCurrentInAmps.Value,
-            ChargeStationId: connectorChargeStationId.Value
+            ConnectorId: connector.Id,
+            MaxCurrentInAmps: connector.MaxCurrentInAmps,
+            ChargeStationId: connector.ChargeStationId
         );
     }
 
-    public static IReadOnlyCollection<ConnectorDto> ToConnectorsDto(this IReadOnlyCollection<Connector> connectors)
+    public static IReadOnlyCollection<ConnectorDto> ToConnectorsDto(this IList<Connector> connectors)
     {
         connectors.NotBeNull();
 
@@ -87,18 +86,37 @@ public static class GroupsMappings
         group.NotBeNull();
 
         return new GroupDto(
-            GroupId: group.Id.Value,
-            Name: group.Name.Value,
-            CapacityInAmps: group.CapacityInAmps.Value,
+            GroupId: group.Id,
+            Name: group.Name,
+            CapacityInAmps: group.CapacityInAmps,
             ChargeStationsCount: group.ChargeStations.Count,
-            ChargeStations: group
-                .ChargeStations.Select(cs => new ChargeStationDto(
-                    ChargeStationId: cs.Id.Value,
-                    Name: cs.Name.Value,
-                    Connectors: cs.Connectors.Select(connector => connector.ToConnectorDto()).ToList()
-                ))
-                .ToList()
-                .AsReadOnly()
+            ChargeStations: group.ChargeStations.Select(cs => cs.ToChargeStationDto()).ToList().AsReadOnly()
         );
+    }
+
+    private static void ValidateChargeStationDto(ChargeStationDto chargeStationDto)
+    {
+        if (chargeStationDto.ChargeStationId == Guid.Empty)
+            throw new ValidationException("Charge Station ID cannot be null or empty");
+
+        if (string.IsNullOrWhiteSpace(chargeStationDto.Name))
+            throw new ValidationException("Name cannot be null or empty");
+
+        if (chargeStationDto.Name.Length > 100)
+            throw new ValidationException("Name cannot be longer than 100 characters");
+    }
+
+    private static void ValidateConnectorDto(ConnectorDto connectorDto)
+    {
+        if (connectorDto.ConnectorId < 1 || connectorDto.ConnectorId > 5)
+            throw new ValidationException(
+                $"Connector ID must be between 1 and 5; it is currently '{connectorDto.ConnectorId}'"
+            );
+
+        if (connectorDto.MaxCurrentInAmps <= 0)
+            throw new ValidationException($"Current `{connectorDto.MaxCurrentInAmps}` must be greater than 0");
+
+        if (connectorDto.ChargeStationId == Guid.Empty)
+            throw new ValidationException("Charge Station ID cannot be null or empty");
     }
 }

@@ -1,5 +1,6 @@
 using SmartCharging.Groups.Contracts;
-using SmartCharging.Groups.Models.ValueObjects;
+using SmartCharging.Groups.Models;
+using SmartCharging.Shared.Application.Contratcs;
 using SmartCharging.Shared.Application.Data;
 using SmartCharging.Shared.BuildingBlocks.Exceptions;
 using SmartCharging.Shared.BuildingBlocks.Extensions;
@@ -8,7 +9,6 @@ namespace SmartCharging.Groups.Features.RemoveChargeStation.v1;
 
 public record RemoveChargeStation(Guid GroupId, Guid ChargeStationId)
 {
-    // - just input validation inside command static constructor and business rules or domain-level validation to the command-handler and construct the Value Objects/Entities within the command-handler
     public static RemoveChargeStation Of(Guid? groupId, Guid? chargeStationId)
     {
         groupId.NotBeNull().NotBeEmpty();
@@ -24,17 +24,13 @@ public class RemoveChargeStationHandler(IUnitOfWork unitOfWork, ILogger<RemoveCh
     {
         removeChargeStation.NotBeNull();
 
-        // Business rules validation in value objects and entities will do in handlers, not commands, and in command we just have input validations
-        var group = await unitOfWork.GroupRepository.GetByIdAsync(
-            GroupId.Of(removeChargeStation.GroupId),
-            cancellationToken
-        );
+        var group = await unitOfWork.GroupRepository.GetByIdAsync(removeChargeStation.GroupId, cancellationToken);
         if (group is null)
         {
             throw new NotFoundException($"Group with ID {removeChargeStation.GroupId} not found.");
         }
 
-        group.RemoveChargeStation(ChargeStationId.Of(removeChargeStation.ChargeStationId));
+        RemoveChargeStation(group, removeChargeStation.ChargeStationId);
 
         unitOfWork.GroupRepository.Update(group);
         await unitOfWork.CommitAsync(cancellationToken);
@@ -44,5 +40,16 @@ public class RemoveChargeStationHandler(IUnitOfWork unitOfWork, ILogger<RemoveCh
             removeChargeStation.ChargeStationId,
             removeChargeStation.GroupId
         );
+    }
+
+    private static void RemoveChargeStation(Group group, Guid stationId)
+    {
+        stationId.NotBeNull();
+
+        var station = group.ChargeStations.FirstOrDefault(s => s.Id == stationId);
+        if (station == null)
+            throw new DomainException("Charge station not found in this group");
+
+        group.ChargeStations.Remove(station);
     }
 }

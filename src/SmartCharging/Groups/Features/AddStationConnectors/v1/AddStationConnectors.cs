@@ -1,6 +1,6 @@
 using SmartCharging.Groups.Dtos;
-using SmartCharging.Groups.Models.ValueObjects;
-using SmartCharging.Shared.Application.Data;
+using SmartCharging.Groups.Models;
+using SmartCharging.Shared.Application.Contratcs;
 using SmartCharging.Shared.BuildingBlocks.Exceptions;
 using SmartCharging.Shared.BuildingBlocks.Extensions;
 
@@ -8,13 +8,6 @@ namespace SmartCharging.Groups.Features.AddStationConnectors.v1;
 
 public record AddStationConnectors(Guid GroupId, Guid ChargeStationId, IReadOnlyCollection<ConnectorDto> Connectors)
 {
-    // - just input validation inside command static constructor and business rules or domain-level validation to the command-handler and construct the Value Objects/Entities within the command-handler
-    // - we can also use FluentValidation for validate basic input validation, not domain validations
-    // - `Command` is an application-layer construct designed to transfer and input validation raw user input into the system not to execute domain-level logic which are in ValueObjects/Entities
-    // - If we use VO Any change in **Value Objects** (e.g., added properties or altered constructors) may affects to the `Command` behavior.
-    // - If we use entities and value objects inside command, we're mixing Domain Validation with Input Validation
-    // - If commands are exposed over external boundaries (e.g., messaging queues), embedding **Value Objects** directly into the command can introduce challenges with serialization and deserialization
-
     public static AddStationConnectors Of(
         Guid? groupId,
         Guid? chargeStationId,
@@ -29,28 +22,31 @@ public record AddStationConnectors(Guid GroupId, Guid ChargeStationId, IReadOnly
     }
 }
 
-public class AddConnectorsHandler(IUnitOfWork unitOfWork, ILogger<AddConnectorsHandler> logger)
+public class AddConnectorsHandler(
+    IUnitOfWork unitOfWork,
+    ILogger<AddConnectorsHandler> logger,
+    IBusinessRuleValidator ruleValidator
+)
 {
     public async Task<AddStationConnectorsResult> Handle(
         AddStationConnectors addStationConnectors,
         CancellationToken cancellationToken
     )
     {
+        // Step 1: Basic validation
         addStationConnectors.NotBeNull();
 
-        // Business rules validation in value objects and entities will do in handlers, not commands, and in command we just have input validations
-        var group = await unitOfWork.GroupRepository.GetByIdAsync(
-            GroupId.Of(addStationConnectors.GroupId),
-            cancellationToken
-        );
+        // Step 2: Fetch the group
+        var group = await unitOfWork.GroupRepository.GetByIdAsync(addStationConnectors.GroupId, cancellationToken);
         if (group is null)
+        {
             throw new NotFoundException($"Group with ID {addStationConnectors.GroupId} not found.");
+        }
 
-        group.AddConnectors(
-            ChargeStationId.Of(addStationConnectors.ChargeStationId),
-            addStationConnectors.Connectors.ToConnectors()
-        );
+        // Step 3: Add connectors
+        AddConnectors(group, addStationConnectors.ChargeStationId, addStationConnectors.Connectors);
 
+        // Step 4: Save changes to a repository
         unitOfWork.GroupRepository.Update(group);
         await unitOfWork.CommitAsync(cancellationToken);
 
@@ -62,6 +58,32 @@ public class AddConnectorsHandler(IUnitOfWork unitOfWork, ILogger<AddConnectorsH
         );
 
         return new AddStationConnectorsResult(addStationConnectors.Connectors);
+    }
+
+    private void AddConnectors(Group group, Guid stationId, IReadOnlyCollection<ConnectorDto> connectorsDto)
+    {
+        // Validate connectors input
+        ruleValidator.ValidateConnectorConfiguration(connectorsDto.ToConnectors());
+
+        // Fetch the specified charge station
+        var station = group.ChargeStations.FirstOrDefault(s => s.Id == stationId);
+        if (station is null)
+        {
+            throw new DomainException("Charge station not found.");
+        }
+
+        // Validate group capacity for adding connectors
+        int additionalLoad = connectorsDto.Sum(c => c.MaxCurrentInAmps);
+        ruleValidator.ValidateCapacityForAdditions(group, additionalLoad);
+
+        // Validate the uniqueness of connector IDs within the station
+        ruleValidator.ValidateConnectorUniqueness(station.Connectors, connectorsDto);
+
+        // Add new connectors to the charge station
+        foreach (var connector in connectorsDto.ToConnectors())
+        {
+            station.Connectors.Add(connector);
+        }
     }
 }
 
