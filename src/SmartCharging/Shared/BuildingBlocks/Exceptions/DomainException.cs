@@ -9,10 +9,10 @@ public class DomainException : CustomException
 {
     private readonly Type? _brokenRuleType;
 
-    public DomainException(string message, int statusCode = StatusCodes.Status409Conflict)
+    public DomainException(string message, int statusCode = StatusCodes.Status400BadRequest)
         : base(message, statusCode) { }
 
-    public DomainException(Type businessRuleType, string message, int statusCode = StatusCodes.Status409Conflict)
+    public DomainException(Type businessRuleType, string message, int statusCode = StatusCodes.Status400BadRequest)
         : base(message, statusCode)
     {
         _brokenRuleType = businessRuleType;
