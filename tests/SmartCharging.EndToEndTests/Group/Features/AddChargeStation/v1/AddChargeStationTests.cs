@@ -29,14 +29,9 @@ public class AddChargeStationTests(
         var groupId = fakeGroup.Id.Value;
         var addChargeStationRoute = Constants.Routes.Groups.AddChargeStation(groupId);
 
-        var newChargeStationId = Guid.NewGuid();
         var request = new AddChargeStationRequest(
             Name: "Test Charge Station",
-            Connectors: new List<ConnectorDto>
-            {
-                new ConnectorDto(newChargeStationId, 2, 32),
-                new ConnectorDto(newChargeStationId, 3, 40),
-            }
+            ConnectorsRequest: new List<AddChargeStationRequest.CreateConnectorRequest> { new(2, 32), new(3, 40) }
         );
 
         // Act
@@ -77,7 +72,7 @@ public class AddChargeStationTests(
 
         var request = new AddChargeStationRequest(
             Name: "Test Charge Station",
-            Connectors: new List<ConnectorDto> { new(nonExistentGroupId, 1, 32), new(nonExistentGroupId, 2, 40) }
+            ConnectorsRequest: new List<AddChargeStationRequest.CreateConnectorRequest> { new(1, 32), new(2, 40) }
         );
 
         // Act - Attempt to add a charge station to a non-existent group

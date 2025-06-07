@@ -18,7 +18,7 @@ public class GroupRepository(SmartChargingDbContext dbContext) : IGroupRepositor
             .FirstOrDefaultAsync(g => g.Id == id, cancellationToken);
     }
 
-    public async Task<IReadOnlyCollection<Group>> GetGroupsByPageAsync(
+    public async Task<IReadOnlyCollection<Group>> GetByPageAsync(
         int pageNumber,
         int pageSize,
         CancellationToken cancellationToken = default
@@ -36,7 +36,7 @@ public class GroupRepository(SmartChargingDbContext dbContext) : IGroupRepositor
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<(IReadOnlyCollection<Group>, int)> GetGroupsAndTotalCountAsync(
+    public async Task<(IReadOnlyCollection<Group>, int)> GetByPageAndTotalCountAsync(
         int pageNumber,
         int pageSize,
         CancellationToken cancellationToken = default

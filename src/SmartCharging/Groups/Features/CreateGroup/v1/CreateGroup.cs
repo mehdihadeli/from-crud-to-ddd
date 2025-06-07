@@ -6,7 +6,7 @@ using SmartCharging.Shared.BuildingBlocks.Extensions;
 
 namespace SmartCharging.Groups.Features.CreateGroup.v1;
 
-public record CreateGroup(string Name, int CapacityInAmps, ChargeStationDto? ChargeStation)
+public sealed record CreateGroup(string Name, int CapacityInAmps, ChargeStationDto? ChargeStation)
 {
     // - just input validation inside command static constructor and business rules or domain-level validation to the command-handler and construct the Value Objects/Entities within the command-handler
     // - we can also use FluentValidation for validate basic input validation, not domain validations
@@ -14,18 +14,18 @@ public record CreateGroup(string Name, int CapacityInAmps, ChargeStationDto? Cha
     // - If we use VO Any change in **Value Objects** (e.g., added properties or altered constructors) may affects to the `Command` behavior.
     // - If we use entities and value objects inside command, we're mixing Domain Validation with Input Validation
     // - If commands are exposed over external boundaries (e.g., messaging queues), embedding **Value Objects** directly into the command can introduce challenges with serialization and deserialization
-    public static CreateGroup Of(string? name, int capacityInAmps, ChargeStationDto? chargeStation)
+    public static CreateGroup Of(string? name, int? capacityInAmps, ChargeStationDto? chargeStation)
     {
         name.NotBeEmptyOrNull();
-        capacityInAmps.NotBeNegativeOrZero();
+        capacityInAmps.NotBeNull().NotBeNegativeOrZero();
 
-        return new CreateGroup(name, capacityInAmps, chargeStation);
+        return new CreateGroup(name, capacityInAmps.Value, chargeStation);
     }
 
     public Guid GroupId { get; } = Guid.CreateVersion7();
 }
 
-public class CreateGroupHandler(IUnitOfWork unitOfWork, ILogger<CreateGroupHandler> logger)
+public sealed class CreateGroupHandler(IUnitOfWork unitOfWork, ILogger<CreateGroupHandler> logger)
 {
     public async Task<CreateGroupResult> Handle(CreateGroup createGroup, CancellationToken cancellationToken)
     {
@@ -52,4 +52,4 @@ public class CreateGroupHandler(IUnitOfWork unitOfWork, ILogger<CreateGroupHandl
     }
 }
 
-public record CreateGroupResult(Guid GroupId);
+public sealed record CreateGroupResult(Guid GroupId);

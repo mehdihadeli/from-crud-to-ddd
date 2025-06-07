@@ -7,13 +7,13 @@ namespace SmartCharging.Groups.Contracts;
 public interface IGroupRepository : IRepository<Group>
 {
     Task<Group?> GetByIdAsync(GroupId id, CancellationToken cancellationToken = default);
-    Task<IReadOnlyCollection<Group>> GetGroupsByPageAsync(
+    Task<IReadOnlyCollection<Group>> GetByPageAsync(
         int pageNumber,
         int pageSize,
         CancellationToken cancellationToken = default
     );
 
-    Task<(IReadOnlyCollection<Group>, int)> GetGroupsAndTotalCountAsync(
+    Task<(IReadOnlyCollection<Group>, int)> GetByPageAndTotalCountAsync(
         int pageNumber,
         int pageSize,
         CancellationToken cancellationToken = default

@@ -1,6 +1,4 @@
 using SmartCharging.Groups;
-using SmartCharging.Groups.Contracts;
-using SmartCharging.Groups.Models;
 using SmartCharging.Shared.Application.Data;
 using SmartCharging.Shared.BuildingBlocks.EF;
 using SmartCharging.Shared.BuildingBlocks.Repository;
@@ -28,10 +26,9 @@ public static class ApplicationConfig
             }
         );
 
+        // shared repositories
         builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
         builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-        // Add all application custom-typed repositories
-        builder.AddRepositories(typeof(ChargeStation).Assembly);
 
         builder.AddGroupsServices();
 

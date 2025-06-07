@@ -8,7 +8,7 @@ public static class UpdateGroupEndpoint
 {
     public static RouteHandlerBuilder MapUpdateGroupEndpoint(this IEndpointRouteBuilder app)
     {
-        return app.MapPut("/{id:guid}", Handle)
+        return app.MapPut("/{id:guid}", HandleAsync)
             .WithName(nameof(UpdateGroup))
             .WithDisplayName(nameof(UpdateGroup).Humanize())
             .WithSummary("Updates an existing Group's details, including its name and capacity.")
@@ -17,27 +17,27 @@ public static class UpdateGroupEndpoint
             )
             .Produces(StatusCodes.Status204NoContent)
             .ProducesValidationProblem();
+    }
 
-        static async Task<Results<NoContent, ValidationProblem, ProblemHttpResult>> Handle(
-            [AsParameters] UpdateGroupRequestParameters parameters
-        )
-        {
-            var (id, request, handler, cancellationToken) = parameters;
+    static async Task<Results<NoContent, ValidationProblem, ProblemHttpResult>> HandleAsync(
+        [AsParameters] UpdateGroupRequestParameters parameters
+    )
+    {
+        var (id, request, handler, cancellationToken) = parameters;
 
-            var updateGroup = UpdateGroup.Of(id, request.Name, request.CapacityInAmps);
+        var updateGroup = UpdateGroup.Of(id, request?.Name, request?.CapacityInAmps);
 
-            await handler.Handle(updateGroup, cancellationToken);
+        await handler.Handle(updateGroup, cancellationToken);
 
-            return TypedResults.NoContent();
-        }
+        return TypedResults.NoContent();
     }
 }
 
-public record UpdateGroupRequestParameters(
+public sealed record UpdateGroupRequestParameters(
     [FromRoute] Guid Id,
-    [FromBody] UpdateGroupRequest Request,
+    [FromBody] UpdateGroupRequest? Request,
     UpdateGroupHandler Handler,
     CancellationToken CancellationToken
 );
 
-public record UpdateGroupRequest(string? Name, int CapacityInAmps);
+public sealed record UpdateGroupRequest(string? Name, int CapacityInAmps);

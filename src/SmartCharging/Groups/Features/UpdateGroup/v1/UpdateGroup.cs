@@ -5,19 +5,20 @@ using SmartCharging.Shared.BuildingBlocks.Extensions;
 
 namespace SmartCharging.Groups.Features.UpdateGroup.v1;
 
-public record UpdateGroup(Guid GroupId, string Name, int CapacityInAmps)
+public sealed record UpdateGroup(Guid GroupId, string Name, int CapacityInAmps)
 {
-    public static UpdateGroup Of(Guid? groupId, string? name, int capacityInAmps)
+    public static UpdateGroup Of(Guid? groupId, string? name, int? capacityInAmps)
     {
         groupId.NotBeNull().NotBeEmpty();
         name.NotBeEmptyOrNull();
+        capacityInAmps.NotBeNull();
         capacityInAmps.NotBeNegativeOrZero();
 
-        return new UpdateGroup(groupId.Value, name, capacityInAmps);
+        return new UpdateGroup(groupId.Value, name, capacityInAmps.Value);
     }
 }
 
-public class UpdateGroupHandler(IUnitOfWork unitOfWork, ILogger<UpdateGroupHandler> logger)
+public sealed class UpdateGroupHandler(IUnitOfWork unitOfWork, ILogger<UpdateGroupHandler> logger)
 {
     public async Task Handle(UpdateGroup updateGroup, CancellationToken cancellationToken)
     {

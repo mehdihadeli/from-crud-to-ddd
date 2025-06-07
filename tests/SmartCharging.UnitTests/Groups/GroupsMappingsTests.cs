@@ -71,7 +71,6 @@ public class GroupsMappingsTests
         groupDto.GroupId.ShouldBe(group.Id.Value);
         groupDto.Name.ShouldBe(group.Name.Value);
         groupDto.CapacityInAmps.ShouldBe(group.CapacityInAmps.Value);
-        groupDto.ChargeStationsCount.ShouldBe(group.ChargeStations.Count);
         groupDto.ChargeStations.First().Name.ShouldBe(group.ChargeStations.First().Name.Value);
     }
 

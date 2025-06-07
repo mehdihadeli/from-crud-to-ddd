@@ -1,4 +1,5 @@
 using Humanizer;
+using SmartCharging.Groups.Contracts;
 using SmartCharging.Groups.Features.AddChargeStation.v1;
 using SmartCharging.Groups.Features.AddStationConnectors.v1;
 using SmartCharging.Groups.Features.CreateGroup.v1;
@@ -10,6 +11,7 @@ using SmartCharging.Groups.Features.RemoveStationConnectors.v1;
 using SmartCharging.Groups.Features.UpdateChargeStationName.v1;
 using SmartCharging.Groups.Features.UpdateConnectorCurrentInAmps.v1;
 using SmartCharging.Groups.Features.UpdateGroup.v1;
+using SmartCharging.Shared.Application.Data;
 
 namespace SmartCharging.Groups;
 
@@ -18,6 +20,8 @@ public static class GroupsConfig
     public static WebApplicationBuilder AddGroupsServices(this WebApplicationBuilder builder)
     {
         AddHandlers(builder);
+
+        builder.Services.AddScoped<IGroupRepository, GroupRepository>();
 
         return builder;
     }

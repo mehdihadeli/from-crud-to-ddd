@@ -5,7 +5,7 @@ using SmartCharging.Shared.BuildingBlocks.Extensions;
 
 namespace SmartCharging.Groups.Features.UpdateChargeStationName.v1;
 
-public record UpdateChargeStationName(Guid GroupId, Guid ChargeStationId, string NewName)
+public sealed record UpdateChargeStationName(Guid GroupId, Guid ChargeStationId, string NewName)
 {
     // - just input validation inside command static constructor and business rules or domain-level validation to the command-handler and construct the Value Objects/Entities within the command-handler
     public static UpdateChargeStationName Of(Guid? groupId, Guid? chargeStationId, string? newName)
@@ -18,7 +18,10 @@ public record UpdateChargeStationName(Guid GroupId, Guid ChargeStationId, string
     }
 }
 
-public class UpdateChargeStationNameHandler(IUnitOfWork unitOfWork, ILogger<UpdateChargeStationNameHandler> logger)
+public sealed class UpdateChargeStationNameHandler(
+    IUnitOfWork unitOfWork,
+    ILogger<UpdateChargeStationNameHandler> logger
+)
 {
     public async Task Handle(UpdateChargeStationName updateChargeStationName, CancellationToken cancellationToken)
     {

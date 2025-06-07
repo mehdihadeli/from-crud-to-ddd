@@ -68,7 +68,7 @@ public class GroupRepositoryTests
         const int pageSize = 5;
 
         // Act
-        var result = await _groupRepository.GetGroupsByPageAsync(pageNumber, pageSize);
+        var result = await _groupRepository.GetByPageAsync(pageNumber, pageSize);
 
         // Assert
         result.ShouldNotBeNull();
@@ -87,7 +87,7 @@ public class GroupRepositoryTests
         const int pageSize = 5;
 
         // Act
-        var result = await _groupRepository.GetGroupsByPageAsync(pageNumber, pageSize);
+        var result = await _groupRepository.GetByPageAsync(pageNumber, pageSize);
 
         // Assert
         result.ShouldBeEmpty();

@@ -1,6 +1,5 @@
 using Microsoft.Extensions.Logging;
 using NSubstitute;
-using SmartCharging.Groups.Contracts;
 using SmartCharging.Groups.Dtos;
 using SmartCharging.Groups.Features.AddChargeStation.v1;
 using SmartCharging.Groups.Models;
@@ -49,6 +48,7 @@ public class AddChargeStationHandlerTests
 
         var addChargeStation = SmartCharging.Groups.Features.AddChargeStation.v1.AddChargeStation.Of(
             groupId.Value,
+            chargeStationId.Value,
             chargeStationName.Value,
             connectors
                 .Select(c => new ConnectorDto(c.ChargeStationId.Value, c.Id.Value, c.MaxCurrentInAmps.Value))
@@ -89,6 +89,7 @@ public class AddChargeStationHandlerTests
 
         var addChargeStation = SmartCharging.Groups.Features.AddChargeStation.v1.AddChargeStation.Of(
             groupId.Value,
+            chargeStationId.Value,
             chargeStationName.Value,
             connectors
                 .Select(c => new ConnectorDto(c.ChargeStationId.Value, c.Id.Value, c.MaxCurrentInAmps.Value))
@@ -144,6 +145,7 @@ public class AddChargeStationHandlerTests
 
         var addChargeStation = SmartCharging.Groups.Features.AddChargeStation.v1.AddChargeStation.Of(
             groupId.Value,
+            chargeStationId.Value,
             chargeStationName.Value,
             connectors
                 .Select(c => new ConnectorDto(c.ChargeStationId.Value, c.Id.Value, c.MaxCurrentInAmps.Value))

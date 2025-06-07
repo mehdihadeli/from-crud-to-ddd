@@ -9,7 +9,7 @@ public static class AddStationConnectorsEndpoint
     public static RouteHandlerBuilder MapAddStationConnectorsEndpoint(this RouteGroupBuilder group)
     {
         return group
-            .MapPost("/{groupId:guid}/charge-stations/{chargeStationId:guid}/connectors", Handle)
+            .MapPost("/{groupId:guid}/charge-stations/{chargeStationId:guid}/connectors", HandleAsync)
             .WithName(nameof(AddStationConnectors))
             .WithDisplayName("Add Connector(s)")
             .WithSummary("Adds one or more connectors to a charge station in a group.")
@@ -19,41 +19,44 @@ public static class AddStationConnectorsEndpoint
             .Produces(StatusCodes.Status201Created)
             .ProducesValidationProblem()
             .ProducesProblem(StatusCodes.Status404NotFound);
+    }
 
-        static async Task<Results<CreatedAtRoute<AddConnectorResponse>, ValidationProblem, ProblemHttpResult>> Handle(
-            [AsParameters] AddConnectorRequestParameters parameters
-        )
-        {
-            var (groupId, chargeStationId, request, handler, cancellationToken) = parameters;
+    static async Task<Results<CreatedAtRoute<AddConnectorResponse>, ValidationProblem, ProblemHttpResult>> HandleAsync(
+        [AsParameters] AddConnectorRequestParameters parameters
+    )
+    {
+        var (groupId, chargeStationId, request, handler, cancellationToken) = parameters;
 
-            var addConnector = AddStationConnectors.Of(
-                groupId,
-                chargeStationId,
-                request.Connectors?.ToList().AsReadOnly()
-            );
-            var result = await handler.Handle(addConnector, cancellationToken);
+        var addConnector = AddStationConnectors.Of(
+            groupId,
+            chargeStationId,
+            request?.ConnectorsRequest?.ToConnectorsDto(chargeStationId)
+        );
+        var result = await handler.Handle(addConnector, cancellationToken);
 
-            var response = new AddConnectorResponse(groupId, chargeStationId, result.Connectors);
+        var response = new AddConnectorResponse(groupId, chargeStationId, result.Connectors);
 
-            return TypedResults.CreatedAtRoute(
-                response,
-                nameof(AddStationConnectors),
-                new { groupId, chargeStationId }
-            );
-        }
+        return TypedResults.CreatedAtRoute(response, nameof(AddStationConnectors), new { groupId, chargeStationId });
     }
 }
 
-public record AddConnectorRequestParameters(
+public sealed record AddConnectorRequestParameters(
     [FromRoute] Guid GroupId,
     [FromRoute] Guid ChargeStationId,
-    [FromBody] AddConnectorRequest Request,
+    [FromBody] AddConnectorRequest? Request,
     AddConnectorsHandler Handler,
     CancellationToken CancellationToken
 );
 
-public record AddConnectorRequest(IEnumerable<ConnectorDto>? Connectors);
+public sealed record AddConnectorRequest(IEnumerable<AddConnectorRequest.CreateConnectorRequest>? ConnectorsRequest)
+{
+    public sealed record CreateConnectorRequest(int ConnectorId, int MaxCurrentInAmps);
+}
 
-// A separate response type from handler result, ensures the API contract is decoupled from handler logic, providing flexibility to modify the handler's response
+// A separate response type from handler result ensures the API contract is decoupled from handler logic, providing flexibility to modify the handler's response
 // or internal structures without breaking the externally exposed API format.
-public record AddConnectorResponse(Guid GroupId, Guid ChargeStationId, IReadOnlyCollection<ConnectorDto> Connectors);
+public sealed record AddConnectorResponse(
+    Guid GroupId,
+    Guid ChargeStationId,
+    IReadOnlyCollection<ConnectorDto> Connectors
+);

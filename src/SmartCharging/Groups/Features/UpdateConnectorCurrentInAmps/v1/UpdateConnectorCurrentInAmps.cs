@@ -1,4 +1,3 @@
-using SmartCharging.Groups.Contracts;
 using SmartCharging.Groups.Models.ValueObjects;
 using SmartCharging.Shared.Application.Data;
 using SmartCharging.Shared.BuildingBlocks.Exceptions;
@@ -6,7 +5,12 @@ using SmartCharging.Shared.BuildingBlocks.Extensions;
 
 namespace SmartCharging.Groups.Features.UpdateConnectorCurrentInAmps.v1;
 
-public record UpdateConnectorCurrentInAmps(Guid GroupId, Guid ChargeStationId, int ConnectorId, int NewCurrentInAmps)
+public sealed record UpdateConnectorCurrentInAmps(
+    Guid GroupId,
+    Guid ChargeStationId,
+    int ConnectorId,
+    int NewCurrentInAmps
+)
 {
     // - just input validation inside command static constructor and business rules or domain-level validation to the command-handler and construct the Value Objects/Entities within the command-handler
     public static UpdateConnectorCurrentInAmps Of(
@@ -25,7 +29,7 @@ public record UpdateConnectorCurrentInAmps(Guid GroupId, Guid ChargeStationId, i
     }
 }
 
-public class UpdateConnectorCurrentInAmpsHandler(
+public sealed class UpdateConnectorCurrentInAmpsHandler(
     IUnitOfWork unitOfWork,
     ILogger<UpdateConnectorCurrentInAmpsHandler> logger
 )

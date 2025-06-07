@@ -1,15 +1,15 @@
-namespace SmartCharging.Groups.Features.UpdateChargeStationName.v1;
-
 using Humanizer;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+
+namespace SmartCharging.Groups.Features.UpdateChargeStationName.v1;
 
 public static class UpdateChargeStationNameEndpoint
 {
     public static RouteHandlerBuilder MapUpdateChargeStationNameEndpoint(this RouteGroupBuilder group)
     {
         return group
-            .MapPut("/{groupId:guid}/charge-stations/{chargeStationId:guid}/name", Handle)
+            .MapPut("/{groupId:guid}/charge-stations/{chargeStationId:guid}/name", HandleAsync)
             .WithName(nameof(UpdateChargeStationName))
             .WithDisplayName(nameof(UpdateChargeStationName).Humanize())
             .WithSummary("Updates the name of a charge station in a group.")
@@ -19,27 +19,27 @@ public static class UpdateChargeStationNameEndpoint
             .Produces(StatusCodes.Status204NoContent)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound);
+    }
 
-        static async Task<Results<NoContent, ProblemHttpResult>> Handle(
-            [AsParameters] UpdateChargeStationNameRequestParameters parameters
-        )
-        {
-            var (groupId, chargeStationId, request, handler, cancellationToken) = parameters;
+    static async Task<Results<NoContent, ProblemHttpResult>> HandleAsync(
+        [AsParameters] UpdateChargeStationNameRequestParameters parameters
+    )
+    {
+        var (groupId, chargeStationId, request, handler, cancellationToken) = parameters;
 
-            var updateChargeStationName = UpdateChargeStationName.Of(groupId, chargeStationId, request.NewName);
-            await handler.Handle(updateChargeStationName, cancellationToken);
+        var updateChargeStationName = UpdateChargeStationName.Of(groupId, chargeStationId, request.NewName);
+        await handler.Handle(updateChargeStationName, cancellationToken);
 
-            return TypedResults.NoContent();
-        }
+        return TypedResults.NoContent();
     }
 }
 
-public record UpdateChargeStationNameRequestParameters(
+public sealed record UpdateChargeStationNameRequestParameters(
     [FromRoute] Guid GroupId,
     [FromRoute] Guid ChargeStationId,
-    [FromBody] UpdateChargeStationNameRequest Request,
+    [FromBody] UpdateChargeStationNameRequest? Request,
     UpdateChargeStationNameHandler Handler,
     CancellationToken CancellationToken
 );
 
-public record UpdateChargeStationNameRequest(string NewName);
+public sealed record UpdateChargeStationNameRequest(string NewName);

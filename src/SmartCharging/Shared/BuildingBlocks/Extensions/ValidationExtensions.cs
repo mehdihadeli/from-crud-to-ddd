@@ -94,7 +94,7 @@ public static class ValidationExtensions
             throw new ValidationException(message: $"{argumentName} cannot be null or empty.");
         }
 
-        return argument.Value.NotBeEmpty();
+        return argument.Value.NotBeEmpty(argumentName);
     }
 
     public static int NotBeNegativeOrZero(
@@ -120,7 +120,7 @@ public static class ValidationExtensions
             throw new ValidationException(message: $"{argumentName} cannot be null or empty.");
         }
 
-        return argument.Value.NotBeNegativeOrZero();
+        return argument.Value.NotBeNegativeOrZero(argumentName);
     }
 
     public static long NotBeNegativeOrZero(
@@ -136,7 +136,7 @@ public static class ValidationExtensions
         return argument;
     }
 
-    public static long NotBeNegativeOrZero(
+    public static int NotBeNegativeOrZero(
         [NotNull] this int? argument,
         [CallerArgumentExpression("argument")] string? argumentName = null
     )
@@ -146,7 +146,7 @@ public static class ValidationExtensions
             throw new ValidationException(message: $"{argumentName} cannot be null or empty.");
         }
 
-        return argument.Value.NotBeNegativeOrZero();
+        return argument.Value.NotBeNegativeOrZero(argumentName);
     }
 
     public static decimal NotBeNegativeOrZero(
@@ -172,7 +172,7 @@ public static class ValidationExtensions
             throw new ValidationException(message: $"{argumentName} cannot be null or empty.");
         }
 
-        return argument.Value.NotBeNegativeOrZero();
+        return argument.Value.NotBeNegativeOrZero(argumentName);
     }
 
     public static double NotBeNegativeOrZero(
@@ -198,7 +198,7 @@ public static class ValidationExtensions
             throw new ValidationException(message: $"{argumentName} cannot be null or empty.");
         }
 
-        return argument.Value.NotBeNegativeOrZero();
+        return argument.Value.NotBeNegativeOrZero(argumentName);
     }
 
     public static string NotBeInvalidEmail(
@@ -274,7 +274,7 @@ public static class ValidationExtensions
             throw new ValidationException(message: $"{argumentName} cannot be null or empty.");
         }
 
-        enumValue.NotBeEmpty();
+        enumValue.NotBeEmpty(argumentName);
 
         return enumValue;
     }
@@ -285,7 +285,7 @@ public static class ValidationExtensions
     )
         where TEnum : Enum
     {
-        enumValue.NotBeNull();
+        enumValue.NotBeNull(argumentName);
 
         // returns `true` if `enumValue` corresponds to one of the defined values in `TEnum`
         if (!Enum.IsDefined(typeof(TEnum), enumValue))

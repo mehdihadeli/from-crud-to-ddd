@@ -10,7 +10,7 @@ public static class GroupGetByIdEndpoint
     public static RouteHandlerBuilder MapGroupGetByIdEndpoint(this RouteGroupBuilder group)
     {
         return group
-            .MapGet("/{groupId:guid}", Handle)
+            .MapGet("/{groupId:guid}", HandleAsync)
             .WithName(nameof(GroupGetById))
             .WithDisplayName(nameof(GroupGetById).Humanize())
             .WithSummary("Retrieves the details of a Group by its ID.")
@@ -19,22 +19,22 @@ public static class GroupGetByIdEndpoint
             )
             .Produces<GroupGetByIdResult>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status404NotFound);
+    }
 
-        static async Task<Results<Ok<GroupGetByIdResponse>, ProblemHttpResult>> Handle(
-            [AsParameters] GroupGetByIdRequestParameters parameters
-        )
-        {
-            var (groupId, handler, cancellationToken) = parameters;
+    static async Task<Results<Ok<GroupGetByIdResponse>, ProblemHttpResult>> HandleAsync(
+        [AsParameters] GroupGetByIdRequestParameters parameters
+    )
+    {
+        var (groupId, handler, cancellationToken) = parameters;
 
-            var getById = GroupGetById.Of(groupId);
-            var result = await handler.Handle(getById, cancellationToken);
+        var getById = GroupGetById.Of(groupId);
+        var result = await handler.Handle(getById, cancellationToken);
 
-            return TypedResults.Ok(new GroupGetByIdResponse(result.Group));
-        }
+        return TypedResults.Ok(new GroupGetByIdResponse(result.Group));
     }
 }
 
-public record GroupGetByIdRequestParameters(
+public sealed record GroupGetByIdRequestParameters(
     [FromRoute] Guid GroupId,
     GroupGetByIdHandler Handler,
     CancellationToken CancellationToken
@@ -42,4 +42,4 @@ public record GroupGetByIdRequestParameters(
 
 // A separate response type from handler result ensures the API contract is decoupled from handler logic, providing flexibility to modify the handler's response
 // or internal structures without breaking the externally exposed API format.
-public record GroupGetByIdResponse(GroupDto Group);
+public sealed record GroupGetByIdResponse(GroupDto Group);

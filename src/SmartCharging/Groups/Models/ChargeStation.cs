@@ -73,7 +73,7 @@ public class ChargeStation : Entity<ChargeStationId>
                 $"Cannot have more than 5 connectors in a charge station. It is {_connectors.Count + connectors.Count}."
             );
 
-        // Ensure uniqueness of connector IDs (within both existing and new connectors)
+        // Ensure the uniqueness of connector IDs (within both existing and new connectors)
         var newConnectorIds = connectors.Select(c => c.Id.Value).ToList();
         var existingConnectorIds = _connectors.Select(c => c.Id.Value).ToList();
 

@@ -19,16 +19,14 @@ public sealed class CreateGroupRequestFake : Faker<CreateGroupRequest>
             // Generate a list of connectors
             var connectors = Enumerable
                 .Range(1, numberOfConnectors)
-                .Select(connectorId => new ConnectorDto(
-                    ChargeStationId: Guid.NewGuid(), // Placeholder since these are yet to be associated with the final charge station
+                .Select(connectorId => new CreateGroupRequest.CreateConnectorRequest(
                     ConnectorId: connectorId,
                     MaxCurrentInAmps: faker.Random.Int(10, 50)
                 ))
                 .ToList();
 
             // Generate the charge station with its connectors
-            var chargeStation = new ChargeStationDto(
-                ChargeStationId: Guid.NewGuid(),
+            var chargeStation = new CreateGroupRequest.CreateChargeStationRequest(
                 Name: faker.Company.CompanyName(),
                 Connectors: connectors.AsReadOnly()
             );
@@ -37,7 +35,7 @@ public sealed class CreateGroupRequestFake : Faker<CreateGroupRequest>
             return new CreateGroupRequest(
                 Name: faker.Commerce.Department(),
                 CapacityInAmps: Math.Max(100, connectors.Sum(c => c.MaxCurrentInAmps) + faker.Random.Int(10, 100)),
-                ChargeStation: chargeStation
+                ChargeStationRequest: chargeStation
             );
         });
     }

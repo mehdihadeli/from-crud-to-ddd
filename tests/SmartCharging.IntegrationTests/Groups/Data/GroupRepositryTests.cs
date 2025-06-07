@@ -74,7 +74,7 @@ public class GroupRepositoryTests : SmartChargingIntegrationTestBase
         }
 
         // Act
-        var groups = await _groupRepository.GetGroupsByPageAsync(1, 5);
+        var groups = await _groupRepository.GetByPageAsync(1, 5);
 
         // Assert
         groups.ShouldNotBeNull();

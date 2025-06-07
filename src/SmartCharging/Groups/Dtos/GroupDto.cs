@@ -1,9 +1,8 @@
 namespace SmartCharging.Groups.Dtos;
 
-public record GroupDto(
+public sealed record GroupDto(
     Guid GroupId,
     string Name,
     int CapacityInAmps,
-    int ChargeStationsCount,
     IReadOnlyCollection<ChargeStationDto> ChargeStations
 );

@@ -1,4 +1,3 @@
-using SmartCharging.Groups.Contracts;
 using SmartCharging.Groups.Dtos;
 using SmartCharging.Groups.Models.ValueObjects;
 using SmartCharging.Shared.Application.Data;
@@ -7,7 +6,7 @@ using SmartCharging.Shared.BuildingBlocks.Extensions;
 
 namespace SmartCharging.Groups.Features.GroupGetById.v1;
 
-public record GroupGetById(Guid GroupId)
+public sealed record GroupGetById(Guid GroupId)
 {
     // - just input validation inside command static constructor and business rules or domain-level validation to the command-handler and construct the Value Objects/Entities within the command-handler
     public static GroupGetById Of(Guid? groupId)
@@ -17,7 +16,7 @@ public record GroupGetById(Guid GroupId)
     }
 }
 
-public class GroupGetByIdHandler(IUnitOfWork unitOfWork)
+public sealed class GroupGetByIdHandler(IUnitOfWork unitOfWork)
 {
     public async Task<GroupGetByIdResult> Handle(GroupGetById groupGetById, CancellationToken cancellationToken)
     {
@@ -34,4 +33,4 @@ public class GroupGetByIdHandler(IUnitOfWork unitOfWork)
     }
 }
 
-public record GroupGetByIdResult(GroupDto Group);
+public sealed record GroupGetByIdResult(GroupDto Group);

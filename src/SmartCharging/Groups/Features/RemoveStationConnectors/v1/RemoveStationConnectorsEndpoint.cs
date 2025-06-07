@@ -19,27 +19,31 @@ public static class RemoveStationConnectorsEndpoint
             .Produces(StatusCodes.Status204NoContent)
             .ProducesValidationProblem()
             .ProducesProblem(StatusCodes.Status404NotFound);
+    }
 
-        static async Task<Results<NoContent, ValidationProblem, ProblemHttpResult>> Handle(
-            [AsParameters] RemoveStationConnectorsRequestParameters parameters
-        )
-        {
-            var (groupId, chargeStationId, request, handler, cancellationToken) = parameters;
+    static async Task<Results<NoContent, ValidationProblem, ProblemHttpResult>> Handle(
+        [AsParameters] RemoveStationConnectorsRequestParameters parameters
+    )
+    {
+        var (groupId, chargeStationId, request, handler, cancellationToken) = parameters;
 
-            var removeStationConnectors = RemoveStationConnectors.Of(groupId, chargeStationId, request);
-            await handler.Handle(removeStationConnectors, cancellationToken);
+        var removeStationConnectors = RemoveStationConnectors.Of(
+            groupId,
+            chargeStationId,
+            request?.ConnectorIds?.ToList()
+        );
+        await handler.Handle(removeStationConnectors, cancellationToken);
 
-            return TypedResults.NoContent();
-        }
+        return TypedResults.NoContent();
     }
 }
 
-public record RemoveStationConnectorsRequestParameters(
+public sealed record RemoveStationConnectorsRequestParameters(
     [FromRoute] Guid GroupId,
     [FromRoute] Guid ChargeStationId,
-    [FromBody] RemoveStationConnectorsRequest Request,
+    [FromBody] RemoveStationConnectorsRequest? Request,
     RemoveStationConnectorsHandler Handler,
     CancellationToken CancellationToken
 );
 
-public record RemoveStationConnectorsRequest(IEnumerable<int>? ConnectorIds);
+public sealed record RemoveStationConnectorsRequest(IEnumerable<int>? ConnectorIds);

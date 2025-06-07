@@ -6,7 +6,11 @@ using SmartCharging.Shared.BuildingBlocks.Extensions;
 
 namespace SmartCharging.Groups.Features.AddStationConnectors.v1;
 
-public record AddStationConnectors(Guid GroupId, Guid ChargeStationId, IReadOnlyCollection<ConnectorDto> Connectors)
+public sealed record AddStationConnectors(
+    Guid GroupId,
+    Guid ChargeStationId,
+    IReadOnlyCollection<ConnectorDto> Connectors
+)
 {
     // - just input validation inside command static constructor and business rules or domain-level validation to the command-handler and construct the Value Objects/Entities within the command-handler
     // - we can also use FluentValidation for validate basic input validation, not domain validations
@@ -29,7 +33,7 @@ public record AddStationConnectors(Guid GroupId, Guid ChargeStationId, IReadOnly
     }
 }
 
-public class AddConnectorsHandler(IUnitOfWork unitOfWork, ILogger<AddConnectorsHandler> logger)
+public sealed class AddConnectorsHandler(IUnitOfWork unitOfWork, ILogger<AddConnectorsHandler> logger)
 {
     public async Task<AddStationConnectorsResult> Handle(
         AddStationConnectors addStationConnectors,
@@ -65,4 +69,4 @@ public class AddConnectorsHandler(IUnitOfWork unitOfWork, ILogger<AddConnectorsH
     }
 }
 
-public record AddStationConnectorsResult(IReadOnlyCollection<ConnectorDto> Connectors);
+public sealed record AddStationConnectorsResult(IReadOnlyCollection<ConnectorDto> Connectors);

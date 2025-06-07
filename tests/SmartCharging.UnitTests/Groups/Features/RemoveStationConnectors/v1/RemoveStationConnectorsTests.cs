@@ -17,7 +17,7 @@ public class RemoveStationConnectorsTests
         var result = SmartCharging.Groups.Features.RemoveStationConnectors.v1.RemoveStationConnectors.Of(
             groupId,
             chargeStationId,
-            request
+            request.ConnectorIds?.ToList()
         );
 
         // Assert
@@ -42,7 +42,7 @@ public class RemoveStationConnectorsTests
                 SmartCharging.Groups.Features.RemoveStationConnectors.v1.RemoveStationConnectors.Of(
                     nullGroupId,
                     chargeStationId,
-                    request
+                    request.ConnectorIds?.ToList()
                 )
             )
             .Message.ShouldContain("groupId cannot be null or empty.");
@@ -62,7 +62,7 @@ public class RemoveStationConnectorsTests
                 SmartCharging.Groups.Features.RemoveStationConnectors.v1.RemoveStationConnectors.Of(
                     groupId,
                     nullChargeStationId,
-                    request
+                    request.ConnectorIds?.ToList()
                 )
             )
             .Message.ShouldContain("chargeStationId cannot be null or empty.");
@@ -82,10 +82,10 @@ public class RemoveStationConnectorsTests
                 SmartCharging.Groups.Features.RemoveStationConnectors.v1.RemoveStationConnectors.Of(
                     groupId,
                     chargeStationId,
-                    nullRequest
+                    nullRequest?.ConnectorIds?.ToList()
                 )
             )
-            .Message.ShouldContain("request cannot be null or empty.");
+            .Message.ShouldContain("connectorIds cannot be null or empty.");
     }
 
     [Fact]
@@ -102,9 +102,9 @@ public class RemoveStationConnectorsTests
                 SmartCharging.Groups.Features.RemoveStationConnectors.v1.RemoveStationConnectors.Of(
                     groupId,
                     chargeStationId,
-                    request
+                    request.ConnectorIds?.ToList()
                 )
             )
-            .Message.ShouldContain("request.ConnectorIds cannot be null or empty.");
+            .Message.ShouldContain("connectorIds cannot be null or empty.");
     }
 }

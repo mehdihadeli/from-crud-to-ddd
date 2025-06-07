@@ -1,11 +1,10 @@
-using SmartCharging.Groups.Contracts;
 using SmartCharging.Groups.Dtos;
 using SmartCharging.Shared.Application.Data;
 using SmartCharging.Shared.BuildingBlocks.Extensions;
 
 namespace SmartCharging.Groups.Features.GetGroupsByPage.v1;
 
-public record GetGroupsByPage(int PageNumber = 1, int PageSize = 5)
+public sealed record GetGroupsByPage(int PageNumber = 1, int PageSize = 5)
 {
     public static GetGroupsByPage Of(int pageNumber = 1, int pageSize = 5)
     {
@@ -13,7 +12,7 @@ public record GetGroupsByPage(int PageNumber = 1, int PageSize = 5)
     }
 };
 
-public class GetGroupsByPageHandler(IUnitOfWork unitOfWork)
+public sealed class GetGroupsByPageHandler(IUnitOfWork unitOfWork)
 {
     public async Task<GetGroupsByPageResult> Handle(
         GetGroupsByPage getGroupsByPage,
@@ -23,7 +22,7 @@ public class GetGroupsByPageHandler(IUnitOfWork unitOfWork)
         getGroupsByPage.NotBeNull();
 
         // Fetch groups and total count
-        var (groups, totalCount) = await unitOfWork.GroupRepository.GetGroupsAndTotalCountAsync(
+        var (groups, totalCount) = await unitOfWork.GroupRepository.GetByPageAndTotalCountAsync(
             getGroupsByPage.PageNumber,
             getGroupsByPage.PageSize,
             cancellationToken
@@ -43,4 +42,9 @@ public class GetGroupsByPageHandler(IUnitOfWork unitOfWork)
     }
 }
 
-public record GetGroupsByPageResult(IReadOnlyCollection<GroupDto> Groups, int PageSize, int PageCount, int TotalCount);
+public sealed record GetGroupsByPageResult(
+    IReadOnlyCollection<GroupDto> Groups,
+    int PageSize,
+    int PageCount,
+    int TotalCount
+);

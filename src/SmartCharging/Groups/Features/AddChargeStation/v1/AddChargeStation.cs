@@ -1,4 +1,3 @@
-using SmartCharging.Groups.Contracts;
 using SmartCharging.Groups.Dtos;
 using SmartCharging.Groups.Models;
 using SmartCharging.Groups.Models.ValueObjects;
@@ -8,7 +7,12 @@ using SmartCharging.Shared.BuildingBlocks.Extensions;
 
 namespace SmartCharging.Groups.Features.AddChargeStation.v1;
 
-public record AddChargeStation(Guid GroupId, string Name, IReadOnlyCollection<ConnectorDto> Connectors)
+public sealed record AddChargeStation(
+    Guid GroupId,
+    Guid ChargeStationId,
+    string Name,
+    IReadOnlyCollection<ConnectorDto> Connectors
+)
 {
     // - just input validation inside command static constructor and business rules or domain-level validation to the command-handler and construct the Value Objects/Entities within the command-handler
     // - we can also use FluentValidation for validate basic input validation, not domain validations
@@ -17,19 +21,23 @@ public record AddChargeStation(Guid GroupId, string Name, IReadOnlyCollection<Co
     // - If we use entities and value objects inside command, we're mixing Domain Validation with Input Validation
     // - If commands are exposed over external boundaries (e.g., messaging queues), embedding **Value Objects** directly into the command can introduce challenges with serialization and deserialization
 
-    public static AddChargeStation Of(Guid? groupId, string? name, IReadOnlyCollection<ConnectorDto>? connectors)
+    public static AddChargeStation Of(
+        Guid? groupId,
+        Guid? chargeStationId,
+        string? name,
+        IReadOnlyCollection<ConnectorDto>? connectors
+    )
     {
         groupId.NotBeNull().NotBeEmpty();
+        chargeStationId.NotBeNull().NotBeEmpty();
         name.NotBeEmptyOrNull();
         connectors.NotBeNull();
 
-        return new AddChargeStation(groupId.Value, name, connectors);
+        return new AddChargeStation(groupId.Value, chargeStationId.Value, name, connectors);
     }
-
-    public Guid ChargeStationId { get; } = Guid.CreateVersion7();
 }
 
-public class AddChargeStationHandler(IUnitOfWork unitOfWork, ILogger<AddChargeStationHandler> logger)
+public sealed class AddChargeStationHandler(IUnitOfWork unitOfWork, ILogger<AddChargeStationHandler> logger)
 {
     public async Task<Guid> Handle(AddChargeStation addChargeStation, CancellationToken cancellationToken)
     {

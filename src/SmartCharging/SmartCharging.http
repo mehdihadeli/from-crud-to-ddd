@@ -7,32 +7,28 @@
 @connectorId = 1
 
 ### 1. Create Group
-# Creates a new group with an optional charge station and its connectors
 POST {{host}}/api/v1/groups
 Content-Type: {{content-type}}
 
 {
   "name": "Test Group",
   "capacityInAmps": 100,
-  "chargeStation": {
-    "id": "{{chargeStationId}}",
+  "chargeStationRequest": {
     "name": "Station A",
     "connectors": [
       {
-        "id": 1,
+        "connectorId": 1,
         "maxCurrentInAmps": 30
       },
       {
-        "id": 2,
+        "connectorId": 2,
         "maxCurrentInAmps": 20
       }
     ]
   }
 }
 
-
 ### 2. Update Group
-# Updates the name and capacity of an existing group
 PUT {{host}}/api/v1/groups/{{groupId}}
 Content-Type: {{content-type}}
 
@@ -41,21 +37,24 @@ Content-Type: {{content-type}}
   "capacityInAmps": 120
 }
 
-
 ### 3. Remove Group
-# Removes an existing group along with all its charge stations and connectors
 DELETE {{host}}/api/v1/groups/{{groupId}}
 
+### 4. Get Group By Id
+GET {{host}}/api/v1/groups/{{groupId}}
+Content-Type: {{content-type}}
 
-### 4. Add Charge Station to Group
-# Adds a new charge station with connectors to an existing group
+### 5. Get Groups By Page
+GET {{host}}/api/v1/groups/pages?PageNumber=1&PageSize=5
+Content-Type: {{content-type}}
+
+### 6. Add Charge Station to Group
 POST {{host}}/api/v1/groups/{{groupId}}/charge-stations
 Content-Type: {{content-type}}
 
 {
-  "chargeStationId": "{{chargeStationId}}",
   "name": "New Station",
-  "connectors": [
+  "connectorsRequest": [
     {
       "connectorId": 1,
       "maxCurrentInAmps": 15
@@ -67,19 +66,23 @@ Content-Type: {{content-type}}
   ]
 }
 
-
-### 5. Remove Charge Station from Group
-# Removes a specific charge station from the specified group
+### 7. Remove Charge Station from Group
 DELETE {{host}}/api/v1/groups/{{groupId}}/charge-stations/{{chargeStationId}}
 
+### 8. Update Charge Station Name
+PUT {{host}}/api/v1/groups/{{groupId}}/charge-stations/{{chargeStationId}}/name
+Content-Type: {{content-type}}
 
-### 6. Add Connector(s) to Charge Station
-# Adds one or more connectors to a charge station in an existing group
+{
+  "newName": "Updated Station Name"
+}
+
+### 9. Add Connector(s) to Charge Station
 POST {{host}}/api/v1/groups/{{groupId}}/charge-stations/{{chargeStationId}}/connectors
 Content-Type: {{content-type}}
 
 {
-  "connectors": [
+  "connectorsRequest": [
     {
       "connectorId": 3,
       "maxCurrentInAmps": 25
@@ -91,8 +94,7 @@ Content-Type: {{content-type}}
   ]
 }
 
-### 7. Remove Connector(s) from Charge Station
-# Removes one or more connectors from a charge station in an existing group
+### 10. Remove Connector(s) from Charge Station
 DELETE {{host}}/api/v1/groups/{{groupId}}/charge-stations/{{chargeStationId}}/connectors
 Content-Type: {{content-type}}
 
@@ -100,23 +102,10 @@ Content-Type: {{content-type}}
   "connectorIds": [1, 2]
 }
 
-### 8. Update Connector Max Current
-# Updates the maximum current (in amps) of a specific connector in a charge station within a group
+### 11. Update Connector Max Current
 PUT {{host}}/api/v1/groups/{{groupId}}/charge-stations/{{chargeStationId}}/connectors/{{connectorId}}/current
 Content-Type: {{content-type}}
 
 {
   "newCurrentInAmps": 40
 }
-
-
-### 9. Get Group By Id
-# Retrieves the details of a Group by its ID, including associated charge stations and connectors
-GET {{host}}/api/v1/groups/{{groupId}}
-Content-Type: {{content-type}}
-
-
-### 10. Get Groups By Page
-# Retrieves a list of groups by specifying page number and page size
-GET {{host}}/api/v1/groups/pages?pageNumber=1&pageSize=5
-Content-Type: {{content-type}}

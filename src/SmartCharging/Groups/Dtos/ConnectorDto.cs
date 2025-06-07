@@ -1,3 +1,3 @@
 namespace SmartCharging.Groups.Dtos;
 
-public record ConnectorDto(Guid ChargeStationId, int ConnectorId, int MaxCurrentInAmps);
+public sealed record ConnectorDto(Guid ChargeStationId, int ConnectorId, int MaxCurrentInAmps);

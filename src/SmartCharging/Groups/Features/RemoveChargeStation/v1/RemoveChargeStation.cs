@@ -1,4 +1,3 @@
-using SmartCharging.Groups.Contracts;
 using SmartCharging.Groups.Models.ValueObjects;
 using SmartCharging.Shared.Application.Data;
 using SmartCharging.Shared.BuildingBlocks.Exceptions;
@@ -6,7 +5,7 @@ using SmartCharging.Shared.BuildingBlocks.Extensions;
 
 namespace SmartCharging.Groups.Features.RemoveChargeStation.v1;
 
-public record RemoveChargeStation(Guid GroupId, Guid ChargeStationId)
+public sealed record RemoveChargeStation(Guid GroupId, Guid ChargeStationId)
 {
     // - just input validation inside command static constructor and business rules or domain-level validation to the command-handler and construct the Value Objects/Entities within the command-handler
     public static RemoveChargeStation Of(Guid? groupId, Guid? chargeStationId)
@@ -18,7 +17,7 @@ public record RemoveChargeStation(Guid GroupId, Guid ChargeStationId)
     }
 }
 
-public class RemoveChargeStationHandler(IUnitOfWork unitOfWork, ILogger<RemoveChargeStationHandler> logger)
+public sealed class RemoveChargeStationHandler(IUnitOfWork unitOfWork, ILogger<RemoveChargeStationHandler> logger)
 {
     public async Task Handle(RemoveChargeStation removeChargeStation, CancellationToken cancellationToken)
     {

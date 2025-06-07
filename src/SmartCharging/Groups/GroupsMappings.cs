@@ -1,4 +1,7 @@
 using SmartCharging.Groups.Dtos;
+using SmartCharging.Groups.Features.AddChargeStation.v1;
+using SmartCharging.Groups.Features.AddStationConnectors.v1;
+using SmartCharging.Groups.Features.CreateGroup.v1;
 using SmartCharging.Groups.Features.GroupGetById.v1;
 using SmartCharging.Groups.Models;
 using SmartCharging.Groups.Models.ValueObjects;
@@ -90,7 +93,6 @@ public static class GroupsMappings
             GroupId: group.Id.Value,
             Name: group.Name.Value,
             CapacityInAmps: group.CapacityInAmps.Value,
-            ChargeStationsCount: group.ChargeStations.Count,
             ChargeStations: group
                 .ChargeStations.Select(cs => new ChargeStationDto(
                     ChargeStationId: cs.Id.Value,
@@ -100,5 +102,52 @@ public static class GroupsMappings
                 .ToList()
                 .AsReadOnly()
         );
+    }
+
+    public static ChargeStationDto ToChargeStationDto(
+        this CreateGroupRequest.CreateChargeStationRequest createChargeStationRequest
+    )
+    {
+        createChargeStationRequest.NotBeNull();
+
+        return new ChargeStationDto(
+            ChargeStationId: createChargeStationRequest.ChargeStationId,
+            Name: createChargeStationRequest.Name,
+            Connectors: createChargeStationRequest
+                .Connectors.Select(c => new ConnectorDto(
+                    ChargeStationId: createChargeStationRequest.ChargeStationId,
+                    ConnectorId: c.ConnectorId,
+                    MaxCurrentInAmps: c.MaxCurrentInAmps
+                ))
+                .ToList()
+        );
+    }
+
+    public static IReadOnlyCollection<ConnectorDto>? ToConnectorsDto(
+        this IEnumerable<AddChargeStationRequest.CreateConnectorRequest>? connectorsRequest,
+        Guid chargeStationId
+    )
+    {
+        if (connectorsRequest is null)
+            return null;
+
+        return connectorsRequest
+            .Select(c => new ConnectorDto(chargeStationId, c.ConnectorId, c.MaxCurrentInAmps))
+            .ToList()
+            .AsReadOnly();
+    }
+
+    public static IReadOnlyCollection<ConnectorDto>? ToConnectorsDto(
+        this IEnumerable<AddConnectorRequest.CreateConnectorRequest>? connectorsRequest,
+        Guid chargeStationId
+    )
+    {
+        if (connectorsRequest is null)
+            return null;
+
+        return connectorsRequest
+            .Select(c => new ConnectorDto(chargeStationId, c.ConnectorId, c.MaxCurrentInAmps))
+            .ToList()
+            .AsReadOnly();
     }
 }

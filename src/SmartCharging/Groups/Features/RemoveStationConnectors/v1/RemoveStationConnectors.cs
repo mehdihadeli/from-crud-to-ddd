@@ -1,4 +1,3 @@
-using SmartCharging.Groups.Contracts;
 using SmartCharging.Groups.Models.ValueObjects;
 using SmartCharging.Shared.Application.Data;
 using SmartCharging.Shared.BuildingBlocks.Exceptions;
@@ -6,25 +5,27 @@ using SmartCharging.Shared.BuildingBlocks.Extensions;
 
 namespace SmartCharging.Groups.Features.RemoveStationConnectors.v1;
 
-public record RemoveStationConnectors(Guid GroupId, Guid ChargeStationId, IReadOnlyCollection<int> ConnectorIds)
+public sealed record RemoveStationConnectors(Guid GroupId, Guid ChargeStationId, IReadOnlyCollection<int> ConnectorIds)
 {
     // - just input validation inside command static constructor and business rules or domain-level validation to the command-handler and construct the Value Objects/Entities within the command-handler
     public static RemoveStationConnectors Of(
         Guid? groupId,
         Guid? chargeStationId,
-        RemoveStationConnectorsRequest? request
+        IReadOnlyCollection<int>? connectorIds
     )
     {
-        request.NotBeNull();
         groupId.NotBeNull().NotBeEmpty();
         chargeStationId.NotBeNull().NotBeEmpty();
-        request.ConnectorIds.NotBeNull();
+        connectorIds.NotBeNull();
 
-        return new RemoveStationConnectors(groupId.Value, chargeStationId.Value, request.ConnectorIds.ToList());
+        return new RemoveStationConnectors(groupId.Value, chargeStationId.Value, connectorIds);
     }
 }
 
-public class RemoveStationConnectorsHandler(IUnitOfWork unitOfWork, ILogger<RemoveStationConnectorsHandler> logger)
+public sealed class RemoveStationConnectorsHandler(
+    IUnitOfWork unitOfWork,
+    ILogger<RemoveStationConnectorsHandler> logger
+)
 {
     public async Task Handle(RemoveStationConnectors removeStationConnectors, CancellationToken cancellationToken)
     {

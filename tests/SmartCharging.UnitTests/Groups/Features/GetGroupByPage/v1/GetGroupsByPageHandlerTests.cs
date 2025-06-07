@@ -36,7 +36,7 @@ public class GetGroupsByPageHandlerTests
         const int pageNumber = 1;
         const int pageSize = 5;
         _unitOfWorkMock
-            .GroupRepository.GetGroupsAndTotalCountAsync(pageNumber, pageSize, Arg.Any<CancellationToken>())
+            .GroupRepository.GetByPageAndTotalCountAsync(pageNumber, pageSize, Arg.Any<CancellationToken>())
             .Returns((groups.Take(pageSize).ToList(), groups.Count));
 
         var getGroupsByPage = GetGroupsByPage.Of(pageNumber, pageSize);
@@ -62,7 +62,7 @@ public class GetGroupsByPageHandlerTests
         const int pageSize = 5;
 
         _unitOfWorkMock
-            .GroupRepository.GetGroupsAndTotalCountAsync(pageNumber, pageSize, Arg.Any<CancellationToken>())
+            .GroupRepository.GetByPageAndTotalCountAsync(pageNumber, pageSize, Arg.Any<CancellationToken>())
             .Returns((new List<Group>(), 0));
 
         var getGroupsByPage = GetGroupsByPage.Of(pageNumber, pageSize);
@@ -94,7 +94,7 @@ public class GetGroupsByPageHandlerTests
         var getGroupsByPage = GetGroupsByPage.Of(pageNumber, pageSize);
 
         _unitOfWorkMock
-            .GroupRepository.GetGroupsAndTotalCountAsync(
+            .GroupRepository.GetByPageAndTotalCountAsync(
                 Arg.Is(pageNumber),
                 Arg.Is(pageSize),
                 Arg.Any<CancellationToken>()
@@ -107,6 +107,6 @@ public class GetGroupsByPageHandlerTests
         // Assert
         await _unitOfWorkMock
             .GroupRepository.Received(1)
-            .GetGroupsAndTotalCountAsync(Arg.Is(pageNumber), Arg.Is(pageSize), Arg.Any<CancellationToken>());
+            .GetByPageAndTotalCountAsync(Arg.Is(pageNumber), Arg.Is(pageSize), Arg.Any<CancellationToken>());
     }
 }

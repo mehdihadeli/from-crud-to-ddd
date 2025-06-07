@@ -1,50 +1,64 @@
 using Humanizer;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using SmartCharging.Groups.Dtos;
 
 namespace SmartCharging.Groups.Features.AddChargeStation.v1;
 
 public static class AddChargeStationEndpoint
 {
-    public static RouteGroupBuilder MapAddChargeStationEndpoint(this RouteGroupBuilder group)
+    public static RouteHandlerBuilder MapAddChargeStationEndpoint(this IEndpointRouteBuilder app)
     {
-        group
-            .MapPost(
-                "/{groupId:guid}/charge-stations",
-                async (
-                    [FromRoute] Guid groupId,
-                    [FromBody] AddChargeStationRequest request,
-                    AddChargeStationHandler handler,
-                    CancellationToken cancellationToken
-                ) =>
-                {
-                    var addChargeStation = AddChargeStation.Of(
-                        groupId,
-                        request.Name,
-                        request.Connectors?.ToList().AsReadOnly()
-                    );
-                    var chargeStationId = await handler.Handle(addChargeStation, cancellationToken);
-
-                    return Results.Created(
-                        $"/api/groups/{groupId}/charge-stations/{chargeStationId}",
-                        new AddChargeStationResponse(chargeStationId)
-                    );
-                }
-            )
+        return app.MapPost("/{groupId:guid}/charge-stations", HandleAsync)
             .WithName(nameof(AddChargeStation))
             .WithDisplayName(nameof(AddChargeStation).Humanize())
             .WithSummary("Adds a single new charge station to a group.")
             .WithDescription(
-                "This endpoint allows the addition of exactly one charge station to a group. The station must have at least one connector to be valid."
+                "This endpoint allows the addition of exactly one charge station to a group. "
+                    + "The station must have at least one connector to be valid."
             )
             .Produces(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound);
+    }
 
-        return group;
+    static async Task<Results<Created<AddChargeStationResponse>, ProblemHttpResult, ValidationProblem>> HandleAsync(
+        [AsParameters] AddChargeStationRequestParameters parameters
+    )
+    {
+        var (groupId, request, handler, cancellationToken) = parameters;
+
+        var addChargeStation = AddChargeStation.Of(
+            groupId,
+            request?.ChargeStationId,
+            request?.Name,
+            request?.ConnectorsRequest?.ToConnectorsDto(request.ChargeStationId)
+        );
+
+        var chargeStationId = await handler.Handle(addChargeStation, cancellationToken);
+
+        return TypedResults.Created(
+            $"/api/groups/{groupId}/charge-stations/{chargeStationId}",
+            new AddChargeStationResponse(chargeStationId)
+        );
     }
 }
 
-public record AddChargeStationRequest(string? Name, IEnumerable<ConnectorDto>? Connectors);
+public sealed record AddChargeStationRequestParameters(
+    [FromRoute] Guid GroupId,
+    [FromBody] AddChargeStationRequest? Request,
+    AddChargeStationHandler Handler,
+    CancellationToken CancellationToken
+);
 
-public record AddChargeStationResponse(Guid ChargeStationId);
+public sealed record AddChargeStationRequest(
+    string? Name,
+    IEnumerable<AddChargeStationRequest.CreateConnectorRequest>? ConnectorsRequest
+)
+{
+    // make it internal to prevent exposing in openapi schema
+    internal Guid ChargeStationId { get; } = Guid.CreateVersion7();
+
+    public sealed record CreateConnectorRequest(int ConnectorId, int MaxCurrentInAmps);
+}
+
+public sealed record AddChargeStationResponse(Guid ChargeStationId);

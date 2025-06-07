@@ -13,6 +13,7 @@ namespace SmartCharging.Groups.Models;
 /// </summary>
 public class Group : Entity<GroupId>, IAggregateRoot
 {
+    /// - The `_chargeStations` collection in `Group` already manages which `ChargeStation` belongs to it, so there’s no need for the child entity (`ChargeStation`) to track the parent with `GroupId`.
     private readonly List<ChargeStation> _chargeStations = new();
 
     // For EF materialization - No validation

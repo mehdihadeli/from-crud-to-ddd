@@ -1,6 +1,7 @@
 using Humanizer;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using SmartCharging.Shared.BuildingBlocks.Extensions;
 
 namespace SmartCharging.Groups.Features.UpdateConnectorCurrentInAmps.v1;
 
@@ -11,7 +12,7 @@ public static class UpdateConnectorCurrentInAmpsEndpoint
         return group
             .MapPut(
                 "/{groupId:guid}/charge-stations/{chargeStationId:guid}/connectors/{connectorId:int}/current",
-                Handle
+                HandleAsync
             )
             .WithName(nameof(UpdateConnectorCurrentInAmps))
             .WithDisplayName(nameof(UpdateConnectorCurrentInAmps).Humanize())
@@ -22,34 +23,34 @@ public static class UpdateConnectorCurrentInAmpsEndpoint
             .Produces(StatusCodes.Status204NoContent)
             .ProducesValidationProblem()
             .ProducesProblem(StatusCodes.Status404NotFound);
+    }
 
-        static async Task<Results<NoContent, ValidationProblem, ProblemHttpResult>> Handle(
-            [AsParameters] UpdateConnectorCurrentInAmpsRequestParameters parameters
-        )
-        {
-            var (groupId, chargeStationId, connectorId, request, handler, cancellationToken) = parameters;
+    static async Task<Results<NoContent, ValidationProblem, ProblemHttpResult>> HandleAsync(
+        [AsParameters] UpdateConnectorCurrentInAmpsRequestParameters parameters
+    )
+    {
+        var (groupId, chargeStationId, connectorId, request, handler, cancellationToken) = parameters;
 
-            var updateConnectorCurrentInAmps = UpdateConnectorCurrentInAmps.Of(
-                groupId,
-                chargeStationId,
-                connectorId,
-                request?.NewCurrentInAmps ?? 0
-            );
+        var updateConnectorCurrentInAmps = UpdateConnectorCurrentInAmps.Of(
+            groupId,
+            chargeStationId,
+            connectorId,
+            request?.NewCurrentInAmps ?? 0
+        );
 
-            await handler.Handle(updateConnectorCurrentInAmps, cancellationToken);
+        await handler.Handle(updateConnectorCurrentInAmps, cancellationToken);
 
-            return TypedResults.NoContent();
-        }
+        return TypedResults.NoContent();
     }
 }
 
-public record UpdateConnectorCurrentInAmpsRequestParameters(
-    [FromRoute] Guid? GroupId,
-    [FromRoute] Guid? ChargeStationId,
+public sealed record UpdateConnectorCurrentInAmpsRequestParameters(
+    [FromRoute] Guid GroupId,
+    [FromRoute] Guid ChargeStationId,
     [FromRoute] int ConnectorId,
     [FromBody] UpdateConnectorCurrentInAmpsRequest? Request,
     UpdateConnectorCurrentInAmpsHandler Handler,
     CancellationToken CancellationToken
 );
 
-public record UpdateConnectorCurrentInAmpsRequest(int NewCurrentInAmps);
+public sealed record UpdateConnectorCurrentInAmpsRequest(int NewCurrentInAmps);
