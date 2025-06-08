@@ -21,7 +21,7 @@ public static class AddStationConnectorsEndpoint
             .ProducesProblem(StatusCodes.Status404NotFound);
     }
 
-    static async Task<Results<CreatedAtRoute<AddConnectorResponse>, ValidationProblem, ProblemHttpResult>> HandleAsync(
+    static async Task<Results<Created<AddConnectorResponse>, ValidationProblem, ProblemHttpResult>> HandleAsync(
         [AsParameters] AddConnectorRequestParameters parameters
     )
     {
@@ -36,7 +36,7 @@ public static class AddStationConnectorsEndpoint
 
         var response = new AddConnectorResponse(groupId, chargeStationId, result.Connectors);
 
-        return TypedResults.CreatedAtRoute(response, nameof(AddStationConnectors), new { groupId, chargeStationId });
+        return TypedResults.Created(string.Empty, response);
     }
 }
 

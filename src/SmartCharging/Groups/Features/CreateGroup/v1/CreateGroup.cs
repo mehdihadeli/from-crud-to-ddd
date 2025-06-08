@@ -1,6 +1,7 @@
 using SmartCharging.Groups.Dtos;
 using SmartCharging.Groups.Models;
 using SmartCharging.Groups.Models.ValueObjects;
+using SmartCharging.Shared.Application.Contracts;
 using SmartCharging.Shared.Application.Data;
 using SmartCharging.Shared.BuildingBlocks.Extensions;
 

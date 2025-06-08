@@ -1,4 +1,5 @@
 using SmartCharging.Groups.Dtos;
+using SmartCharging.Shared.Application.Contracts;
 using SmartCharging.Shared.Application.Data;
 using SmartCharging.Shared.BuildingBlocks.Extensions;
 

@@ -4,6 +4,7 @@ using SmartCharging.Groups.Contracts;
 using SmartCharging.Groups.Features.UpdateConnectorCurrentInAmps.v1;
 using SmartCharging.Groups.Models;
 using SmartCharging.Groups.Models.ValueObjects;
+using SmartCharging.Shared.Application.Contracts;
 using SmartCharging.Shared.Application.Data;
 using SmartCharging.Shared.BuildingBlocks.Exceptions;
 using SmartCharging.UnitTests.Groups.Mocks;

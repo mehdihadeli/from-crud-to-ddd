@@ -36,10 +36,7 @@ public static class AddChargeStationEndpoint
 
         var chargeStationId = await handler.Handle(addChargeStation, cancellationToken);
 
-        return TypedResults.Created(
-            $"/api/groups/{groupId}/charge-stations/{chargeStationId}",
-            new AddChargeStationResponse(chargeStationId)
-        );
+        return TypedResults.Created(string.Empty, new AddChargeStationResponse(chargeStationId));
     }
 }
 

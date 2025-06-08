@@ -236,7 +236,86 @@ The project is organized into a folder structure that aligns with the principles
   - **Application**: Data persistence and extension methods for the application.
   - **BuildingBlocks**: Cross-cutting concerns, such as database configurations, OpenAPI settings, and validation utilities.
 
+
+
 ## Domain Model
+
+### Diagram
+
+```mermaid
+classDiagram
+
+class Group {
+<<AggregateRoot>>
+-id: GroupId
+-name: String
+-capacity: Integer
++addStation(ChargeStation) void
++removeStation(ChargeStationId) void
+}
+
+    class ChargeStation {
+        -id: ChargeStationId
+        -name: String
+        +addConnector(Connector) void
+        +removeConnector(ConnectorId) void
+    }
+
+    class Connector {
+        -id: Integer | Between 1-5
+        -maxCurrent: Integer
+    }
+
+    %% Composition Relationships - *--(◆ filled diamond)
+    Group "1" *-- "0..*" ChargeStation : contains
+    ChargeStation "1" *-- "1..5" Connector : has
+```
+#### 1. Group → ChargeStation Relationship
+
+- Cardinality: `1 → 0..*` means:
+  - 1 Group can contain zero or many `(0..*)` ChargeStations
+  - A ChargeStation is depended on a group and cannot exist without a Group (◆ Composition)
+- Lifecycle: When a Group is deleted, all its ChargeStations are automatically deleted
+- Real-world analogy: Like a parking lot (Group) containing charging stations (ChargeStations)
+
+#### 2. ChargeStation → Connector Relationship
+
+- Cardinality: `1 → 1..5` means:
+  - 1 ChargeStation must have 1 to 5 Connectors
+  - A Connector cannot exist without a ChargeStation (◆ Composition)
+- Lifecycle: When a ChargeStation is deleted, all its Connectors are automatically deleted
+- Business rule: Enforces our requirement that stations must have 1-5 connectors
+
+```mermaid
+flowchart TD
+%% Group Level
+    G1[("Group 1 (Main Parking Lot)<br/>Capacity: 200A")]
+    style G1 fill:#e6f3ff,stroke:#3399ff,stroke-width:2px
+
+%% Charge Stations
+    G1 --> S1["Charge Station A1"]
+    G1 --> S2["Charge Station A2)"]
+    G1 --> S3["Charge Station A3"]
+
+%% Connectors (Adjusted to fit 200A total)
+    S1 --> C1A["Connector #1<br/>Max: 32A"]
+    S1 --> C1B["Connector #2<br/>Max: 32A"]
+
+    S2 --> C2A["Connector #1<br/>Max: 50A"]
+    S2 --> C2B["Connector #2<br/>Max: 16A"]
+
+    S3 --> C3A["Connector #1<br/>Max: 50A"]
+
+%% Capacity Calculation
+    C1A -->|32A| Total
+    C1B -->|32A| Total
+    C2A -->|50A| Total
+    C2B -->|16A| Total
+    C3A -->|50A| Total
+
+    Total{"Total Load: 180A/200A<br/><span style='color:green'>Under Capacity</span>"}
+    style Total stroke:#00aa00,stroke-width:2px
+```
 
 ### Entities
 

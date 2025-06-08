@@ -1,6 +1,6 @@
 using SmartCharging.Groups.Contracts;
 
-namespace SmartCharging.Shared.Application.Data;
+namespace SmartCharging.Shared.Application.Contracts;
 
 public interface IUnitOfWork : IDisposable
 {

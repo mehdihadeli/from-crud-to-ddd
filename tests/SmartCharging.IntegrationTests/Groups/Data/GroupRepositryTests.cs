@@ -2,6 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using SmartCharging.Groups.Contracts;
 using SmartCharging.Groups.Models.ValueObjects;
 using SmartCharging.IntegrationTests.Groups.Mocks;
+using SmartCharging.Shared.Application.Contracts;
 using SmartCharging.Shared.Application.Data;
 using SmartCharging.TestsShared.Fixtures;
 using Xunit.Abstractions;

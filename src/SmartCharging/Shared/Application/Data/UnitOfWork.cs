@@ -1,4 +1,5 @@
 using SmartCharging.Groups.Contracts;
+using SmartCharging.Shared.Application.Contracts;
 
 namespace SmartCharging.Shared.Application.Data;
 
