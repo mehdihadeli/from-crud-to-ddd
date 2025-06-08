@@ -2,13 +2,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace SmartCharging.Shared.BuildingBlocks.EF;
 
-internal class MigrationSeedWorker<TContext>(
+// Using IHostedService for fixing the problem for running this worker in the background with BackgroundService and running late. using IHostedService, we are ensuring our hosted-service executed before ServiceProvider resolve in the tests.
+public class MigrationSeedWorker<TContext>(
     IServiceProvider serviceProvider,
     Func<TContext, IServiceProvider, Task>? seeder = null
-) : BackgroundService
+) : IHostedService
     where TContext : DbContext
 {
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    public async Task StartAsync(CancellationToken cancellationToken)
     {
         using var scope = serviceProvider.CreateScope();
         var scopeServiceProvider = scope.ServiceProvider;
@@ -19,7 +20,7 @@ internal class MigrationSeedWorker<TContext>(
         {
             logger.LogInformation("Migrating database associated with context {DbContextName}", typeof(TContext).Name);
 
-            await context.Database.MigrateAsync(cancellationToken: stoppingToken);
+            await context.Database.MigrateAsync(cancellationToken: cancellationToken);
             if (seeder != null)
             {
                 await seeder(context, scopeServiceProvider);
@@ -36,10 +37,9 @@ internal class MigrationSeedWorker<TContext>(
             );
         }
     }
-}
 
-public interface IDataSeeder<in TContext>
-    where TContext : DbContext
-{
-    Task SeedAsync(TContext context);
+    public Task StopAsync(CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
+    }
 }

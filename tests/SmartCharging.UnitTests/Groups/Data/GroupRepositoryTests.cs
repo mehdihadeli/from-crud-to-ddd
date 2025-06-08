@@ -1,4 +1,5 @@
 using Shouldly;
+using SmartCharging.Groups.Data;
 using SmartCharging.Groups.Models;
 using SmartCharging.Groups.Models.ValueObjects;
 using SmartCharging.Shared.Application.Data;

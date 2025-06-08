@@ -8,9 +8,6 @@ public static class WebApplicationBuilderExtensions
 {
     public static WebApplicationBuilder AddInfrastructure(this WebApplicationBuilder builder)
     {
-        builder.Services.AddAuthentication();
-        builder.Services.AddAuthorization();
-
         builder.AddVersioning();
         builder.AddAspnetOpenApi(["v1"]);
 

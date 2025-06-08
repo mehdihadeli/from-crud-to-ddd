@@ -1,4 +1,5 @@
 using Bogus;
+using SmartCharging.Groups.Data;
 using SmartCharging.Shared.Application.Data;
 using SmartCharging.UnitTests.Groups.Mocks;
 

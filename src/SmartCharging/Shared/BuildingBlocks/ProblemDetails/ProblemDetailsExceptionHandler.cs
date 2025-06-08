@@ -26,15 +26,16 @@ public class ProblemDetailsExceptionHandler(
         }
 
         var statusCode = GetMappedStatusCodes(exception);
-        var details = PopulateNewProblemDetail(statusCode, context, exception);
+        var problemDetails = PopulateNewProblemDetail(statusCode, context, exception);
 
-        context.Response.StatusCode = statusCode == 0 ? context.Response.StatusCode : statusCode;
+        context.Response.StatusCode = statusCode;
+
         await problemDetailsService.WriteAsync(
             new ProblemDetailsContext
             {
                 HttpContext = context,
                 Exception = exception,
-                ProblemDetails = details,
+                ProblemDetails = problemDetails,
             }
         );
 
@@ -47,7 +48,7 @@ public class ProblemDetailsExceptionHandler(
         Exception exception
     )
     {
-        // type will fill automatically by .net core
+        // .NET core will fill type property automatically
         var problem = TypedResults
             .Problem(
                 statusCode: code,
@@ -76,6 +77,8 @@ public class ProblemDetailsExceptionHandler(
             DbUpdateConcurrencyException => StatusCodes.Status409Conflict,
             DbUpdateException => StatusCodes.Status500InternalServerError,
             BadHttpRequestException => StatusCodes.Status400BadRequest,
+            ArgumentNullException => StatusCodes.Status400BadRequest,
+            ArgumentOutOfRangeException => StatusCodes.Status400BadRequest,
             OperationCanceledException => StatusCodes.Status499ClientClosedRequest,
             AppException appException => appException.StatusCode,
             DomainException domainException => domainException.StatusCode,

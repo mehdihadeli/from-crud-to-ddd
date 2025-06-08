@@ -3,8 +3,6 @@ using SmartCharging.Shared.BuildingBlocks.Extensions;
 
 namespace SmartCharging.Shared.BuildingBlocks.OpenApi;
 
-// https://github.com/dotnet/aspnet-api-versioning/issues/1115
-
 public static class Extensions
 {
     public static WebApplicationBuilder AddAspnetOpenApi(this WebApplicationBuilder builder, string[] versions)
@@ -28,13 +26,14 @@ public static class Extensions
 
     public static WebApplication UseAspnetOpenApi(this WebApplication app)
     {
+        app.MapOpenApi();
+
         if (!app.Environment.IsDevelopment())
         {
             return app;
         }
 
-        app.MapOpenApi();
-
+        // add swagger ui
         app.UseSwaggerUI(options =>
         {
             var descriptions = app.DescribeApiVersions();

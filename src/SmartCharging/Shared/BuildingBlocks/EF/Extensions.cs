@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using SmartCharging.Shared.Application.Contracts;
 
 namespace SmartCharging.Shared.BuildingBlocks.EF;
 
@@ -8,25 +9,23 @@ public static class Extensions
 {
     public static void AddPostgresDbContext<TDbContext>(
         this WebApplicationBuilder builder,
-        string name,
+        string connectionName,
         Action<WebApplicationBuilder>? action = null
     )
         where TDbContext : DbContext
     {
-        var services = builder.Services;
-
-        services.AddDbContext<TDbContext>(
+        builder.Services.AddDbContext<TDbContext>(
             (sp, options) =>
             {
                 options
                     .UseNpgsql(
-                        builder.Configuration.GetConnectionString(name),
+                        builder.Configuration.GetConnectionString(connectionName),
                         sqlOptions =>
                         {
                             var assemblyName = typeof(TDbContext).Assembly.GetName().Name;
 
                             sqlOptions.MigrationsAssembly(assemblyName);
-                            sqlOptions.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
+                            sqlOptions.EnableRetryOnFailure(3, TimeSpan.FromSeconds(10), null);
                         }
                     )
                     .UseSnakeCaseNamingConvention()
@@ -39,7 +38,7 @@ public static class Extensions
         action?.Invoke(builder);
     }
 
-    public static WebApplicationBuilder AddMigration<TContext>(
+    public static WebApplicationBuilder AddMigrationSeedWorker<TContext>(
         this WebApplicationBuilder builder,
         Func<TContext, IServiceProvider, Task>? seeder = null
     )
@@ -50,13 +49,13 @@ public static class Extensions
         return builder;
     }
 
-    public static WebApplicationBuilder AddMigration<TContext, TDbSeeder>(this WebApplicationBuilder builder)
+    public static WebApplicationBuilder AddMigrationSeedWorker<TContext, TDbSeeder>(this WebApplicationBuilder builder)
         where TContext : DbContext
         where TDbSeeder : class, IDataSeeder<TContext>
     {
         builder.Services.AddScoped<IDataSeeder<TContext>, TDbSeeder>();
 
-        return builder.AddMigration<TContext>(
+        return builder.AddMigrationSeedWorker<TContext>(
             (context, sp) => sp.GetRequiredService<IDataSeeder<TContext>>().SeedAsync(context)
         );
     }

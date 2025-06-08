@@ -17,19 +17,18 @@ public static class ApplicationConfig
                 if (app.Environment.IsDevelopment())
                 {
                     // apply migration and seed data for dev environment
-                    app.AddMigration<SmartChargingDbContext, SmartChargingDataSeeder>();
+                    app.AddMigrationSeedWorker<SmartChargingDbContext, SmartChargingDataSeeder>();
                 }
                 else
                 {
                     // just apply migration for production without seeding
-                    app.AddMigration<SmartChargingDbContext>();
+                    app.AddMigrationSeedWorker<SmartChargingDbContext>();
                 }
             }
         );
 
-        // shared repositories
-        builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
         builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+        builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
         builder.AddGroupsServices();
 

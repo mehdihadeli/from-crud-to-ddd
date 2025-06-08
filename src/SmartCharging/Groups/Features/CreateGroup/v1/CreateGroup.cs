@@ -18,7 +18,8 @@ public sealed record CreateGroup(string Name, int CapacityInAmps, ChargeStationD
     public static CreateGroup Of(string? name, int? capacityInAmps, ChargeStationDto? chargeStation)
     {
         name.NotBeEmptyOrNull();
-        capacityInAmps.NotBeNull().NotBeNegativeOrZero();
+        capacityInAmps.NotBeNull();
+        capacityInAmps.NotBeNegativeOrZero();
 
         return new CreateGroup(name, capacityInAmps.Value, chargeStation);
     }

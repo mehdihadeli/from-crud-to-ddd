@@ -1,3 +1,4 @@
+using SmartCharging.Shared.Application.Contracts;
 using SmartCharging.Shared.BuildingBlocks.EF;
 
 namespace SmartCharging.Shared.Application.Data;
