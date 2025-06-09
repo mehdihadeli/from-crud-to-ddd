@@ -216,7 +216,7 @@ public class Group : Entity<GroupId>, IAggregateRoot
             throw new DomainException("Connector not found");
 
         // Calculate what the new total would be
-        int newTotal = GetTotalCurrent() + newCurrent.Value - connector.MaxCurrentInAmps.Value;
+        int newTotal = (GetTotalCurrent() - connector.MaxCurrentInAmps.Value) + newCurrent.Value;
 
         // Validate before making any changes
         if (newTotal > CapacityInAmps.Value)
