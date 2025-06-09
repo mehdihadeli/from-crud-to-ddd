@@ -28,14 +28,14 @@ namespace SmartCharging.Shared.Application.Data.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    b.Property<Guid?>("group_id")
+                    b.Property<Guid>("GroupId")
                         .HasColumnType("uuid")
                         .HasColumnName("group_id");
 
                     b.HasKey("Id")
                         .HasName("pk_charge_stations");
 
-                    b.HasIndex("group_id")
+                    b.HasIndex("GroupId")
                         .HasDatabaseName("ix_charge_stations_group_id");
 
                     b.ToTable("charge_stations", (string)null);
@@ -73,8 +73,9 @@ namespace SmartCharging.Shared.Application.Data.Migrations
                 {
                     b.HasOne("SmartCharging.Groups.Models.Group", null)
                         .WithMany("ChargeStations")
-                        .HasForeignKey("group_id")
+                        .HasForeignKey("GroupId")
                         .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
                         .HasConstraintName("fk_charge_stations_groups_group_id");
 
                     b.OwnsOne("SmartCharging.Groups.Models.ValueObjects.Name", "Name", b1 =>

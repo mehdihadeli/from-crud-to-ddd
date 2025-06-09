@@ -2,7 +2,6 @@ using Humanizer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SmartCharging.Groups.Models;
-using SmartCharging.Groups.Models.ValueObjects;
 
 namespace SmartCharging.Shared.Application.Data.EntityConfigurations;
 
@@ -46,7 +45,8 @@ public class GroupConfiguration : IEntityTypeConfiguration<Group>
         builder
             .HasMany(g => g.ChargeStations)
             .WithOne()
-            .HasForeignKey(nameof(GroupId).Underscore()) // Shadow property in the ChargeStationConfiguration
+            // Explicit relationship
+            .HasForeignKey(c => c.GroupId)
             .OnDelete(DeleteBehavior.Cascade); // Auto-delete stations when group is deleted
     }
 }

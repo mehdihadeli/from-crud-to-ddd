@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http.Json;
 using Microsoft.EntityFrameworkCore;
 using SmartCharging.EndToEndTests.Group.Mocks;
+using SmartCharging.Groups.Dtos;
 using SmartCharging.Groups.Features.GetGroupsByPage.v1;
 using SmartCharging.Shared.Application.Data;
 using SmartCharging.TestsShared.Fixtures;
@@ -44,11 +45,14 @@ public class GetGroupsByPageTests(
         getGroupsResponse.Groups.Count.ShouldBe(pageSize);
         getGroupsResponse.TotalCount.ShouldBe(15);
 
-        var firstGroupInPage = groupsToCreate.OrderBy(g => g.Name.Value).Skip((pageNumber - 1) * pageSize).First();
-
-        // Ensure the response matches the expected data from the database
-        getGroupsResponse.Groups.First().GroupId.ShouldBe(firstGroupInPage.Id.Value);
-        getGroupsResponse.Groups.First().Name.ShouldBe(firstGroupInPage.Name.Value);
+        // Verify all items in the page match
+        foreach (var responseGroupDto in getGroupsResponse.Groups)
+        {
+            var matchingGroup = groupsToCreate.FirstOrDefault(g => g.Id.Value == responseGroupDto.GroupId);
+            matchingGroup.ShouldNotBeNull();
+            responseGroupDto.Name.ShouldBe(matchingGroup.Name.Value);
+            responseGroupDto.GroupId.ShouldBe(matchingGroup.Id.Value);
+        }
     }
 
     [Fact]

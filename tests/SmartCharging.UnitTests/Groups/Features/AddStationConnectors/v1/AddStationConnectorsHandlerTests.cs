@@ -37,19 +37,12 @@ public class AddStationConnectorsHandlerTests
         var chargeStation = ChargeStation.Create(
             chargeStationId,
             Name.Of("Station A"),
-            new List<Connector>
-            {
-                Connector.Create(ConnectorId.Of(1), CurrentInAmps.Of(50), chargeStationId),
-            }.AsReadOnly()
+            new List<Connector> { Connector.Create(ConnectorId.Of(1), CurrentInAmps.Of(50)) }.AsReadOnly()
         );
         var group = Group.Create(groupId, Name.Of("Group A"), groupCapacity, chargeStation);
 
         // New connectors to be added
-        var newConnectors = new List<ConnectorDto>
-        {
-            new(chargeStationId.Value, 2, 70),
-            new(chargeStationId.Value, 3, 100),
-        };
+        var newConnectors = new List<ConnectorDto> { new(2, 70), new(3, 100) };
 
         _unitOfWorkMock.GroupRepository.GetByIdAsync(Arg.Is(groupId), Arg.Any<CancellationToken>()).Returns(group);
 
@@ -88,7 +81,7 @@ public class AddStationConnectorsHandlerTests
         var addConnectors = SmartCharging.Groups.Features.AddStationConnectors.v1.AddStationConnectors.Of(
             groupId.Value,
             chargeStationId.Value,
-            new List<ConnectorDto> { new ConnectorDto(chargeStationId.Value, 1, 50) }
+            new List<ConnectorDto> { new ConnectorDto(1, 50) }
         );
 
         // Act & Assert
@@ -111,7 +104,7 @@ public class AddStationConnectorsHandlerTests
         // Add a charge station to the group with at least one connector
         var initialConnectors = new List<Connector>
         {
-            Connector.Create(ConnectorId.Of(1), CurrentInAmps.Of(50), chargeStationId),
+            Connector.Create(ConnectorId.Of(1), CurrentInAmps.Of(50)),
         }.AsReadOnly();
 
         var chargeStation = ChargeStation.Create(chargeStationId, Name.Of("Station A"), initialConnectors);
@@ -130,7 +123,7 @@ public class AddStationConnectorsHandlerTests
         var addConnectors = SmartCharging.Groups.Features.AddStationConnectors.v1.AddStationConnectors.Of(
             groupId.Value,
             chargeStationId.Value,
-            new List<ConnectorDto> { new ConnectorDto(chargeStationId.Value, 2, 50) }
+            new List<ConnectorDto> { new ConnectorDto(2, 50) }
         );
 
         // Act & Assert

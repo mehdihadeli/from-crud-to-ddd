@@ -32,6 +32,9 @@ public class ChargeStation : Entity<ChargeStationId>
     /// </summary>
     public IReadOnlyCollection<Connector> Connectors => _connectors.AsReadOnly();
 
+    // will be set by group stations navigation by ef core, we don't need to set it explicitly
+    public GroupId GroupId { get; private set; } = default!;
+
     /// <summary>
     /// Creates a new charge station with connectors.
     /// </summary>

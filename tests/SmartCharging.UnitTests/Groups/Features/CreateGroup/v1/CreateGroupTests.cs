@@ -37,8 +37,8 @@ public class CreateGroupTests
                 cs => cs.Connectors,
                 faker => new List<Connector>
                 {
-                    Connector.Create(ConnectorId.Of(1), CurrentInAmps.Of(60), ChargeStationId.New()),
-                    Connector.Create(ConnectorId.Of(2), CurrentInAmps.Of(50), ChargeStationId.New()), // This exceeds capacity
+                    Connector.Create(ConnectorId.Of(1), CurrentInAmps.Of(60)),
+                    Connector.Create(ConnectorId.Of(2), CurrentInAmps.Of(50)), // This exceeds capacity
                 }
             )
             .Generate();

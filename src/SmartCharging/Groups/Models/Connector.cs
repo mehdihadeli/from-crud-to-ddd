@@ -15,11 +15,10 @@ public class Connector : Entity<ConnectorId>
     // For EF materialization - No validation
     private Connector() { }
 
-    private Connector(ConnectorId id, CurrentInAmps maxCurrentInAmps, ChargeStationId chargeStationId)
+    private Connector(ConnectorId id, CurrentInAmps maxCurrentInAmps)
     {
         Id = id.NotBeNull();
         MaxCurrentInAmps = maxCurrentInAmps.NotBeNull();
-        ChargeStationId = chargeStationId.NotBeNull();
     }
 
     /// <summary>
@@ -27,22 +26,21 @@ public class Connector : Entity<ConnectorId>
     /// </summary>
     public CurrentInAmps MaxCurrentInAmps { get; private set; }
 
-    public ChargeStationId ChargeStationId { get; private set; }
+    // will be set by ChargeStation connectors navigation by ef core, we don't need to set it explicitly
+    public ChargeStationId ChargeStationId { get; private set; } = default!;
 
     /// <summary>
     /// Creates a new connector with the given maximum current
     /// </summary>
     /// <param name="id"></param>
     /// <param name="maxCurrentInAmps"></param>
-    /// <param name="chargeStationId"></param>
     /// <returns></returns>
-    public static Connector Create(ConnectorId id, CurrentInAmps maxCurrentInAmps, ChargeStationId chargeStationId)
+    public static Connector Create(ConnectorId id, CurrentInAmps maxCurrentInAmps)
     {
         id.NotBeNull();
         maxCurrentInAmps.NotBeNull();
-        chargeStationId.NotBeNull();
 
-        return new Connector(id, maxCurrentInAmps, chargeStationId);
+        return new Connector(id, maxCurrentInAmps);
     }
 
     /// <summary>

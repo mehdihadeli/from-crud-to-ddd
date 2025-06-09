@@ -38,8 +38,8 @@ public class AddChargeStationHandlerTests
         var chargeStationName = Name.Of("Station A");
         var connectors = new[]
         {
-            Connector.Create(ConnectorId.Of(1), CurrentInAmps.Of(20), chargeStationId),
-            Connector.Create(ConnectorId.Of(2), CurrentInAmps.Of(30), chargeStationId),
+            Connector.Create(ConnectorId.Of(1), CurrentInAmps.Of(20)),
+            Connector.Create(ConnectorId.Of(2), CurrentInAmps.Of(30)),
         }
             .ToList()
             .AsReadOnly();
@@ -49,11 +49,8 @@ public class AddChargeStationHandlerTests
 
         var addChargeStation = SmartCharging.Groups.Features.AddChargeStation.v1.AddChargeStation.Of(
             groupId.Value,
-            chargeStationId.Value,
             chargeStationName.Value,
-            connectors
-                .Select(c => new ConnectorDto(c.ChargeStationId.Value, c.Id.Value, c.MaxCurrentInAmps.Value))
-                .ToList()
+            connectors.Select(c => new ConnectorDto(c.Id.Value, c.MaxCurrentInAmps.Value)).ToList()
         );
 
         // Act
@@ -82,19 +79,16 @@ public class AddChargeStationHandlerTests
         var chargeStationName = Name.Of("Station A");
         var connectors = new[]
         {
-            Connector.Create(ConnectorId.Of(1), CurrentInAmps.Of(20), chargeStationId),
-            Connector.Create(ConnectorId.Of(2), CurrentInAmps.Of(30), chargeStationId),
+            Connector.Create(ConnectorId.Of(1), CurrentInAmps.Of(20)),
+            Connector.Create(ConnectorId.Of(2), CurrentInAmps.Of(30)),
         }
             .ToList()
             .AsReadOnly();
 
         var addChargeStation = SmartCharging.Groups.Features.AddChargeStation.v1.AddChargeStation.Of(
             groupId.Value,
-            chargeStationId.Value,
             chargeStationName.Value,
-            connectors
-                .Select(c => new ConnectorDto(c.ChargeStationId.Value, c.Id.Value, c.MaxCurrentInAmps.Value))
-                .ToList()
+            connectors.Select(c => new ConnectorDto(c.Id.Value, c.MaxCurrentInAmps.Value)).ToList()
         );
 
         // Mock repository behavior to return null
@@ -132,8 +126,8 @@ public class AddChargeStationHandlerTests
         var chargeStationName = Name.Of("Station A");
         var connectors = new[]
         {
-            Connector.Create(ConnectorId.Of(1), CurrentInAmps.Of(20), chargeStationId),
-            Connector.Create(ConnectorId.Of(2), CurrentInAmps.Of(30), chargeStationId),
+            Connector.Create(ConnectorId.Of(1), CurrentInAmps.Of(20)),
+            Connector.Create(ConnectorId.Of(2), CurrentInAmps.Of(30)),
         }
             .ToList()
             .AsReadOnly();
@@ -146,11 +140,8 @@ public class AddChargeStationHandlerTests
 
         var addChargeStation = SmartCharging.Groups.Features.AddChargeStation.v1.AddChargeStation.Of(
             groupId.Value,
-            chargeStationId.Value,
             chargeStationName.Value,
-            connectors
-                .Select(c => new ConnectorDto(c.ChargeStationId.Value, c.Id.Value, c.MaxCurrentInAmps.Value))
-                .ToList()
+            connectors.Select(c => new ConnectorDto(c.Id.Value, c.MaxCurrentInAmps.Value)).ToList()
         );
 
         // Act & Assert

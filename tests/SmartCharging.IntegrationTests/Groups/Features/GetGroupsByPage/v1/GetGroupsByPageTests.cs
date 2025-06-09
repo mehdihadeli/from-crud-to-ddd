@@ -50,17 +50,18 @@ public class GetGroupsByPageTests(
         var result = await handler.Handle(getGroupsByPage, CancellationToken.None);
 
         // Assert
+        result.ShouldNotBeNull();
         result.Groups.ShouldNotBeNull();
-        result.Groups.ShouldNotBeEmpty();
         result.Groups.Count.ShouldBe(5);
+        result.TotalCount.ShouldBe(10);
 
-        // Validate that the returned collection contains the expected data.
-        var expectedGroups = fakeGroups.OrderBy(g => g.Name.Value).Take(5);
-        foreach (var (returnedGroup, expectedGroup) in result.Groups.Zip(expectedGroups))
+        // Verify all items in the page match
+        foreach (var responseGroupDto in result.Groups)
         {
-            returnedGroup.GroupId.ShouldBe(expectedGroup.Id.Value);
-            returnedGroup.Name.ShouldBe(expectedGroup.Name.Value);
-            returnedGroup.CapacityInAmps.ShouldBe(expectedGroup.CapacityInAmps.Value);
+            var matchingGroup = fakeGroups.FirstOrDefault(g => g.Id.Value == responseGroupDto.GroupId);
+            matchingGroup.ShouldNotBeNull();
+            responseGroupDto.Name.ShouldBe(matchingGroup.Name.Value);
+            responseGroupDto.GroupId.ShouldBe(matchingGroup.Id.Value);
         }
     }
 

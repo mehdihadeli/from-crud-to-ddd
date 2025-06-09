@@ -35,8 +35,8 @@ public class AddStationConnectorsTests(
         var targetChargeStation = fakeGroup.ChargeStations.First();
         var newConnectors = new List<Connector>
         {
-            Connector.Create(ConnectorId.Of(4), CurrentInAmps.Of(30), targetChargeStation.Id),
-            Connector.Create(ConnectorId.Of(5), CurrentInAmps.Of(20), targetChargeStation.Id),
+            Connector.Create(ConnectorId.Of(4), CurrentInAmps.Of(30)),
+            Connector.Create(ConnectorId.Of(5), CurrentInAmps.Of(20)),
         };
 
         var addStationConnectors = SmartCharging.Groups.Features.AddStationConnectors.v1.AddStationConnectors.Of(
@@ -75,10 +75,7 @@ public class AddStationConnectorsTests(
         // Arrange
         var nonExistentGroupId = Guid.NewGuid();
         var chargeStationId = Guid.NewGuid();
-        var newConnectors = new List<Connector>
-        {
-            Connector.Create(ConnectorId.Of(1), CurrentInAmps.Of(30), ChargeStationId.Of(chargeStationId)),
-        };
+        var newConnectors = new List<Connector> { Connector.Create(ConnectorId.Of(1), CurrentInAmps.Of(30)) };
 
         var addStationConnectors = SmartCharging.Groups.Features.AddStationConnectors.v1.AddStationConnectors.Of(
             nonExistentGroupId,
@@ -108,10 +105,7 @@ public class AddStationConnectorsTests(
         });
 
         var nonExistentChargeStationId = Guid.NewGuid();
-        var newConnectors = new List<Connector>
-        {
-            Connector.Create(ConnectorId.Of(1), CurrentInAmps.Of(30), ChargeStationId.Of(nonExistentChargeStationId)),
-        };
+        var newConnectors = new List<Connector> { Connector.Create(ConnectorId.Of(1), CurrentInAmps.Of(30)) };
 
         var addStationConnectors = SmartCharging.Groups.Features.AddStationConnectors.v1.AddStationConnectors.Of(
             fakeGroup.Id.Value,
@@ -144,7 +138,7 @@ public class AddStationConnectorsTests(
         var newConnectors = new List<Connector>
         {
             // add duplicate connector
-            Connector.Create(ConnectorId.Of(3), CurrentInAmps.Of(40), targetChargeStation.Id),
+            Connector.Create(ConnectorId.Of(3), CurrentInAmps.Of(40)),
         };
 
         var addStationConnectors = SmartCharging.Groups.Features.AddStationConnectors.v1.AddStationConnectors.Of(

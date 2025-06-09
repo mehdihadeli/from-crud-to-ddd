@@ -16,11 +16,7 @@ public static class GroupsMappings
         chargeStationDto.Connectors.NotBeNull();
 
         var connectors = chargeStationDto.Connectors.Select(x =>
-            Connector.Create(
-                ConnectorId.Of(x.ConnectorId),
-                CurrentInAmps.Of(x.MaxCurrentInAmps),
-                ChargeStationId.Of(chargeStationDto.ChargeStationId)
-            )
+            Connector.Create(ConnectorId.Of(x.ConnectorId), CurrentInAmps.Of(x.MaxCurrentInAmps))
         );
         var chargeStation = ChargeStation.Create(
             ChargeStationId.Of(chargeStationDto.ChargeStationId),
@@ -47,8 +43,7 @@ public static class GroupsMappings
         connectorDto.NotBeNull();
         return Connector.Create(
             ConnectorId.Of(connectorDto.ConnectorId),
-            CurrentInAmps.Of(connectorDto.MaxCurrentInAmps),
-            ChargeStationId.Of(connectorDto.ChargeStationId)
+            CurrentInAmps.Of(connectorDto.MaxCurrentInAmps)
         );
     }
 
@@ -63,12 +58,7 @@ public static class GroupsMappings
     {
         connector.NotBeNull();
 
-        ChargeStationId connectorChargeStationId = connector.ChargeStationId;
-        return new ConnectorDto(
-            ConnectorId: connector.Id.Value,
-            MaxCurrentInAmps: connector.MaxCurrentInAmps.Value,
-            ChargeStationId: connectorChargeStationId.Value
-        );
+        return new ConnectorDto(ConnectorId: connector.Id.Value, MaxCurrentInAmps: connector.MaxCurrentInAmps.Value);
     }
 
     public static IReadOnlyCollection<ConnectorDto> ToConnectorsDto(this IReadOnlyCollection<Connector> connectors)
@@ -115,7 +105,6 @@ public static class GroupsMappings
             Name: createChargeStationRequest.Name,
             Connectors: createChargeStationRequest
                 .Connectors.Select(c => new ConnectorDto(
-                    ChargeStationId: createChargeStationRequest.ChargeStationId,
                     ConnectorId: c.ConnectorId,
                     MaxCurrentInAmps: c.MaxCurrentInAmps
                 ))
@@ -124,30 +113,22 @@ public static class GroupsMappings
     }
 
     public static IReadOnlyCollection<ConnectorDto>? ToConnectorsDto(
-        this IEnumerable<AddChargeStationRequest.CreateConnectorRequest>? connectorsRequest,
-        Guid chargeStationId
+        this IEnumerable<AddChargeStationRequest.CreateConnectorRequest>? connectorsRequest
     )
     {
         if (connectorsRequest is null)
             return null;
 
-        return connectorsRequest
-            .Select(c => new ConnectorDto(chargeStationId, c.ConnectorId, c.MaxCurrentInAmps))
-            .ToList()
-            .AsReadOnly();
+        return connectorsRequest.Select(c => new ConnectorDto(c.ConnectorId, c.MaxCurrentInAmps)).ToList().AsReadOnly();
     }
 
     public static IReadOnlyCollection<ConnectorDto>? ToConnectorsDto(
-        this IEnumerable<AddConnectorRequest.CreateConnectorRequest>? connectorsRequest,
-        Guid chargeStationId
+        this IEnumerable<AddConnectorRequest.CreateConnectorRequest>? connectorsRequest
     )
     {
         if (connectorsRequest is null)
             return null;
 
-        return connectorsRequest
-            .Select(c => new ConnectorDto(chargeStationId, c.ConnectorId, c.MaxCurrentInAmps))
-            .ToList()
-            .AsReadOnly();
+        return connectorsRequest.Select(c => new ConnectorDto(c.ConnectorId, c.MaxCurrentInAmps)).ToList().AsReadOnly();
     }
 }

@@ -26,11 +26,7 @@ public sealed class ChargeStationFake : Faker<ChargeStation>
                 .Select(connectorIndex =>
                 {
                     var maxCurrent = faker.Random.Int(10, 50);
-                    return Connector.Create(
-                        ConnectorId.Of(connectorIndex),
-                        CurrentInAmps.Of(maxCurrent),
-                        chargeStationId
-                    );
+                    return Connector.Create(ConnectorId.Of(connectorIndex), CurrentInAmps.Of(maxCurrent));
                 })
                 .ToList();
 

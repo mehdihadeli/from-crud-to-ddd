@@ -1,5 +1,3 @@
-using Bogus;
-using Shouldly;
 using SmartCharging.Groups.Models;
 using SmartCharging.Groups.Models.ValueObjects;
 using SmartCharging.Shared.BuildingBlocks.Exceptions;
@@ -265,14 +263,14 @@ public class GroupTests
         var group = new GroupFake(numberOfConnectorsPerStation: 1, groupCapacity: 100).Generate();
         var station = group.ChargeStations.First();
 
-        // Verify initial number of connectors for clarity
+        // Verify the initial number of connectors for clarity
         station.Connectors.Count.ShouldBe(1);
 
         // Define two new connectors to be added
         var newConnectors = new[]
         {
-            Connector.Create(ConnectorId.Of(2), CurrentInAmps.Of(20), station.Id),
-            Connector.Create(ConnectorId.Of(3), CurrentInAmps.Of(10), station.Id),
+            Connector.Create(ConnectorId.Of(2), CurrentInAmps.Of(20)),
+            Connector.Create(ConnectorId.Of(3), CurrentInAmps.Of(10)),
         };
 
         // Act
@@ -303,8 +301,8 @@ public class GroupTests
         // Define two new connectors, each requiring 30 amps
         var additionalConnectors = new[]
         {
-            Connector.Create(ConnectorId.Of(4), CurrentInAmps.Of(30), station.Id),
-            Connector.Create(ConnectorId.Of(5), CurrentInAmps.Of(30), station.Id),
+            Connector.Create(ConnectorId.Of(4), CurrentInAmps.Of(30)),
+            Connector.Create(ConnectorId.Of(5), CurrentInAmps.Of(30)),
         };
 
         // Act: Add new connectors
@@ -330,8 +328,8 @@ public class GroupTests
         // Define connectors that would exceed the group's capacity
         var additionalConnectors = new[]
         {
-            Connector.Create(ConnectorId.Of(4), CurrentInAmps.Of(30), station.Id),
-            Connector.Create(ConnectorId.Of(5), CurrentInAmps.Of(40), station.Id), // Exceeds capacity
+            Connector.Create(ConnectorId.Of(4), CurrentInAmps.Of(30)),
+            Connector.Create(ConnectorId.Of(5), CurrentInAmps.Of(40)), // Exceeds capacity
         };
 
         // Act & Assert: Adding these connectors should throw a DomainException
@@ -347,7 +345,7 @@ public class GroupTests
         var groupCapacity = 500;
         var group = new GroupFake(numberOfConnectorsPerStation: 2, groupCapacity: groupCapacity).Generate();
         var station = group.ChargeStations.First();
-        var newConnectors = new[] { Connector.Create(ConnectorId.Of(3), CurrentInAmps.Of(20), station.Id) };
+        var newConnectors = new[] { Connector.Create(ConnectorId.Of(3), CurrentInAmps.Of(20)) };
 
         // Act
         group.AddConnectors(station.Id, newConnectors);
@@ -420,7 +418,7 @@ public class GroupTests
         // Arrange
         var group = new GroupFake(numberOfConnectorsPerStation: 5, groupCapacity: 500).Generate();
         var station = group.ChargeStations.First();
-        var extraConnectors = new[] { Connector.Create(ConnectorId.Of(5), CurrentInAmps.Of(15), station.Id) };
+        var extraConnectors = new[] { Connector.Create(ConnectorId.Of(5), CurrentInAmps.Of(15)) };
 
         // Act & Assert
         Should

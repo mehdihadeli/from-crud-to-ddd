@@ -2,8 +2,8 @@
 @content-type = application/json
 
 # Shared Variables
-@groupId = b2a1f60c-8f45-4c69-a123-9d79dfefcc65
-@chargeStationId = 8c3d486c-02db-4d9d-8f7b-f3c91d334ccc
+@groupId = 0197554f-42c5-7774-94ec-4cf827537e60
+@chargeStationId = 0197554f-42c5-75d5-8ddc-d591416dc636
 @connectorId = 1
 
 ### 1. Create Group
@@ -42,11 +42,9 @@ DELETE {{host}}/api/v1/groups/{{groupId}}
 
 ### 4. Get Group By Id
 GET {{host}}/api/v1/groups/{{groupId}}
-Content-Type: {{content-type}}
 
 ### 5. Get Groups By Page
-GET {{host}}/api/v1/groups/pages?PageNumber=1&PageSize=5
-Content-Type: {{content-type}}
+GET {{host}}/api/v1/groups?PageNumber=1&PageSize=5
 
 ### 6. Add Charge Station to Group
 POST {{host}}/api/v1/groups/{{groupId}}/charge-stations
@@ -99,7 +97,7 @@ DELETE {{host}}/api/v1/groups/{{groupId}}/charge-stations/{{chargeStationId}}/co
 Content-Type: {{content-type}}
 
 {
-  "connectorIds": [1, 2]
+  "connectorIds": [1]
 }
 
 ### 11. Update Connector Max Current

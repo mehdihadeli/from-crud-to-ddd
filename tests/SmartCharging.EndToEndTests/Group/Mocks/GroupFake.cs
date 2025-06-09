@@ -30,7 +30,7 @@ public sealed class GroupFake : Faker<Groups.Models.Group>
                 .Select(connectorId =>
                 {
                     var currentAmp = maxConnectorCurrent ?? f.Random.Int(10, 50);
-                    return Connector.Create(ConnectorId.Of(connectorId), CurrentInAmps.Of(currentAmp), chargeStationId);
+                    return Connector.Create(ConnectorId.Of(connectorId), CurrentInAmps.Of(currentAmp));
                 })
                 .ToList();
 

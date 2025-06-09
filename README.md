@@ -197,8 +197,9 @@ The project is organized into a folder structure that aligns with the principles
 
 ```
 /
-├── Groups/                          # Related to the "Groups" aggregate in the domain
+├── Groups/                          # Groups aggregate related functionality and logic
 │   ├── Contracts/                   # Interfaces for the domain and contracts for integration
+│   ├── Data/                        # Data access functionality related to Group aggregate like GroupRepository
 │   ├── Dtos/                        # Data Transfer Objects specific to Groups
 │   ├── Features/                    # Contains vertical slices (use-cases) for Groups
 │   │   ├── AddChargeStation/        # Slice for "Add Charge Station" functionality
@@ -217,7 +218,7 @@ The project is organized into a folder structure that aligns with the principles
 │   ├── GroupsMappings.cs            # Mapping configurations specific to Groups
 ├── Shared/                          # Shared functionality to avoid duplication
 │   ├── Application/                 # Application-level shared resources
-│   │   ├── Data/                    # Data access and persistence logic (DBContext, EF Configurations,...)
+│   │   ├── Data/                    # Data access and persistence functionality (DBContext, UnitOfWork,EF Configurations)
 │   │   ├── Extensions/              # Helpful extension methods
 │   ├── BuildingBlocks/              # Cross-cutting concerns and infrastructure setup
 ```

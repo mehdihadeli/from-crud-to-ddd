@@ -31,7 +31,6 @@ public class AddChargeStationTests(
         var newChargeStation = new ChargeStationFake(3).Generate();
         var addChargeStation = SmartCharging.Groups.Features.AddChargeStation.v1.AddChargeStation.Of(
             fakeGroup.Id.Value,
-            newChargeStation.Id.Value,
             newChargeStation.Name.Value,
             newChargeStation.Connectors.ToConnectorsDto()
         );
@@ -68,7 +67,6 @@ public class AddChargeStationTests(
 
         var addChargeStation = SmartCharging.Groups.Features.AddChargeStation.v1.AddChargeStation.Of(
             nonExistentGroupId,
-            newChargeStation.Id.Value,
             newChargeStation.Name.Value,
             newChargeStation.Connectors.ToConnectorsDto()
         );

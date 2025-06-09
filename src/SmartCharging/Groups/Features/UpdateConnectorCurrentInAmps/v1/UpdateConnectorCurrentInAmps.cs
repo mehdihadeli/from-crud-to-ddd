@@ -1,6 +1,5 @@
 using SmartCharging.Groups.Models.ValueObjects;
 using SmartCharging.Shared.Application.Contracts;
-using SmartCharging.Shared.Application.Data;
 using SmartCharging.Shared.BuildingBlocks.Exceptions;
 using SmartCharging.Shared.BuildingBlocks.Extensions;
 

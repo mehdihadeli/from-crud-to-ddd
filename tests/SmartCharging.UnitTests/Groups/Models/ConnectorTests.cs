@@ -1,4 +1,3 @@
-using Shouldly;
 using SmartCharging.Groups.Models;
 using SmartCharging.Groups.Models.ValueObjects;
 using SmartCharging.Shared.BuildingBlocks.Exceptions;
@@ -13,22 +12,21 @@ public class ConnectorTests
         // Arrange
         var connectorId = ConnectorId.Of(1);
         var maxCurrent = CurrentInAmps.Of(10);
-        var chargeStationId = ChargeStationId.New();
 
         // Act
-        var connector = Connector.Create(connectorId, maxCurrent, chargeStationId);
+        var connector = Connector.Create(connectorId, maxCurrent);
 
         // Assert
         connector.Id.ShouldBe(connectorId);
         connector.MaxCurrentInAmps.ShouldBe(maxCurrent);
-        connector.ChargeStationId.ShouldBe(chargeStationId);
+        connector.ChargeStationId.ShouldBeNull();
     }
 
     [Fact]
     public void UpdateCurrentInAmps_WithValidData_ShouldUpdateSuccessfully()
     {
         // Arrange
-        var connector = Connector.Create(ConnectorId.Of(1), CurrentInAmps.Of(10), ChargeStationId.New());
+        var connector = Connector.Create(ConnectorId.Of(1), CurrentInAmps.Of(10));
         var updatedCurrent = CurrentInAmps.Of(20);
 
         // Act
@@ -47,7 +45,7 @@ public class ConnectorTests
 
         // Act & Assert
         Should
-            .Throw<ValidationException>(() => Connector.Create(null!, maxCurrent, chargeStationId))
+            .Throw<ValidationException>(() => Connector.Create(null!, maxCurrent))
             .Message.ShouldBe("id cannot be null or empty.");
     }
 
@@ -60,28 +58,15 @@ public class ConnectorTests
 
         // Act & Assert
         Should
-            .Throw<ValidationException>(() => Connector.Create(connectorId, null!, chargeStationId))
+            .Throw<ValidationException>(() => Connector.Create(connectorId, null!))
             .Message.ShouldBe("maxCurrentInAmps cannot be null or empty.");
-    }
-
-    [Fact]
-    public void CreateConnector_WithNullChargeStationId_ShouldThrowValidationException()
-    {
-        // Arrange
-        var connectorId = ConnectorId.Of(1);
-        var maxCurrent = CurrentInAmps.Of(10);
-
-        // Act & Assert
-        Should
-            .Throw<ValidationException>(() => Connector.Create(connectorId, maxCurrent, null!))
-            .Message.ShouldBe("chargeStationId cannot be null or empty.");
     }
 
     [Fact]
     public void UpdateCurrentInAmps_WithNullValue_ShouldThrowValidationException()
     {
         // Arrange
-        var connector = Connector.Create(ConnectorId.Of(1), CurrentInAmps.Of(10), ChargeStationId.New());
+        var connector = Connector.Create(ConnectorId.Of(1), CurrentInAmps.Of(10));
 
         // Act & Assert
         Should
@@ -98,7 +83,7 @@ public class ConnectorTests
 
         // Act & Assert
         Should
-            .Throw<ValidationException>(() => Connector.Create(connectorId, CurrentInAmps.Of(0), chargeStationId))
+            .Throw<ValidationException>(() => Connector.Create(connectorId, CurrentInAmps.Of(0)))
             .Message.ShouldBe("Current `0` must be greater than 0");
     }
 
@@ -106,7 +91,7 @@ public class ConnectorTests
     public void UpdateCurrentInAmps_WithInvalidCurrent_ShouldThrowValidationException()
     {
         // Arrange
-        var connector = Connector.Create(ConnectorId.Of(1), CurrentInAmps.Of(10), ChargeStationId.New());
+        var connector = Connector.Create(ConnectorId.Of(1), CurrentInAmps.Of(10));
 
         // Act & Assert
         Should

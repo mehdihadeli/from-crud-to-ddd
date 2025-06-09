@@ -30,7 +30,7 @@ namespace SmartCharging.Shared.Application.Data.Migrations
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
                     name = table.Column<string>(type: "text", nullable: false),
-                    group_id = table.Column<Guid>(type: "uuid", nullable: true)
+                    group_id = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {

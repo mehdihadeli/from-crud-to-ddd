@@ -1,4 +1,3 @@
-using Shouldly;
 using SmartCharging.Groups.Models;
 using SmartCharging.Groups.Models.ValueObjects;
 using SmartCharging.Shared.BuildingBlocks.Exceptions;
@@ -20,8 +19,8 @@ public class AddChargeStationTests
         var chargeStationName = Name.Of("Station A");
         var connectors = new List<Connector>
         {
-            Connector.Create(ConnectorId.Of(1), CurrentInAmps.Of(50), chargeStationId),
-            Connector.Create(ConnectorId.Of(2), CurrentInAmps.Of(100), chargeStationId),
+            Connector.Create(ConnectorId.Of(1), CurrentInAmps.Of(50)),
+            Connector.Create(ConnectorId.Of(2), CurrentInAmps.Of(100)),
         }.AsReadOnly();
 
         var chargeStation = ChargeStation.Create(chargeStationId, chargeStationName, connectors);
@@ -46,8 +45,8 @@ public class AddChargeStationTests
         var chargeStationName = Name.Of("Station Exceeding");
         var connectors = new List<Connector>
         {
-            Connector.Create(ConnectorId.Of(1), CurrentInAmps.Of(70), chargeStationId),
-            Connector.Create(ConnectorId.Of(2), CurrentInAmps.Of(50), chargeStationId), // Total 120 amps
+            Connector.Create(ConnectorId.Of(1), CurrentInAmps.Of(70)),
+            Connector.Create(ConnectorId.Of(2), CurrentInAmps.Of(50)), // Total 120 amps
         }.AsReadOnly();
 
         var chargeStation = ChargeStation.Create(chargeStationId, chargeStationName, connectors);
@@ -67,10 +66,7 @@ public class AddChargeStationTests
         var existingStation = ChargeStation.Create(
             chargeStationId,
             Name.Of("Station 1"),
-            new List<Connector>
-            {
-                Connector.Create(ConnectorId.Of(1), CurrentInAmps.Of(100), chargeStationId),
-            }.AsReadOnly()
+            new List<Connector> { Connector.Create(ConnectorId.Of(1), CurrentInAmps.Of(100)) }.AsReadOnly()
         );
         var group = Group.Create(GroupId.New(), groupName, groupCapacityInAmps, existingStation);
 
@@ -78,10 +74,7 @@ public class AddChargeStationTests
         var duplicateStation = ChargeStation.Create(
             chargeStationId,
             Name.Of("Duplicate"),
-            new List<Connector>
-            {
-                Connector.Create(ConnectorId.Of(2), CurrentInAmps.Of(50), chargeStationId),
-            }.AsReadOnly()
+            new List<Connector> { Connector.Create(ConnectorId.Of(2), CurrentInAmps.Of(50)) }.AsReadOnly()
         );
 
         // Act & Assert: Adding the duplicate station should throw a DomainException
@@ -122,10 +115,7 @@ public class AddChargeStationTests
             ChargeStation.Create(
                 ChargeStationId.New(),
                 invalidName!,
-                new List<Connector>
-                {
-                    Connector.Create(ConnectorId.Of(1), CurrentInAmps.Of(100), ChargeStationId.New()),
-                }.AsReadOnly()
+                new List<Connector> { Connector.Create(ConnectorId.Of(1), CurrentInAmps.Of(100)) }.AsReadOnly()
             )
         );
 

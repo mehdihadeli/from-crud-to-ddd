@@ -29,9 +29,8 @@ public static class AddChargeStationEndpoint
 
         var addChargeStation = AddChargeStation.Of(
             groupId,
-            request?.ChargeStationId,
             request?.Name,
-            request?.ConnectorsRequest?.ToConnectorsDto(request.ChargeStationId)
+            request?.ConnectorsRequest?.ToConnectorsDto()
         );
 
         var chargeStationId = await handler.Handle(addChargeStation, cancellationToken);
@@ -52,9 +51,6 @@ public sealed record AddChargeStationRequest(
     IEnumerable<AddChargeStationRequest.CreateConnectorRequest>? ConnectorsRequest
 )
 {
-    // make it internal to prevent exposing in openapi schema
-    internal Guid ChargeStationId { get; } = Guid.CreateVersion7();
-
     public sealed record CreateConnectorRequest(int ConnectorId, int MaxCurrentInAmps);
 }
 

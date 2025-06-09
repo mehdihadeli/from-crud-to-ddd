@@ -16,8 +16,8 @@ public class ChargeStationTests
         var stationName = Name.Of("Station 1");
         var connectors = new[]
         {
-            Connector.Create(ConnectorId.Of(1), CurrentInAmps.Of(10), stationId),
-            Connector.Create(ConnectorId.Of(2), CurrentInAmps.Of(20), stationId),
+            Connector.Create(ConnectorId.Of(1), CurrentInAmps.Of(10)),
+            Connector.Create(ConnectorId.Of(2), CurrentInAmps.Of(20)),
         };
 
         // Act
@@ -50,8 +50,8 @@ public class ChargeStationTests
         var chargeStation = new ChargeStationFake(1).Generate();
         var additionalConnectors = new[]
         {
-            Connector.Create(ConnectorId.Of(2), CurrentInAmps.Of(15), chargeStation.Id),
-            Connector.Create(ConnectorId.Of(3), CurrentInAmps.Of(25), chargeStation.Id),
+            Connector.Create(ConnectorId.Of(2), CurrentInAmps.Of(15)),
+            Connector.Create(ConnectorId.Of(3), CurrentInAmps.Of(25)),
         };
 
         // Act
@@ -96,9 +96,9 @@ public class ChargeStationTests
         // Arrange
         var connectors = new[]
         {
-            Connector.Create(ConnectorId.Of(1), CurrentInAmps.Of(10), ChargeStationId.New()),
-            Connector.Create(ConnectorId.Of(2), CurrentInAmps.Of(20), ChargeStationId.New()),
-            Connector.Create(ConnectorId.Of(3), CurrentInAmps.Of(15), ChargeStationId.New()),
+            Connector.Create(ConnectorId.Of(1), CurrentInAmps.Of(10)),
+            Connector.Create(ConnectorId.Of(2), CurrentInAmps.Of(20)),
+            Connector.Create(ConnectorId.Of(3), CurrentInAmps.Of(15)),
         };
         var chargeStation = ChargeStation.Create(ChargeStationId.New(), Name.Of("Station"), connectors);
 
@@ -114,7 +114,7 @@ public class ChargeStationTests
     {
         // Arrange
         var name = Name.Of("Station");
-        var connectors = new[] { Connector.Create(ConnectorId.Of(1), CurrentInAmps.Of(10), ChargeStationId.New()) };
+        var connectors = new[] { Connector.Create(ConnectorId.Of(1), CurrentInAmps.Of(10)) };
 
         // Act & Assert
         Should
@@ -127,7 +127,7 @@ public class ChargeStationTests
     {
         // Arrange
         var id = ChargeStationId.New();
-        var connectors = new[] { Connector.Create(ConnectorId.Of(1), CurrentInAmps.Of(10), id) };
+        var connectors = new[] { Connector.Create(ConnectorId.Of(1), CurrentInAmps.Of(10)) };
 
         // Act & Assert
         Should
@@ -155,7 +155,7 @@ public class ChargeStationTests
         var chargeStation = new ChargeStationFake(2).Generate();
         var existingConnector = chargeStation.Connectors.First();
 
-        var duplicateConnector = Connector.Create(existingConnector.Id, CurrentInAmps.Of(25), chargeStation.Id);
+        var duplicateConnector = Connector.Create(existingConnector.Id, CurrentInAmps.Of(25));
 
         // Act & Assert
         Should
@@ -170,8 +170,8 @@ public class ChargeStationTests
         var chargeStation = new ChargeStationFake(4).Generate();
         var additionalConnectors = new[]
         {
-            Connector.Create(ConnectorId.Of(5), CurrentInAmps.Of(10), chargeStation.Id),
-            Connector.Create(ConnectorId.Of(4), CurrentInAmps.Of(20), chargeStation.Id), // Exceeds limit
+            Connector.Create(ConnectorId.Of(5), CurrentInAmps.Of(10)),
+            Connector.Create(ConnectorId.Of(4), CurrentInAmps.Of(20)), // Exceeds limit
         };
 
         // Act & Assert

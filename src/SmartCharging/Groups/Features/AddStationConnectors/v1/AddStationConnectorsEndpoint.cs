@@ -30,7 +30,7 @@ public static class AddStationConnectorsEndpoint
         var addConnector = AddStationConnectors.Of(
             groupId,
             chargeStationId,
-            request?.ConnectorsRequest?.ToConnectorsDto(chargeStationId)
+            request?.ConnectorsRequest?.ToConnectorsDto()
         );
         var result = await handler.Handle(addConnector, cancellationToken);
 

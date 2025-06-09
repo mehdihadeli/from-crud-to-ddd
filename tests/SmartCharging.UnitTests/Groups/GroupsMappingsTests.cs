@@ -19,7 +19,6 @@ public class GroupsMappingsTests
         // Assert
         connectorDto.ConnectorId.ShouldBe(connector.Id.Value);
         connectorDto.MaxCurrentInAmps.ShouldBe(connector.MaxCurrentInAmps.Value);
-        connectorDto.ChargeStationId.ShouldBe(connector.ChargeStationId.Value);
     }
 
     [Fact]
@@ -43,11 +42,7 @@ public class GroupsMappingsTests
     {
         // Arrange
         var chargeStation = new ChargeStationFake(1).Generate();
-        var connectorDto = new ConnectorDto(
-            ConnectorId: 1,
-            MaxCurrentInAmps: 30,
-            ChargeStationId: chargeStation.Id.Value
-        );
+        var connectorDto = new ConnectorDto(ConnectorId: 1, MaxCurrentInAmps: 30);
 
         // Act
         var connector = connectorDto.ToConnector();
@@ -55,7 +50,7 @@ public class GroupsMappingsTests
         // Assert
         connector.Id.Value.ShouldBe(connectorDto.ConnectorId);
         connector.MaxCurrentInAmps.Value.ShouldBe(connectorDto.MaxCurrentInAmps);
-        connector.ChargeStationId.Value.ShouldBe(connectorDto.ChargeStationId);
+        connector.ChargeStationId.ShouldBeNull();
     }
 
     [Fact]
@@ -96,14 +91,13 @@ public class GroupsMappingsTests
     {
         // Arrange
         var chargeStationId = Guid.NewGuid();
-        var groupId = Guid.NewGuid();
         var chargeStationDto = new ChargeStationDto(
             ChargeStationId: chargeStationId,
             Name: "Test Charge Station",
             Connectors: new List<ConnectorDto>
             {
-                new ConnectorDto(ConnectorId: 1, MaxCurrentInAmps: 30, ChargeStationId: chargeStationId),
-                new ConnectorDto(ConnectorId: 2, MaxCurrentInAmps: 40, ChargeStationId: chargeStationId),
+                new(ConnectorId: 1, MaxCurrentInAmps: 30),
+                new(ConnectorId: 2, MaxCurrentInAmps: 40),
             }
         );
 
@@ -126,8 +120,8 @@ public class GroupsMappingsTests
         var chargeStationId = Guid.NewGuid();
         var connectorDtos = new List<ConnectorDto>
         {
-            new ConnectorDto(ConnectorId: 1, MaxCurrentInAmps: 30, ChargeStationId: chargeStationId),
-            new ConnectorDto(ConnectorId: 2, MaxCurrentInAmps: 40, ChargeStationId: chargeStationId),
+            new(ConnectorId: 1, MaxCurrentInAmps: 30),
+            new(ConnectorId: 2, MaxCurrentInAmps: 40),
         };
 
         // Act

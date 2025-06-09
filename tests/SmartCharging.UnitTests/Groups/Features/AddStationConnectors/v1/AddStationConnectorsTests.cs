@@ -1,4 +1,3 @@
-using Shouldly;
 using SmartCharging.Groups.Models;
 using SmartCharging.Groups.Models.ValueObjects;
 using SmartCharging.Shared.BuildingBlocks.Exceptions;
@@ -17,7 +16,7 @@ public class AddStationConnectorsTests
 
         var initialConnectors = new List<Connector>
         {
-            Connector.Create(ConnectorId.Of(1), CurrentInAmps.Of(50), chargeStationId),
+            Connector.Create(ConnectorId.Of(1), CurrentInAmps.Of(50)),
         }.AsReadOnly();
 
         var chargeStation = ChargeStation.Create(chargeStationId, Name.Of("Station A"), initialConnectors);
@@ -26,8 +25,8 @@ public class AddStationConnectorsTests
         // Create new connectors to add
         var newConnectors = new List<Connector>
         {
-            Connector.Create(ConnectorId.Of(2), CurrentInAmps.Of(50), chargeStationId),
-            Connector.Create(ConnectorId.Of(3), CurrentInAmps.Of(30), chargeStationId),
+            Connector.Create(ConnectorId.Of(2), CurrentInAmps.Of(50)),
+            Connector.Create(ConnectorId.Of(3), CurrentInAmps.Of(30)),
         };
 
         // Act: Add the connectors to the charge station in the group
@@ -49,7 +48,7 @@ public class AddStationConnectorsTests
         var groupCapacityInAmps = CurrentInAmps.Of(150);
         var chargeStationId = ChargeStationId.New();
 
-        var existingConnector = Connector.Create(ConnectorId.Of(1), CurrentInAmps.Of(100), chargeStationId);
+        var existingConnector = Connector.Create(ConnectorId.Of(1), CurrentInAmps.Of(100));
         var chargeStation = ChargeStation.Create(
             chargeStationId,
             Name.Of("Station B"),
@@ -59,10 +58,7 @@ public class AddStationConnectorsTests
         var group = Group.Create(GroupId.New(), groupName, groupCapacityInAmps, chargeStation);
 
         // Try adding new connectors whose total current exceeds group capacity
-        var newConnectors = new List<Connector>
-        {
-            Connector.Create(ConnectorId.Of(2), CurrentInAmps.Of(70), chargeStationId),
-        };
+        var newConnectors = new List<Connector> { Connector.Create(ConnectorId.Of(2), CurrentInAmps.Of(70)) };
 
         // Act & Assert: Adding exceeding connectors should throw DomainException
         var exception = Should.Throw<DomainException>(() => group.AddConnectors(chargeStationId, newConnectors));
@@ -77,7 +73,7 @@ public class AddStationConnectorsTests
         var groupCapacityInAmps = CurrentInAmps.Of(500);
         var chargeStationId = ChargeStationId.New();
 
-        var existingConnector = Connector.Create(ConnectorId.Of(1), CurrentInAmps.Of(100), chargeStationId);
+        var existingConnector = Connector.Create(ConnectorId.Of(1), CurrentInAmps.Of(100));
         var chargeStation = ChargeStation.Create(
             chargeStationId,
             Name.Of("Station C"),
@@ -89,7 +85,7 @@ public class AddStationConnectorsTests
         // Try adding a connector with a duplicate ID
         var newConnectors = new List<Connector>
         {
-            Connector.Create(ConnectorId.Of(1), CurrentInAmps.Of(50), chargeStationId), // Duplicate ID
+            Connector.Create(ConnectorId.Of(1), CurrentInAmps.Of(50)), // Duplicate ID
         };
 
         // Act & Assert: Adding a duplicate connector should throw DomainException

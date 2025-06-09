@@ -1,5 +1,6 @@
 using System.Reflection;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using SmartCharging.Shared.BuildingBlocks.Types;
 
 namespace SmartCharging.Shared.BuildingBlocks.EF;
 
@@ -40,10 +41,13 @@ public class StronglyTypedIdValueConverterSelector<T>(ValueConverterSelectorDepe
             return false;
         }
 
-        var valueProperty = type.GetProperty("Value");
-        if (valueProperty?.GetGetMethod() != null)
+        // Check for the marker interface
+        var idInterface = type.GetInterfaces()
+            .FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IStronglyTypedId<>));
+
+        if (idInterface != null)
         {
-            valueType = valueProperty.PropertyType;
+            valueType = idInterface.GetGenericArguments()[0];
             return true;
         }
 
@@ -56,19 +60,14 @@ public class StronglyTypedIdValueConverterSelector<T>(ValueConverterSelectorDepe
 }
 
 public class StronglyTypedIdConverter<TStronglyTypedId, TValue>(ConverterMappingHints mappingHints = null)
-    : ValueConverter<TStronglyTypedId, TValue>(id => GetValue(id), value => CreateFromValue(value), mappingHints)
+    : ValueConverter<TStronglyTypedId, TValue>(
+        id => ((IStronglyTypedId<TValue>)id).Value,
+        value => CreateFromValue(value),
+        mappingHints
+    )
     where TStronglyTypedId : notnull
 {
     private static readonly Func<TValue, TStronglyTypedId> CreateFromValue = CreateConverter();
-
-    private static TValue GetValue(TStronglyTypedId id)
-    {
-        var valueProperty = typeof(TStronglyTypedId).GetProperty("Value");
-        if (valueProperty == null)
-            throw new InvalidOperationException($"Type {typeof(TStronglyTypedId)} does not have a Value property");
-
-        return (TValue)valueProperty.GetValue(id)!;
-    }
 
     private static Func<TValue, TStronglyTypedId> CreateConverter()
     {
@@ -88,13 +87,22 @@ public class StronglyTypedIdConverter<TStronglyTypedId, TValue>(ConverterMapping
             types: Type.EmptyTypes,
             modifiers: null
         );
-        var valueProperty = type.GetProperty("Value");
-        if (parameterlessCtor != null && valueProperty?.CanWrite == true)
+
+        if (parameterlessCtor != null)
         {
             return value =>
             {
                 var instance = (TStronglyTypedId)parameterlessCtor.Invoke(null);
-                valueProperty.SetValue(instance, value);
+
+                // Use the interface to set the value if possible
+                if (instance is IStronglyTypedId<TValue> stronglyTypedId)
+                {
+                    // This assumes the Value property is settable through reflection
+                    // even if it's not publicly settable
+                    var valueProperty = type.GetProperty("Value");
+                    valueProperty?.SetValue(instance, value);
+                }
+
                 return instance;
             };
         }

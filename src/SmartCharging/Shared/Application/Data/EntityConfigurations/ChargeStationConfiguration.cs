@@ -2,7 +2,6 @@ using Humanizer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SmartCharging.Groups.Models;
-using SmartCharging.Groups.Models.ValueObjects;
 
 namespace SmartCharging.Shared.Application.Data.EntityConfigurations;
 
@@ -25,6 +24,8 @@ public class ChargeStationConfiguration : IEntityTypeConfiguration<ChargeStation
                 name.Property(p => p.Value).HasColumnName(nameof(ChargeStation.Name).Underscore()).IsRequired();
             }
         );
+
+        builder.Property(c => c.GroupId).IsRequired();
 
         builder
             .HasMany(g => g.Connectors)

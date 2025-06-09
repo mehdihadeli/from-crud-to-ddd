@@ -19,14 +19,11 @@ public class ConnectorConfiguration : IEntityTypeConfiguration<Connector>
             .ValueGeneratedNever()
             .IsRequired();
 
-        // Define composite primary key: ChargeStationId + ConnectorId
+        // Define a composite primary key: ChargeStationId + ConnectorId
         // Connector has integer Identifier unique within the context of a charge station
         builder.HasKey(c => new { c.ChargeStationId, c.Id });
 
-        builder
-            .Property(c => c.ChargeStationId)
-            .HasConversion(id => id.Value, value => ChargeStationId.Of(value))
-            .IsRequired();
+        builder.Property(c => c.ChargeStationId).IsRequired();
 
         // Owned type configuration for MaxCurrentInAmps
         builder.OwnsOne(

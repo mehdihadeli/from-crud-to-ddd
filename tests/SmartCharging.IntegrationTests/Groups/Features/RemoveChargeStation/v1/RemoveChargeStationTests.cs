@@ -38,16 +38,24 @@ public class RemoveChargeStationTests(
         await handler.Handle(removeChargeStation, CancellationToken.None);
 
         // Assert
-        var updatedGroup = await SharedFixture.ExecuteEfDbContextAsync(async db =>
+        await SharedFixture.ExecuteEfDbContextAsync(async db =>
         {
-            return await db
+            var updatedGroup = await db
                 .Groups.Include(g => g.ChargeStations)
                 .ThenInclude(cs => cs.Connectors)
                 .FirstOrDefaultAsync(g => g.Id == fakeGroup.Id);
-        });
 
-        updatedGroup.ShouldNotBeNull();
-        updatedGroup.ChargeStations.ShouldBeEmpty();
+            // check that the group aggregate has no charge stations
+            updatedGroup.ShouldNotBeNull();
+            updatedGroup.ChargeStations.ShouldBeEmpty();
+
+            // check db for the removed station and connectors
+            var existingStationOnDb = db.ChargeStations.FirstOrDefault(x => x.GroupId == fakeGroup.Id);
+            existingStationOnDb.ShouldBeNull();
+
+            var existingConnectorsOnDb = db.Connectors.Where(x => x.ChargeStationId == targetChargeStation.Id).ToList();
+            existingConnectorsOnDb.ShouldBeEmpty();
+        });
     }
 
     [Fact]
@@ -137,18 +145,29 @@ public class RemoveChargeStationTests(
         await handler.Handle(removeChargeStation, CancellationToken.None);
 
         // Assert
-        var updatedGroup = await SharedFixture.ExecuteEfDbContextAsync(async db =>
+        await SharedFixture.ExecuteEfDbContextAsync(async db =>
         {
-            return await db
+            var updatedGroup = await db
                 .Groups.Include(g => g.ChargeStations)
                 .ThenInclude(cs => cs.Connectors)
                 .FirstOrDefaultAsync(g => g.Id == fakeGroup.Id);
+
+            updatedGroup.ShouldNotBeNull();
+            updatedGroup.ChargeStations.Count.ShouldBe(1);
+
+            var remainingStation = updatedGroup.ChargeStations.Single();
+            remainingStation.Id.ShouldBe(fakeGroup.ChargeStations.First().Id);
+
+            // check db for the removed station and connectors
+            var existingStationsOnDb = db.ChargeStations.Where(x => x.GroupId == fakeGroup.Id);
+            existingStationsOnDb.ShouldNotBeEmpty();
+            existingStationsOnDb.Count().ShouldBe(1);
+            existingStationsOnDb.FirstOrDefault(x => x.Id == additionalChargeStation.Id).ShouldBeNull();
+
+            var existingConnectorsOnDb = db
+                .Connectors.Where(x => x.ChargeStationId == additionalChargeStation.Id)
+                .ToList();
+            existingConnectorsOnDb.ShouldBeEmpty();
         });
-
-        updatedGroup.ShouldNotBeNull();
-        updatedGroup.ChargeStations.Count.ShouldBe(1);
-
-        var remainingStation = updatedGroup.ChargeStations.Single();
-        remainingStation.Id.ShouldBe(fakeGroup.ChargeStations.First().Id);
     }
 }

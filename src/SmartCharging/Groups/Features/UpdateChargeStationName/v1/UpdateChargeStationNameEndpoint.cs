@@ -27,7 +27,7 @@ public static class UpdateChargeStationNameEndpoint
     {
         var (groupId, chargeStationId, request, handler, cancellationToken) = parameters;
 
-        var updateChargeStationName = UpdateChargeStationName.Of(groupId, chargeStationId, request.NewName);
+        var updateChargeStationName = UpdateChargeStationName.Of(groupId, chargeStationId, request?.NewName);
         await handler.Handle(updateChargeStationName, cancellationToken);
 
         return TypedResults.NoContent();
