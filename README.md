@@ -1,4 +1,4 @@
-# ⚡SmartCharging API
+# ⚡From Crud To DDD
 
 > 💡 A practical api sample based on `Vertical Slice Architecture`, `DDD`, `Minimal APIs` and `.Net 9`.
 
