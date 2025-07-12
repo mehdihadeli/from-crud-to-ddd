@@ -4,7 +4,7 @@
 
 This project involves migrating our [existing CRUD-based](https://github.com/mehdihadeli/from-crud-to-ddd/tree/without-ddd) application architecture to a more robust and maintainable [Domain-Driven Design (DDD) approach](https://github.com/mehdihadeli/from-crud-to-ddd/). The goal is to better align the codebase with business logic, improve scalability, and enhance long-term maintainability.
 
-To ensure a smooth and isolated transition, the migration has been organized into two separate Git branches.
+To ensure a smooth and isolated transition, the migration has been organized into [two separate Git branches](https://github.com/mehdihadeli/from-crud-to-ddd/branches).
 
 ## Table of Contents
 
