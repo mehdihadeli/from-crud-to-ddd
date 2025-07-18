@@ -5,10 +5,20 @@ PROJECT := src/SmartCharging/SmartCharging.csproj
 .PHONY: all
 all: build
 
+# Restore NuGet packages
+.PHONY: restore
+restore:
+	dotnet restore
+
 # Build the project
 .PHONY: build
 build: 
 	dotnet build 
+
+# CI build (without restore step)
+.PHONY: ci-build
+ci-build:
+	dotnet build --no-restore
 
 # Clean build artifacts
 .PHONY: clean
