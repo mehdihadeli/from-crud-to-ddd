@@ -35,10 +35,9 @@ integration-tests:
 end-to-end-tests: 
 	dotnet test ./tests/SmartCharging.EndToEndTests/SmartCharging.EndToEndTests.csproj
 
-# Run all test
+# Run all tests (unit, integration, and end-to-end)
 .PHONY: test
-test: 
-	dotnet test
+test: unit-tests integration-tests end-to-end-tests
 
 # Format code using CSharpier
 .PHONY: format
