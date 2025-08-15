@@ -1,6 +1,6 @@
-using SmartCharging.Groups;
-using SmartCharging.Groups.Dtos;
 using SmartCharging.UnitTests.Groups.Mocks;
+using SmartChargingApi.Groups;
+using SmartChargingApi.Groups.Dtos;
 
 namespace SmartCharging.UnitTests.Groups;
 
@@ -74,9 +74,20 @@ public class GroupsMappingsTests
     {
         // Arrange
         var group = new GroupFake(2, 400).Generate();
+        var capacityStats = new GroupCapacityStatisticsDto(
+            CurrentLoadAmps: 100,
+            MaxCapacityAmps: 200,
+            AvailableCapacityAmps: 100
+        );
+
+        var energyStats = new GroupEnergyConsumptionDto(
+            EnergyUsedKWh: 1500,
+            PeriodStart: DateTime.UtcNow.AddDays(-7),
+            PeriodEnd: DateTime.UtcNow
+        );
 
         // Act
-        var result = group.ToGroupGetByIdResult();
+        var result = group.ToGroupGetByIdResult(capacityStats: capacityStats, energyStats: energyStats);
 
         // Assert
         result.Group.ShouldNotBeNull();

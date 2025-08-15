@@ -7,13 +7,54 @@ on:
     branches: ["main"]
 
 jobs:
+  pre-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "9.0.x"
+
+      # https://learn.microsoft.com/en-us/dotnet/core/tools/global-tools
+      - name: Restore .NET Tools
+        shell: bash
+        run: dotnet tool restore
+
+      - name: Run Analyzers Task
+        if: success()
+        shell: bash
+        run: |
+          echo "📂 Running analyzers for solution file: ."
+          make check-analyzers .
+
+      - name: Run Format Task
+        if: success()
+        shell: bash
+        id: format
+        run: |
+          echo "🧹 Checking format for solution file: ."
+          make check-format .
+
+      - name: Run Style Task
+        id: style
+        shell: bash
+        if: success()
+        run: |
+          echo "🎨 Checking style for solution file: ."
+          make check-style .
+
   build-test:
     runs-on: ubuntu-latest
+    needs: [pre-checks]
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+
       - name: Setup .NET
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "9.0.x"
 
@@ -22,6 +63,6 @@ jobs:
 
       - name: Build
         run: make ci-build
-        
+
       - name: Run automated unit and integration tests
         run: make test

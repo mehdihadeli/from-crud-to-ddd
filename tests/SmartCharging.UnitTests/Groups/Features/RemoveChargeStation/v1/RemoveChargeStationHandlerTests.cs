@@ -1,13 +1,11 @@
 using Microsoft.Extensions.Logging;
 using NSubstitute;
-using SmartCharging.Groups.Contracts;
-using SmartCharging.Groups.Features.RemoveChargeStation.v1;
-using SmartCharging.Groups.Models;
-using SmartCharging.Groups.Models.ValueObjects;
-using SmartCharging.Shared.Application.Contracts;
-using SmartCharging.Shared.Application.Data;
-using SmartCharging.Shared.BuildingBlocks.Exceptions;
+using SmartCharging.ServiceDefaults.Exceptions;
 using SmartCharging.UnitTests.Groups.Mocks;
+using SmartChargingApi.Groups.Features.RemoveChargeStation.v1;
+using SmartChargingApi.Groups.Models;
+using SmartChargingApi.Groups.Models.ValueObjects;
+using SmartChargingApi.Shared.Contracts;
 
 namespace SmartCharging.UnitTests.Groups.Features.RemoveChargeStation.v1;
 
@@ -38,7 +36,7 @@ public class RemoveChargeStationHandlerTests
 
         _unitOfWorkMock.GroupRepository.GetByIdAsync(Arg.Is(groupId), Arg.Any<CancellationToken>()).Returns(group);
 
-        var removeChargeStation = SmartCharging.Groups.Features.RemoveChargeStation.v1.RemoveChargeStation.Of(
+        var removeChargeStation = SmartChargingApi.Groups.Features.RemoveChargeStation.v1.RemoveChargeStation.Of(
             groupId.Value,
             chargeStation.Id.Value
         );
@@ -70,7 +68,7 @@ public class RemoveChargeStationHandlerTests
             .GroupRepository.GetByIdAsync(Arg.Is(groupId), Arg.Any<CancellationToken>())
             .Returns((Group)null!);
 
-        var removeChargeStation = SmartCharging.Groups.Features.RemoveChargeStation.v1.RemoveChargeStation.Of(
+        var removeChargeStation = SmartChargingApi.Groups.Features.RemoveChargeStation.v1.RemoveChargeStation.Of(
             groupId.Value,
             chargeStationId.Value
         );
@@ -103,7 +101,7 @@ public class RemoveChargeStationHandlerTests
 
         _unitOfWorkMock.GroupRepository.GetByIdAsync(Arg.Is(groupId), Arg.Any<CancellationToken>()).Returns(group);
 
-        var removeChargeStation = SmartCharging.Groups.Features.RemoveChargeStation.v1.RemoveChargeStation.Of(
+        var removeChargeStation = SmartChargingApi.Groups.Features.RemoveChargeStation.v1.RemoveChargeStation.Of(
             groupId.Value,
             chargeStationId.Value
         );

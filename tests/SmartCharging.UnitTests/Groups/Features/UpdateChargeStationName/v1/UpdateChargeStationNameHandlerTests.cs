@@ -1,13 +1,11 @@
 using Microsoft.Extensions.Logging;
 using NSubstitute;
-using SmartCharging.Groups.Contracts;
-using SmartCharging.Groups.Features.UpdateChargeStationName.v1;
-using SmartCharging.Groups.Models;
-using SmartCharging.Groups.Models.ValueObjects;
-using SmartCharging.Shared.Application.Contracts;
-using SmartCharging.Shared.Application.Data;
-using SmartCharging.Shared.BuildingBlocks.Exceptions;
+using SmartCharging.ServiceDefaults.Exceptions;
 using SmartCharging.UnitTests.Groups.Mocks;
+using SmartChargingApi.Groups.Features.UpdateChargeStationName.v1;
+using SmartChargingApi.Groups.Models;
+using SmartChargingApi.Groups.Models.ValueObjects;
+using SmartChargingApi.Shared.Contracts;
 
 namespace SmartCharging.UnitTests.Groups.Features.UpdateChargeStationName.v1;
 
@@ -42,7 +40,7 @@ public class UpdateChargeStationNameHandlerTests
         _unitOfWorkMock.GroupRepository.GetByIdAsync(Arg.Is(groupId), Arg.Any<CancellationToken>()).Returns(group);
 
         var updateChargeStationName =
-            new SmartCharging.Groups.Features.UpdateChargeStationName.v1.UpdateChargeStationName(
+            new SmartChargingApi.Groups.Features.UpdateChargeStationName.v1.UpdateChargeStationName(
                 groupId.Value,
                 chargeStationId.Value,
                 newName.Value
@@ -75,7 +73,7 @@ public class UpdateChargeStationNameHandlerTests
             .Returns((Group)null!);
 
         var updateChargeStationName =
-            new SmartCharging.Groups.Features.UpdateChargeStationName.v1.UpdateChargeStationName(
+            new SmartChargingApi.Groups.Features.UpdateChargeStationName.v1.UpdateChargeStationName(
                 groupId.Value,
                 chargeStationId.Value,
                 newName.Value
@@ -111,7 +109,7 @@ public class UpdateChargeStationNameHandlerTests
         _unitOfWorkMock.GroupRepository.GetByIdAsync(Arg.Is(groupId), Arg.Any<CancellationToken>()).Returns(group);
 
         var updateChargeStationName =
-            new SmartCharging.Groups.Features.UpdateChargeStationName.v1.UpdateChargeStationName(
+            new SmartChargingApi.Groups.Features.UpdateChargeStationName.v1.UpdateChargeStationName(
                 groupId.Value,
                 chargeStationId.Value,
                 newName.Value

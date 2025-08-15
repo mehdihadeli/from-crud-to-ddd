@@ -1,11 +1,12 @@
 using Microsoft.Extensions.DependencyInjection;
-using SmartCharging.Groups.Contracts;
-using SmartCharging.Groups.Models.ValueObjects;
 using SmartCharging.IntegrationTests.Groups.Mocks;
-using SmartCharging.Shared.Application.Contracts;
-using SmartCharging.Shared.Application.Data;
+using SmartCharging.Shared.Data;
 using SmartCharging.TestsShared.Fixtures;
-using Xunit.Abstractions;
+using SmartChargingApi;
+using SmartChargingApi.Groups.Contracts;
+using SmartChargingApi.Groups.Models.ValueObjects;
+using SmartChargingApi.Shared.Contracts;
+using SmartChargingApi.Shared.Data;
 
 namespace SmartCharging.IntegrationTests.Groups.Data;
 
@@ -14,33 +15,30 @@ public class GroupRepositoryTests : SmartChargingIntegrationTestBase
     private readonly IGroupRepository _groupRepository;
     private readonly IUnitOfWork _unitOfWork;
 
-    public GroupRepositoryTests(
-        SharedFixture<SmartChargingMetadata, SmartChargingDbContext> sharedFixture,
-        ITestOutputHelper outputHelper
-    )
-        : base(sharedFixture, outputHelper)
+    public GroupRepositoryTests(SharedFixture<SmartChargingMetadata, SmartChargingDbContext> sharedFixture)
+        : base(sharedFixture)
     {
         _groupRepository = base.Scope.ServiceProvider.GetRequiredService<IGroupRepository>();
         _unitOfWork = base.Scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
     }
 
     [Fact]
-    internal async Task AddAsync_WithValidGroup_Should_AddGroupSuccessfully()
+    internal async Task AddAsync_WhenGroupIsValid_AddsGroupSuccessfully()
     {
         // Arrange
         var fakeGroup = new GroupFake(numberOfConnectorsPerStation: 3).Generate();
 
         // Act
         await _groupRepository.AddAsync(fakeGroup, CancellationToken.None);
-        await _unitOfWork.CommitAsync();
+        await _unitOfWork.CommitAsync(TestContext.Current.CancellationToken);
 
         // Assert
-        var exists = await _groupRepository.ExistsAsync(fakeGroup.Id);
+        var exists = await _groupRepository.ExistsAsync(fakeGroup.Id, TestContext.Current.CancellationToken);
         exists.ShouldBeTrue();
     }
 
     [Fact]
-    internal async Task GetByIdAsync_WithExistingGroup_Should_ReturnGroupWithDetails()
+    internal async Task GetByIdAsync_WhenGroupExists_ReturnsGroupWithDetails()
     {
         // Arrange
         var fakeGroup = new GroupFake(numberOfConnectorsPerStation: 3).Generate();
@@ -52,7 +50,7 @@ public class GroupRepositoryTests : SmartChargingIntegrationTestBase
         });
 
         // Act
-        var retrievedGroup = await _groupRepository.GetByIdAsync(fakeGroup.Id);
+        var retrievedGroup = await _groupRepository.GetByIdAsync(fakeGroup.Id, TestContext.Current.CancellationToken);
 
         // Assert
         retrievedGroup.ShouldNotBeNull();
@@ -61,7 +59,7 @@ public class GroupRepositoryTests : SmartChargingIntegrationTestBase
     }
 
     [Fact]
-    internal async Task GetGroupsByPageAsync_WithValidPageNumberAndSize_Should_ReturnPagedResults()
+    internal async Task GetGroupsByPageAsync_WhenPageNumberAndSizeAreValid_ReturnsPagedResults()
     {
         // Arrange
         for (var i = 0; i < 10; i++)
@@ -75,7 +73,7 @@ public class GroupRepositoryTests : SmartChargingIntegrationTestBase
         }
 
         // Act
-        var groups = await _groupRepository.GetByPageAsync(1, 5);
+        var groups = await _groupRepository.GetByPageAsync(1, 5, TestContext.Current.CancellationToken);
 
         // Assert
         groups.ShouldNotBeNull();
@@ -83,7 +81,7 @@ public class GroupRepositoryTests : SmartChargingIntegrationTestBase
     }
 
     [Fact]
-    internal async Task ExistsAsync_WithExistingGroup_Should_ReturnTrue()
+    internal async Task ExistsAsync_WhenGroupExists_ReturnsTrue()
     {
         // Arrange
         var fakeGroup = new GroupFake(numberOfConnectorsPerStation: 3).Generate();
@@ -95,25 +93,25 @@ public class GroupRepositoryTests : SmartChargingIntegrationTestBase
         });
 
         // Act
-        var exists = await _groupRepository.ExistsAsync(fakeGroup.Id);
+        var exists = await _groupRepository.ExistsAsync(fakeGroup.Id, TestContext.Current.CancellationToken);
 
         // Assert
         exists.ShouldBeTrue();
     }
 
     [Fact]
-    internal async Task ExistsAsync_WithNonExistentGroup_Should_ReturnFalse()
+    internal async Task ExistsAsync_WhenGroupDoesNotExist_ReturnsFalse()
     {
         // Act
         var nonExistentGroupId = GroupId.New();
-        var exists = await _groupRepository.ExistsAsync(nonExistentGroupId);
+        var exists = await _groupRepository.ExistsAsync(nonExistentGroupId, TestContext.Current.CancellationToken);
 
         // Assert
         exists.ShouldBeFalse();
     }
 
     [Fact]
-    internal async Task Remove_WithExistingGroup_Should_RemoveGroupSuccessfully()
+    internal async Task Remove_WhenGroupExists_RemovesGroupSuccessfully()
     {
         // Arrange
         var fakeGroup = new GroupFake(numberOfConnectorsPerStation: 3).Generate();
@@ -125,16 +123,16 @@ public class GroupRepositoryTests : SmartChargingIntegrationTestBase
         });
 
         // Act
-        var groupToRemove = await _groupRepository.GetByIdAsync(fakeGroup.Id);
+        var groupToRemove = await _groupRepository.GetByIdAsync(fakeGroup.Id, TestContext.Current.CancellationToken);
         if (groupToRemove != null)
         {
-            // remove applies to a scoped dbcontext that uses also inside unitofwork
+            // remove applying to a scoped dbcontext that uses also inside the unitofwork
             _groupRepository.Remove(groupToRemove);
-            await _unitOfWork.CommitAsync();
+            await _unitOfWork.CommitAsync(TestContext.Current.CancellationToken);
         }
 
         // Assert
-        var exists = await _groupRepository.ExistsAsync(fakeGroup.Id);
+        var exists = await _groupRepository.ExistsAsync(fakeGroup.Id, TestContext.Current.CancellationToken);
         exists.ShouldBeFalse();
     }
 }

@@ -1,6 +1,5 @@
 using Bogus;
-using SmartCharging.Groups.Dtos;
-using SmartCharging.Groups.Features.CreateGroup.v1;
+using SmartChargingApi.Groups.Features.CreateGroup.v1;
 
 namespace SmartCharging.EndToEndTests.Group.Mocks;
 

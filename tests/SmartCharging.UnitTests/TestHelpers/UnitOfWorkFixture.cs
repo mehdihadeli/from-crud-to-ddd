@@ -1,7 +1,8 @@
 using Bogus;
-using SmartCharging.Groups.Data;
-using SmartCharging.Shared.Application.Data;
+using SmartCharging.Shared.Data;
 using SmartCharging.UnitTests.Groups.Mocks;
+using SmartChargingApi.Groups.Data;
+using SmartChargingApi.Shared.Data;
 
 namespace SmartCharging.UnitTests.TestHelpers;
 

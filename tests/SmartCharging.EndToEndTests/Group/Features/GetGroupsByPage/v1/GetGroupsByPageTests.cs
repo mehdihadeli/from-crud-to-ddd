@@ -1,22 +1,21 @@
 using System.Net;
 using System.Net.Http.Json;
-using Microsoft.EntityFrameworkCore;
 using SmartCharging.EndToEndTests.Group.Mocks;
-using SmartCharging.Groups.Dtos;
-using SmartCharging.Groups.Features.GetGroupsByPage.v1;
-using SmartCharging.Shared.Application.Data;
+using SmartCharging.Shared.Data;
 using SmartCharging.TestsShared.Fixtures;
-using Xunit.Abstractions;
+using SmartChargingApi;
+using SmartChargingApi.Groups.Features.GetGroupsByPage.v1;
+using SmartChargingApi.Shared.Data;
 
 namespace SmartCharging.EndToEndTests.Group.Features.GetGroupsByPage.v1;
 
-public class GetGroupsByPageTests(
-    SharedFixture<SmartChargingMetadata, SmartChargingDbContext> sharedFixture,
-    ITestOutputHelper outputHelper
-) : SmartChargingEndToEndTestBase(sharedFixture, outputHelper)
+//TestName: `MethodName_Condition_ExpectedResult`
+
+public class GetGroupsByPageTests(SharedFixture<SmartChargingMetadata, SmartChargingDbContext> sharedFixture)
+    : SmartChargingEndToEndTestBase(sharedFixture)
 {
     [Fact]
-    internal async Task GetGroupsByPage_WithValidPageRequest_Should_ReturnPaginatedGroups()
+    internal async Task GetGroupsByPage_WhenPageRequestIsValid_ReturnsPaginatedGroups()
     {
         // Arrange
         var groupsToCreate = Enumerable
@@ -36,7 +35,8 @@ public class GetGroupsByPageTests(
         var getGroupsRoute = $"{Constants.Routes.Groups.GetByPage}?pageSize={pageSize}&pageNumber={pageNumber}";
 
         var getGroupsResponse = await SharedFixture.GuestClient.GetFromJsonAsync<GetGroupsByPageResponse>(
-            getGroupsRoute
+            getGroupsRoute,
+            cancellationToken: TestContext.Current.CancellationToken
         );
 
         // Assert
@@ -56,7 +56,7 @@ public class GetGroupsByPageTests(
     }
 
     [Fact]
-    internal async Task GetGroupsByPage_WithEmptyDatabase_Should_ReturnEmptyList()
+    internal async Task GetGroupsByPage_WhenDatabaseIsEmpty_ReturnsEmptyGroupList()
     {
         // Arrange
         await SharedFixture.ExecuteEfDbContextAsync(async db =>
@@ -71,7 +71,8 @@ public class GetGroupsByPageTests(
         var getGroupsRoute = $"{Constants.Routes.Groups.GetByPage}?pageSize={pageSize}&pageNumber={pageNumber}";
 
         var getGroupsResponse = await SharedFixture.GuestClient.GetFromJsonAsync<GetGroupsByPageResponse>(
-            getGroupsRoute
+            getGroupsRoute,
+            cancellationToken: TestContext.Current.CancellationToken
         );
 
         // Assert
@@ -82,14 +83,14 @@ public class GetGroupsByPageTests(
     }
 
     [Fact]
-    internal async Task GetGroupsByPage_WithInvalidPageSize_Should_ReturnBadRequest()
+    internal async Task GetGroupsByPage_WhenPageSizeIsInvalid_ReturnsBadRequest()
     {
         // Arrange
         var invalidPageSize = -5;
         var getGroupsRoute = $"{Constants.Routes.Groups.GetByPage}?pageSize={invalidPageSize}&pageNumber=1";
 
         // Act
-        var response = await SharedFixture.GuestClient.GetAsync(getGroupsRoute);
+        var response = await SharedFixture.GuestClient.GetAsync(getGroupsRoute, TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);

@@ -1,4 +1,4 @@
-using SmartCharging.Shared.BuildingBlocks.Exceptions;
+using SmartCharging.ServiceDefaults.Exceptions;
 
 namespace SmartCharging.UnitTests.Groups.Features.RemoveChargeStation.v1;
 
@@ -12,7 +12,7 @@ public class RemoveChargeStationTests
         var chargeStationId = Guid.NewGuid();
 
         // Act
-        var result = SmartCharging.Groups.Features.RemoveChargeStation.v1.RemoveChargeStation.Of(
+        var result = SmartChargingApi.Groups.Features.RemoveChargeStation.v1.RemoveChargeStation.Of(
             groupId,
             chargeStationId
         );
@@ -33,7 +33,7 @@ public class RemoveChargeStationTests
         // Act & Assert
         Should
             .Throw<ValidationException>(() =>
-                SmartCharging.Groups.Features.RemoveChargeStation.v1.RemoveChargeStation.Of(
+                SmartChargingApi.Groups.Features.RemoveChargeStation.v1.RemoveChargeStation.Of(
                     nullGroupId,
                     chargeStationId
                 )
@@ -51,7 +51,7 @@ public class RemoveChargeStationTests
         // Act & Assert
         Should
             .Throw<ValidationException>(() =>
-                SmartCharging.Groups.Features.RemoveChargeStation.v1.RemoveChargeStation.Of(
+                SmartChargingApi.Groups.Features.RemoveChargeStation.v1.RemoveChargeStation.Of(
                     groupId,
                     nullChargeStationId
                 )

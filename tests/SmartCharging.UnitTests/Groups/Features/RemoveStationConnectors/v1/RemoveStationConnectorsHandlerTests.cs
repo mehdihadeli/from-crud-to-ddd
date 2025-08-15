@@ -1,13 +1,11 @@
 using Microsoft.Extensions.Logging;
 using NSubstitute;
-using SmartCharging.Groups.Contracts;
-using SmartCharging.Groups.Features.RemoveStationConnectors.v1;
-using SmartCharging.Groups.Models;
-using SmartCharging.Groups.Models.ValueObjects;
-using SmartCharging.Shared.Application.Contracts;
-using SmartCharging.Shared.Application.Data;
-using SmartCharging.Shared.BuildingBlocks.Exceptions;
+using SmartCharging.ServiceDefaults.Exceptions;
 using SmartCharging.UnitTests.Groups.Mocks;
+using SmartChargingApi.Groups.Features.RemoveStationConnectors.v1;
+using SmartChargingApi.Groups.Models;
+using SmartChargingApi.Groups.Models.ValueObjects;
+using SmartChargingApi.Shared.Contracts;
 
 namespace SmartCharging.UnitTests.Groups.Features.RemoveStationConnectors.v1;
 
@@ -41,7 +39,7 @@ public class RemoveStationConnectorsHandlerTests
         var connectorIdsToRemove = chargeStation.Connectors.Select(c => c.Id).Take(2).ToList();
 
         var removeStationConnectors =
-            new SmartCharging.Groups.Features.RemoveStationConnectors.v1.RemoveStationConnectors(
+            new SmartChargingApi.Groups.Features.RemoveStationConnectors.v1.RemoveStationConnectors(
                 groupId.Value,
                 chargeStation.Id.Value,
                 connectorIdsToRemove.Select(x => x.Value).ToList()
@@ -75,7 +73,7 @@ public class RemoveStationConnectorsHandlerTests
             .Returns((Group)null!);
 
         var removeStationConnectors =
-            new SmartCharging.Groups.Features.RemoveStationConnectors.v1.RemoveStationConnectors(
+            new SmartChargingApi.Groups.Features.RemoveStationConnectors.v1.RemoveStationConnectors(
                 groupId.Value,
                 chargeStationId.Value,
                 connectorIds.Select(x => x.Value).ToList()
@@ -112,7 +110,7 @@ public class RemoveStationConnectorsHandlerTests
 
         var connectorIds = new List<ConnectorId> { ConnectorId.Of(1) };
         var removeStationConnectors =
-            new SmartCharging.Groups.Features.RemoveStationConnectors.v1.RemoveStationConnectors(
+            new SmartChargingApi.Groups.Features.RemoveStationConnectors.v1.RemoveStationConnectors(
                 groupId.Value,
                 chargeStationId.Value,
                 connectorIds.Select(x => x.Value).ToList()

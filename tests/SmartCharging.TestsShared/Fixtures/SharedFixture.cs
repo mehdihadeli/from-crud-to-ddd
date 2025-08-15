@@ -4,9 +4,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Xunit;
-using Xunit.Abstractions;
+using SmartCharging.ServiceDefaults.EF;
+using WireMock.Server;
 using Xunit.Sdk;
+using Xunit.v3;
 
 namespace SmartCharging.TestsShared.Fixtures;
 
@@ -22,6 +23,8 @@ public class SharedFixture<TEntryPoint, TEfCoreDbContext> : IAsyncLifetime
     private HttpClient? _guestClient;
 
     // properties
+    public WireMockServer WireMockServer { get; }
+    public string WireMockServerUrl { get; }
     public event Func<Task>? SharedFixtureInitialized;
     public event Func<Task>? SharedFixtureDisposed;
     public PostgresContainerFixture PostgresContainerFixture { get; }
@@ -52,14 +55,17 @@ public class SharedFixture<TEntryPoint, TEfCoreDbContext> : IAsyncLifetime
         }
     }
 
-    // constructor
     public SharedFixture(IMessageSink messageSink)
     {
         _messageSink = messageSink;
         messageSink.OnMessage(new DiagnosticMessage("Constructing SharedFixture..."));
 
         // Service provider will build after getting with get accessors, we don't want to build our service provider here
-        PostgresContainerFixture = new PostgresContainerFixture();
+        PostgresContainerFixture = new PostgresContainerFixture(messageSink);
+
+        // new WireMockServer() is equivalent to call WireMockServer.Start()
+        WireMockServer = WireMockServer.Start();
+        WireMockServerUrl = WireMockServer.Url!;
 
         Factory = new CustomWebApplicationFactory<TEntryPoint>();
     }
@@ -69,13 +75,31 @@ public class SharedFixture<TEntryPoint, TEfCoreDbContext> : IAsyncLifetime
         Factory.SetOutputHelper(outputHelper);
     }
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
         // for having the capability of overriding dependencies in IntegrationTestBase, we should not build a service provider here.
         _messageSink.OnMessage(new DiagnosticMessage("SharedFixture Started..."));
 
         // Service provider will build after getting with get accessors, we don't want to build our service provider here
+        await Factory.InitializeAsync();
         await PostgresContainerFixture.InitializeAsync();
+
+        // or using `AddOverrideEnvKeyValues` and using `__` as seperator to change configs that are accessible during service registration with BindOptions
+        // with `AddOverrideInMemoryConfig` config changes are accessible after services registration and build process through IOptions<> with ServiceProvider
+        Factory.AddOverrideEnvKeyValues(keyValues =>
+        {
+            keyValues.Add(
+                $"{nameof(PostgresOptions)}__{nameof(PostgresOptions.ConnectionString)}",
+                PostgresContainerFixture.PostgresContainer.GetConnectionString()
+            );
+        });
+
+        // with `AddOverrideInMemoryConfig` config changes are accessible after services registration and build process
+        Factory.WithTestConfiguration(cfg =>
+        {
+            // Or we can override configuration explicitly, and it is accessible via IOptions<> and Configuration
+            cfg["WireMockUrl"] = WireMockServerUrl;
+        });
 
         if (SharedFixtureInitialized is not null)
         {
@@ -83,16 +107,19 @@ public class SharedFixture<TEntryPoint, TEfCoreDbContext> : IAsyncLifetime
         }
     }
 
-    public async Task DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
         await PostgresContainerFixture.DisposeAsync();
 
+        WireMockServer.Stop();
         GuestClient.Dispose();
 
         if (SharedFixtureDisposed is not null)
         {
             await SharedFixtureDisposed.Invoke();
         }
+
+        await Factory.DisposeAsync();
 
         _messageSink.OnMessage(new DiagnosticMessage("SharedFixture Stopped..."));
     }
@@ -122,9 +149,9 @@ public class SharedFixture<TEntryPoint, TEfCoreDbContext> : IAsyncLifetime
         Factory.AddOverrideInMemoryConfig(keyValuesAction);
     }
 
-    public async Task ResetDatabasesAsync()
+    public async Task CleanupAsync(CancellationToken cancellationToken = default)
     {
-        await PostgresContainerFixture.ResetDbAsync();
+        await PostgresContainerFixture.ResetDbAsync(cancellationToken);
     }
 
     public async Task ExecuteScopeAsync(Func<IServiceProvider, Task> action)

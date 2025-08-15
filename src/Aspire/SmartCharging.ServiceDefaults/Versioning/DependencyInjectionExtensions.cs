@@ -1,0 +1,23 @@
+using Asp.Versioning;
+
+namespace SmartCharging.ServiceDefaults.Versioning;
+
+public static class DependencyInjectionExtensions
+{
+    public static IHostApplicationBuilder AddVersioning(this IHostApplicationBuilder builder)
+    {
+        builder
+            .Services.AddApiVersioning(options =>
+            {
+                options.DefaultApiVersion = new(1, 0);
+                options.ApiVersionReader = new UrlSegmentApiVersionReader();
+            })
+            .AddApiExplorer(options =>
+            {
+                options.GroupNameFormat = "'v'V";
+                options.SubstituteApiVersionInUrl = true;
+            });
+
+        return builder;
+    }
+}

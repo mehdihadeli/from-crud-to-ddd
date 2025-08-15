@@ -1,13 +1,13 @@
 using Bogus;
-using SmartCharging.Groups.Models;
-using SmartCharging.Groups.Models.ValueObjects;
+using SmartChargingApi.Groups.Models;
+using SmartChargingApi.Groups.Models.ValueObjects;
 
 namespace SmartCharging.EndToEndTests.Group.Mocks;
 
 /// <summary>
 /// Creates a fake `Group` with valid data adhering to domain rules.
 /// </summary>
-public sealed class GroupFake : Faker<Groups.Models.Group>
+public sealed class GroupFake : Faker<SmartChargingApi.Groups.Models.Group>
 {
     public GroupFake(int numberOfConnectorsPerStation = 2, int? groupCapacity = 500, int? maxConnectorCurrent = null)
     {
@@ -37,7 +37,7 @@ public sealed class GroupFake : Faker<Groups.Models.Group>
             var chargeStation = ChargeStation.Create(chargeStationId, Name.Of(f.Commerce.ProductName()), connectors);
 
             // Create the group with explicit or random CapacityInAmps
-            return Groups.Models.Group.Create(
+            return SmartChargingApi.Groups.Models.Group.Create(
                 GroupId.New(),
                 Name.Of(f.Commerce.Department()),
                 CurrentInAmps.Of(groupCapacityValue),

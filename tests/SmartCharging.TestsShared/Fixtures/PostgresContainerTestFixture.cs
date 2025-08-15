@@ -1,33 +1,45 @@
 using Npgsql;
 using Respawn;
+using SmartCharging.TestsShared.Helpers;
 using Testcontainers.PostgreSql;
 using Xunit;
+using Xunit.Sdk;
+using Xunit.v3;
 
 namespace SmartCharging.TestsShared.Fixtures;
 
 public class PostgresContainerFixture : IAsyncLifetime
 {
+    private readonly IMessageSink _messageSink;
+    public PostgresContainerOptions PostgresContainerOptions { get; }
     public PostgreSqlContainer PostgresContainer { get; }
     public int HostPort => PostgresContainer.GetMappedPublicPort(PostgreSqlBuilder.PostgreSqlPort);
+    public string ConnectionString => PostgresContainer.GetConnectionString();
     public int TcpContainerPort => PostgreSqlBuilder.PostgreSqlPort;
 
-    public string ConnectionString => PostgresContainer.GetConnectionString();
-
-    public PostgresContainerFixture()
+    public PostgresContainerFixture(IMessageSink messageSink)
     {
-        var options = new PostgresContainerOptions();
+        _messageSink = messageSink;
+        PostgresContainerOptions = ConfigurationHelper.BindOptions<PostgresContainerOptions>();
+        ArgumentNullException.ThrowIfNull(PostgresContainerOptions);
+
         var postgresContainerBuilder = new PostgreSqlBuilder()
-            .WithDatabase(options.DatabaseName)
+            .WithDatabase(PostgresContainerOptions.DatabaseName)
             .WithCleanUp(true)
-            .WithName(options.Name)
-            .WithImage(options.ImageName);
+            .WithName(PostgresContainerOptions.Name)
+            .WithImage(PostgresContainerOptions.ImageName);
 
         PostgresContainer = postgresContainerBuilder.Build();
     }
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
         await PostgresContainer.StartAsync();
+        _messageSink.OnMessage(
+            new DiagnosticMessage(
+                $"Postgres fixture started on Host port {HostPort} and container tcp port {TcpContainerPort}..."
+            )
+        );
     }
 
     public async Task ResetDbAsync(CancellationToken cancellationToken = default)
@@ -46,13 +58,17 @@ public class PostgresContainerFixture : IAsyncLifetime
             // https://github.com/jbogard/Respawn/pull/115 - fixed
             await checkpoint.ResetAsync(connection)!;
         }
-        catch (Exception e) { }
+        catch (Exception e)
+        {
+            _messageSink.OnMessage(new DiagnosticMessage(e.Message));
+        }
     }
 
-    public async Task DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
         await PostgresContainer.StopAsync();
         await PostgresContainer.DisposeAsync(); //important for the event to cleanup to be fired!
+        _messageSink.OnMessage(new DiagnosticMessage("Postgres fixture stopped."));
     }
 }
 

@@ -1,12 +1,9 @@
 using Bogus;
 using NSubstitute;
-using Shouldly;
-using SmartCharging.Groups.Contracts;
-using SmartCharging.Groups.Features.GetGroupsByPage.v1;
-using SmartCharging.Groups.Models;
-using SmartCharging.Shared.Application.Contracts;
-using SmartCharging.Shared.Application.Data;
 using SmartCharging.UnitTests.Groups.Mocks;
+using SmartChargingApi.Groups.Features.GetGroupsByPage.v1;
+using SmartChargingApi.Groups.Models;
+using SmartChargingApi.Shared.Contracts;
 
 namespace SmartCharging.UnitTests.Groups.Features.GetGroupByPage.v1;
 

@@ -1,7 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using SmartCharging.Shared.Application.Data;
-using SmartCharging.Shared.BuildingBlocks.EF;
+using SmartCharging.ServiceDefaults.EF;
+using SmartCharging.Shared.Data;
+using SmartChargingApi.Shared.Data;
 
 namespace SmartCharging.UnitTests.TestHelpers;
 

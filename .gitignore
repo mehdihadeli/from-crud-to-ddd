@@ -372,3 +372,6 @@ coverage.info
 *.vsix
 
 .env
+
+.junie
+.aiassistant

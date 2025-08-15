@@ -1,4 +1,4 @@
-using SmartCharging.Shared.BuildingBlocks.Exceptions;
+using SmartCharging.ServiceDefaults.Exceptions;
 
 namespace SmartCharging.UnitTests.Groups.Features.UpdateChargeStationName.v1;
 
@@ -13,7 +13,7 @@ public class UpdateChargeStationNameTests
         var newName = "Updated Station Name";
 
         // Act
-        var result = SmartCharging.Groups.Features.UpdateChargeStationName.v1.UpdateChargeStationName.Of(
+        var result = SmartChargingApi.Groups.Features.UpdateChargeStationName.v1.UpdateChargeStationName.Of(
             groupId,
             chargeStationId,
             newName
@@ -37,7 +37,7 @@ public class UpdateChargeStationNameTests
         // Act & Assert
         Should
             .Throw<ValidationException>(() =>
-                SmartCharging.Groups.Features.UpdateChargeStationName.v1.UpdateChargeStationName.Of(
+                SmartChargingApi.Groups.Features.UpdateChargeStationName.v1.UpdateChargeStationName.Of(
                     nullGroupId,
                     chargeStationId,
                     newName
@@ -57,7 +57,7 @@ public class UpdateChargeStationNameTests
         // Act & Assert
         Should
             .Throw<ValidationException>(() =>
-                SmartCharging.Groups.Features.UpdateChargeStationName.v1.UpdateChargeStationName.Of(
+                SmartChargingApi.Groups.Features.UpdateChargeStationName.v1.UpdateChargeStationName.Of(
                     groupId,
                     nullChargeStationId,
                     newName
@@ -77,7 +77,7 @@ public class UpdateChargeStationNameTests
         // Act & Assert
         Should
             .Throw<ValidationException>(() =>
-                SmartCharging.Groups.Features.UpdateChargeStationName.v1.UpdateChargeStationName.Of(
+                SmartChargingApi.Groups.Features.UpdateChargeStationName.v1.UpdateChargeStationName.Of(
                     groupId,
                     chargeStationId,
                     nullNewName
@@ -87,7 +87,7 @@ public class UpdateChargeStationNameTests
 
         Should
             .Throw<ValidationException>(() =>
-                SmartCharging.Groups.Features.UpdateChargeStationName.v1.UpdateChargeStationName.Of(
+                SmartChargingApi.Groups.Features.UpdateChargeStationName.v1.UpdateChargeStationName.Of(
                     groupId,
                     chargeStationId,
                     "   "

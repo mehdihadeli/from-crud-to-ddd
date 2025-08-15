@@ -2,21 +2,21 @@ using System.Net;
 using System.Net.Http.Json;
 using Microsoft.EntityFrameworkCore;
 using SmartCharging.EndToEndTests.Group.Mocks;
-using SmartCharging.Groups.Dtos;
-using SmartCharging.Groups.Features.AddChargeStation.v1;
-using SmartCharging.Shared.Application.Data;
+using SmartCharging.Shared.Data;
 using SmartCharging.TestsShared.Fixtures;
-using Xunit.Abstractions;
+using SmartChargingApi;
+using SmartChargingApi.Groups.Features.AddChargeStation.v1;
+using SmartChargingApi.Shared.Data;
 
 namespace SmartCharging.EndToEndTests.Group.Features.AddChargeStation.v1;
 
-public class AddChargeStationTests(
-    SharedFixture<SmartChargingMetadata, SmartChargingDbContext> sharedFixture,
-    ITestOutputHelper outputHelper
-) : SmartChargingEndToEndTestBase(sharedFixture, outputHelper)
+//TestName: `MethodName_Condition_ExpectedResult`
+
+public class AddChargeStationTests(SharedFixture<SmartChargingMetadata, SmartChargingDbContext> sharedFixture)
+    : SmartChargingEndToEndTestBase(sharedFixture)
 {
     [Fact]
-    internal async Task AddChargeStation_WithValidData_Should_AddChargeStationSuccessfully()
+    internal async Task AddChargeStation_WhenGroupExistsAndRequestIsValid_AddsChargeStationSuccessfully()
     {
         // Arrange
         var fakeGroup = new GroupFake(numberOfConnectorsPerStation: 1).Generate();
@@ -35,10 +35,16 @@ public class AddChargeStationTests(
         );
 
         // Act
-        var addResponse = await SharedFixture.GuestClient.PostAsJsonAsync(addChargeStationRoute, request);
+        var addResponse = await SharedFixture.GuestClient.PostAsJsonAsync(
+            addChargeStationRoute,
+            request,
+            cancellationToken: TestContext.Current.CancellationToken
+        );
         addResponse.StatusCode.ShouldBe(HttpStatusCode.Created);
 
-        var responseContent = await addResponse.Content.ReadFromJsonAsync<AddChargeStationResponse>();
+        var responseContent = await addResponse.Content.ReadFromJsonAsync<AddChargeStationResponse>(
+            cancellationToken: TestContext.Current.CancellationToken
+        );
         responseContent.ShouldNotBeNull();
         responseContent.ChargeStationId.ShouldNotBe(Guid.Empty);
 
@@ -64,7 +70,7 @@ public class AddChargeStationTests(
     }
 
     [Fact]
-    internal async Task AddChargeStation_GroupDoesNotExist_Should_ReturnNotFound()
+    internal async Task AddChargeStation_WhenGroupDoesNotExist_ReturnsNotFound()
     {
         // Arrange - Use a non-existent group ID
         var nonExistentGroupId = Guid.NewGuid();
@@ -76,7 +82,11 @@ public class AddChargeStationTests(
         );
 
         // Act - Attempt to add a charge station to a non-existent group
-        var addResponse = await SharedFixture.GuestClient.PostAsJsonAsync(addChargeStationRoute, request);
+        var addResponse = await SharedFixture.GuestClient.PostAsJsonAsync(
+            addChargeStationRoute,
+            request,
+            cancellationToken: TestContext.Current.CancellationToken
+        );
 
         // Assert - Validate the response is 404 Not Found
         addResponse.StatusCode.ShouldBe(HttpStatusCode.NotFound);

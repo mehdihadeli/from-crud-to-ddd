@@ -8,7 +8,6 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\SmartCharging\SmartCharging.csproj" />
     <ProjectReference Include="..\SmartCharging.TestsShared\SmartCharging.TestsShared.csproj" />
   </ItemGroup>
 </Project>

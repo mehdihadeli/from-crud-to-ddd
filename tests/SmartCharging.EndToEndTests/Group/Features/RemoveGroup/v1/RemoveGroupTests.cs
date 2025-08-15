@@ -1,19 +1,18 @@
 using System.Net;
 using Microsoft.EntityFrameworkCore;
 using SmartCharging.EndToEndTests.Group.Mocks;
-using SmartCharging.Shared.Application.Data;
+using SmartCharging.Shared.Data;
 using SmartCharging.TestsShared.Fixtures;
-using Xunit.Abstractions;
+using SmartChargingApi;
+using SmartChargingApi.Shared.Data;
 
 namespace SmartCharging.EndToEndTests.Group.Features.RemoveGroup.v1;
 
-public class RemoveGroupTests(
-    SharedFixture<SmartChargingMetadata, SmartChargingDbContext> sharedFixture,
-    ITestOutputHelper outputHelper
-) : SmartChargingEndToEndTestBase(sharedFixture, outputHelper)
+public class RemoveGroupTests(SharedFixture<SmartChargingMetadata, SmartChargingDbContext> sharedFixture)
+    : SmartChargingEndToEndTestBase(sharedFixture)
 {
     [Fact]
-    internal async Task RemoveGroup_WithValidGroupId_Should_RemoveGroupSuccessfully()
+    internal async Task RemoveGroup_WhenGroupIdIsValid_RemovesGroupSuccessfully()
     {
         // Arrange
         var fakeGroup = new GroupFake(numberOfConnectorsPerStation: 2).Generate();
@@ -27,7 +26,10 @@ public class RemoveGroupTests(
         var deleteGroupRoute = Constants.Routes.Groups.Delete(groupId);
 
         // Act
-        var deleteResponse = await SharedFixture.GuestClient.DeleteAsync(deleteGroupRoute);
+        var deleteResponse = await SharedFixture.GuestClient.DeleteAsync(
+            deleteGroupRoute,
+            TestContext.Current.CancellationToken
+        );
 
         // Assert
         deleteResponse.StatusCode.ShouldBe(HttpStatusCode.NoContent);
@@ -41,14 +43,17 @@ public class RemoveGroupTests(
     }
 
     [Fact]
-    internal async Task RemoveGroup_WithNonExistentGroupId_Should_ReturnNotFound()
+    internal async Task RemoveGroup_WhenGroupIdDoesNotExist_ReturnsNotFound()
     {
         // Arrange
         var nonExistentGroupId = Guid.NewGuid();
         var deleteGroupRoute = Constants.Routes.Groups.Delete(nonExistentGroupId);
 
         // Act
-        var deleteResponse = await SharedFixture.GuestClient.DeleteAsync(deleteGroupRoute);
+        var deleteResponse = await SharedFixture.GuestClient.DeleteAsync(
+            deleteGroupRoute,
+            TestContext.Current.CancellationToken
+        );
 
         // Assert
         deleteResponse.StatusCode.ShouldBe(HttpStatusCode.NotFound);

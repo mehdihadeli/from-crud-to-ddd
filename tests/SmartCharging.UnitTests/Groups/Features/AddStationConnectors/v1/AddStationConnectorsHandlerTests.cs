@@ -1,14 +1,11 @@
 using Microsoft.Extensions.Logging;
 using NSubstitute;
-using Shouldly;
-using SmartCharging.Groups.Contracts;
-using SmartCharging.Groups.Dtos;
-using SmartCharging.Groups.Features.AddStationConnectors.v1;
-using SmartCharging.Groups.Models;
-using SmartCharging.Groups.Models.ValueObjects;
-using SmartCharging.Shared.Application.Contracts;
-using SmartCharging.Shared.Application.Data;
-using SmartCharging.Shared.BuildingBlocks.Exceptions;
+using SmartCharging.ServiceDefaults.Exceptions;
+using SmartChargingApi.Groups.Dtos;
+using SmartChargingApi.Groups.Features.AddStationConnectors.v1;
+using SmartChargingApi.Groups.Models;
+using SmartChargingApi.Groups.Models.ValueObjects;
+using SmartChargingApi.Shared.Contracts;
 
 namespace SmartCharging.UnitTests.Groups.Features.AddStationConnectors.v1;
 
@@ -46,7 +43,7 @@ public class AddStationConnectorsHandlerTests
 
         _unitOfWorkMock.GroupRepository.GetByIdAsync(Arg.Is(groupId), Arg.Any<CancellationToken>()).Returns(group);
 
-        var addConnectors = SmartCharging.Groups.Features.AddStationConnectors.v1.AddStationConnectors.Of(
+        var addConnectors = SmartChargingApi.Groups.Features.AddStationConnectors.v1.AddStationConnectors.Of(
             groupId.Value,
             chargeStationId.Value,
             newConnectors
@@ -78,7 +75,7 @@ public class AddStationConnectorsHandlerTests
             .GroupRepository.GetByIdAsync(Arg.Is(groupId), Arg.Any<CancellationToken>())
             .Returns((Group)null!);
 
-        var addConnectors = SmartCharging.Groups.Features.AddStationConnectors.v1.AddStationConnectors.Of(
+        var addConnectors = SmartChargingApi.Groups.Features.AddStationConnectors.v1.AddStationConnectors.Of(
             groupId.Value,
             chargeStationId.Value,
             new List<ConnectorDto> { new ConnectorDto(1, 50) }
@@ -120,14 +117,15 @@ public class AddStationConnectorsHandlerTests
             .Do(x => throw new Exception("Commit failed."));
 
         // Prepare AddStationConnectors request with new connectors
-        var addConnectors = SmartCharging.Groups.Features.AddStationConnectors.v1.AddStationConnectors.Of(
+        var addConnectors = SmartChargingApi.Groups.Features.AddStationConnectors.v1.AddStationConnectors.Of(
             groupId.Value,
             chargeStationId.Value,
             new List<ConnectorDto> { new ConnectorDto(2, 50) }
         );
 
         // Act & Assert
-        var exception = await Should.ThrowAsync<Exception>(() => _handler.Handle(addConnectors, CancellationToken.None)
+        var exception = await Should.ThrowAsync<Exception>(() =>
+            _handler.Handle(addConnectors, CancellationToken.None)
         );
 
         // Verify the correct exception is thrown

@@ -1,0 +1,23 @@
+{
+  "recommendations": [
+    "ms-dotnettools.csdevkit",
+    "dzhavat.bracket-pair-toggler",
+    "streetsidesoftware.code-spell-checker",
+    "emmanuelbeziat.vscode-great-icons",
+    "PKief.material-icon-theme",
+    "DavidAnson.vscode-markdownlint",
+    "IBM.output-colorizer",
+    "humao.rest-client",
+    "GitHub.vscode-github-actions",
+    "esbenp.prettier-vscode",
+    "editorconfig.editorconfig",
+    "mads-hartmann.bash-ide-vscode",
+    "DavidAnson.vscode-markdownlint",
+    "redhat.vscode-yaml",
+    "kennylong.kubernetes-yaml-formatter",
+    "ms-vscode.makefile-tools",
+    "sonarsource.sonarlint-vscode",
+    "csharpier.csharpier-vscode"
+  ]
+}
+

@@ -1,24 +1,23 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using SmartCharging.Groups;
-using SmartCharging.Groups.Features.AddStationConnectors.v1;
-using SmartCharging.Groups.Models;
-using SmartCharging.Groups.Models.ValueObjects;
 using SmartCharging.IntegrationTests.Groups.Mocks;
-using SmartCharging.Shared.Application.Data;
-using SmartCharging.Shared.BuildingBlocks.Exceptions;
+using SmartCharging.ServiceDefaults.Exceptions;
+using SmartCharging.Shared.Data;
 using SmartCharging.TestsShared.Fixtures;
-using Xunit.Abstractions;
+using SmartChargingApi;
+using SmartChargingApi.Groups;
+using SmartChargingApi.Groups.Features.AddStationConnectors.v1;
+using SmartChargingApi.Groups.Models;
+using SmartChargingApi.Groups.Models.ValueObjects;
+using SmartChargingApi.Shared.Data;
 
 namespace SmartCharging.IntegrationTests.Groups.Features.AddStationConnectors.v1;
 
-public class AddStationConnectorsTests(
-    SharedFixture<SmartChargingMetadata, SmartChargingDbContext> sharedFixture,
-    ITestOutputHelper outputHelper
-) : SmartChargingIntegrationTestBase(sharedFixture, outputHelper)
+public class AddStationConnectorsTests(SharedFixture<SmartChargingMetadata, SmartChargingDbContext> sharedFixture)
+    : SmartChargingIntegrationTestBase(sharedFixture)
 {
     [Fact]
-    internal async Task AddStationConnectors_WithValidData_Should_AddConnectorsSuccessfully()
+    internal async Task AddStationConnectors_WhenDataIsValid_AddsConnectorsSuccessfully()
     {
         // Arrange
         var fakeGroup = new GroupFake(
@@ -39,7 +38,7 @@ public class AddStationConnectorsTests(
             Connector.Create(ConnectorId.Of(5), CurrentInAmps.Of(20)),
         };
 
-        var addStationConnectors = SmartCharging.Groups.Features.AddStationConnectors.v1.AddStationConnectors.Of(
+        var addStationConnectors = SmartChargingApi.Groups.Features.AddStationConnectors.v1.AddStationConnectors.Of(
             fakeGroup.Id.Value,
             targetChargeStation.Id.Value,
             newConnectors.ToConnectorsDto()
@@ -70,14 +69,14 @@ public class AddStationConnectorsTests(
     }
 
     [Fact]
-    internal async Task AddStationConnectors_ToNonExistentGroup_Should_ThrowNotFoundException()
+    internal async Task AddStationConnectors_WhenGroupDoesNotExist_ThrowsNotFoundException()
     {
         // Arrange
         var nonExistentGroupId = Guid.NewGuid();
         var chargeStationId = Guid.NewGuid();
         var newConnectors = new List<Connector> { Connector.Create(ConnectorId.Of(1), CurrentInAmps.Of(30)) };
 
-        var addStationConnectors = SmartCharging.Groups.Features.AddStationConnectors.v1.AddStationConnectors.Of(
+        var addStationConnectors = SmartChargingApi.Groups.Features.AddStationConnectors.v1.AddStationConnectors.Of(
             nonExistentGroupId,
             chargeStationId,
             newConnectors.ToConnectorsDto()
@@ -94,7 +93,7 @@ public class AddStationConnectorsTests(
     }
 
     [Fact]
-    internal async Task AddStationConnectors_ToNonExistentChargeStation_Should_ThrowDomainException()
+    internal async Task AddStationConnectors_WhenChargeStationDoesNotExist_ThrowsDomainException()
     {
         // Arrange
         var fakeGroup = new GroupFake(numberOfConnectorsPerStation: 3).Generate();
@@ -107,7 +106,7 @@ public class AddStationConnectorsTests(
         var nonExistentChargeStationId = Guid.NewGuid();
         var newConnectors = new List<Connector> { Connector.Create(ConnectorId.Of(1), CurrentInAmps.Of(30)) };
 
-        var addStationConnectors = SmartCharging.Groups.Features.AddStationConnectors.v1.AddStationConnectors.Of(
+        var addStationConnectors = SmartChargingApi.Groups.Features.AddStationConnectors.v1.AddStationConnectors.Of(
             fakeGroup.Id.Value,
             nonExistentChargeStationId,
             newConnectors.ToConnectorsDto()
@@ -124,7 +123,7 @@ public class AddStationConnectorsTests(
     }
 
     [Fact]
-    internal async Task AddStationConnectors_WithDuplicateConnectorIds_Should_ThrowDomainException()
+    internal async Task AddStationConnectors_WhenConnectorIdsAreDuplicate_ThrowsDomainException()
     {
         // Arrange
         var fakeGroup = new GroupFake(numberOfConnectorsPerStation: 3).Generate();
@@ -141,7 +140,7 @@ public class AddStationConnectorsTests(
             Connector.Create(ConnectorId.Of(3), CurrentInAmps.Of(40)),
         };
 
-        var addStationConnectors = SmartCharging.Groups.Features.AddStationConnectors.v1.AddStationConnectors.Of(
+        var addStationConnectors = SmartChargingApi.Groups.Features.AddStationConnectors.v1.AddStationConnectors.Of(
             fakeGroup.Id.Value,
             targetChargeStation.Id.Value,
             newConnectors.ToConnectorsDto()

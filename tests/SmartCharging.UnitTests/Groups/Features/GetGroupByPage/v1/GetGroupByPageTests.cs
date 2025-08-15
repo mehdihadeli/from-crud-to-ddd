@@ -1,6 +1,5 @@
-using Shouldly;
-using SmartCharging.Groups.Features.GetGroupsByPage.v1;
-using SmartCharging.Shared.BuildingBlocks.Exceptions;
+using SmartCharging.ServiceDefaults.Exceptions;
+using SmartChargingApi.Groups.Features.GetGroupsByPage.v1;
 
 namespace SmartCharging.UnitTests.Groups.Features.GetGroupByPage.v1;
 

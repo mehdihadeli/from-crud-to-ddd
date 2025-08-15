@@ -1,0 +1,16 @@
+{
+  "name": "from-crud-to-ddd",
+  "version": "1.0.0",
+  "description": "A practical api sample based on `Vertical Slice Architecture`, `DDD`, `Minimal APIs` and `.Net 9`.",
+  "scripts": {
+    "prepare": "make prepare"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@commitlint/cli": "^19.2.1",
+    "@commitlint/config-conventional": "^19.1.0",
+    "husky": "^9.0.11",
+    "npm-check-updates": "^16.14.18"
+  }
+}

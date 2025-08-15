@@ -1,6 +1,6 @@
 using Bogus;
-using SmartCharging.Groups.Models;
-using SmartCharging.Groups.Models.ValueObjects;
+using SmartChargingApi.Groups.Models;
+using SmartChargingApi.Groups.Models.ValueObjects;
 
 namespace SmartCharging.UnitTests.Groups.Mocks;
 

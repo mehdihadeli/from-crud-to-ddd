@@ -1,5 +1,5 @@
-using SmartCharging.Groups.Features.RemoveStationConnectors.v1;
-using SmartCharging.Shared.BuildingBlocks.Exceptions;
+using SmartCharging.ServiceDefaults.Exceptions;
+using SmartChargingApi.Groups.Features.RemoveStationConnectors.v1;
 
 namespace SmartCharging.UnitTests.Groups.Features.RemoveStationConnectors.v1;
 
@@ -14,7 +14,7 @@ public class RemoveStationConnectorsTests
         var request = new RemoveStationConnectorsRequest(new List<int> { 1, 2 });
 
         // Act
-        var result = SmartCharging.Groups.Features.RemoveStationConnectors.v1.RemoveStationConnectors.Of(
+        var result = SmartChargingApi.Groups.Features.RemoveStationConnectors.v1.RemoveStationConnectors.Of(
             groupId,
             chargeStationId,
             request.ConnectorIds?.ToList()
@@ -39,7 +39,7 @@ public class RemoveStationConnectorsTests
         // Act & Assert
         Should
             .Throw<ValidationException>(() =>
-                SmartCharging.Groups.Features.RemoveStationConnectors.v1.RemoveStationConnectors.Of(
+                SmartChargingApi.Groups.Features.RemoveStationConnectors.v1.RemoveStationConnectors.Of(
                     nullGroupId,
                     chargeStationId,
                     request.ConnectorIds?.ToList()
@@ -59,7 +59,7 @@ public class RemoveStationConnectorsTests
         // Act & Assert
         Should
             .Throw<ValidationException>(() =>
-                SmartCharging.Groups.Features.RemoveStationConnectors.v1.RemoveStationConnectors.Of(
+                SmartChargingApi.Groups.Features.RemoveStationConnectors.v1.RemoveStationConnectors.Of(
                     groupId,
                     nullChargeStationId,
                     request.ConnectorIds?.ToList()
@@ -79,7 +79,7 @@ public class RemoveStationConnectorsTests
         // Act & Assert
         Should
             .Throw<ValidationException>(() =>
-                SmartCharging.Groups.Features.RemoveStationConnectors.v1.RemoveStationConnectors.Of(
+                SmartChargingApi.Groups.Features.RemoveStationConnectors.v1.RemoveStationConnectors.Of(
                     groupId,
                     chargeStationId,
                     nullRequest?.ConnectorIds?.ToList()
@@ -99,7 +99,7 @@ public class RemoveStationConnectorsTests
         // Act & Assert
         Should
             .Throw<ValidationException>(() =>
-                SmartCharging.Groups.Features.RemoveStationConnectors.v1.RemoveStationConnectors.Of(
+                SmartChargingApi.Groups.Features.RemoveStationConnectors.v1.RemoveStationConnectors.Of(
                     groupId,
                     chargeStationId,
                     request.ConnectorIds?.ToList()
