@@ -1,0 +1,2 @@
+# for fixing issues use 'just fix-all'
+make check-all

@@ -1,8 +1,7 @@
-using SmartCharging.Groups.Models;
-using SmartCharging.Groups.Models.ValueObjects;
-using SmartCharging.Shared.BuildingBlocks.Exceptions;
+using SmartCharging.ServiceDefaults.Exceptions;
 using SmartCharging.UnitTests.Groups.Mocks;
-using ValidationException = SmartCharging.Shared.BuildingBlocks.Exceptions.ValidationException;
+using SmartChargingApi.Groups.Models;
+using SmartChargingApi.Groups.Models.ValueObjects;
 
 namespace SmartCharging.UnitTests.Groups.Models;
 

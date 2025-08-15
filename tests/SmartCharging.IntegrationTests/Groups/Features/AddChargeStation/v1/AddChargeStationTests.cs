@@ -1,22 +1,21 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using SmartCharging.Groups;
-using SmartCharging.Groups.Features.AddChargeStation.v1;
 using SmartCharging.IntegrationTests.Groups.Mocks;
-using SmartCharging.Shared.Application.Data;
-using SmartCharging.Shared.BuildingBlocks.Exceptions;
+using SmartCharging.ServiceDefaults.Exceptions;
+using SmartCharging.Shared.Data;
 using SmartCharging.TestsShared.Fixtures;
-using Xunit.Abstractions;
+using SmartChargingApi;
+using SmartChargingApi.Groups;
+using SmartChargingApi.Groups.Features.AddChargeStation.v1;
+using SmartChargingApi.Shared.Data;
 
 namespace SmartCharging.IntegrationTests.Groups.Features.AddChargeStation.v1;
 
-public class AddChargeStationTests(
-    SharedFixture<SmartChargingMetadata, SmartChargingDbContext> sharedFixture,
-    ITestOutputHelper outputHelper
-) : SmartChargingIntegrationTestBase(sharedFixture, outputHelper)
+public class AddChargeStationTests(SharedFixture<SmartChargingMetadata, SmartChargingDbContext> sharedFixture)
+    : SmartChargingIntegrationTestBase(sharedFixture)
 {
     [Fact]
-    internal async Task AddChargeStation_WithValidData_Should_AddChargeStationToGroupSuccessfully()
+    internal async Task AddChargeStation_WhenGroupExists_AddsChargeStationToGroupSuccessfully()
     {
         // Arrange
         var fakeGroup = new GroupFake(numberOfConnectorsPerStation: 3).Generate();
@@ -29,7 +28,7 @@ public class AddChargeStationTests(
         });
 
         var newChargeStation = new ChargeStationFake(3).Generate();
-        var addChargeStation = SmartCharging.Groups.Features.AddChargeStation.v1.AddChargeStation.Of(
+        var addChargeStation = SmartChargingApi.Groups.Features.AddChargeStation.v1.AddChargeStation.Of(
             fakeGroup.Id.Value,
             newChargeStation.Name.Value,
             newChargeStation.Connectors.ToConnectorsDto()
@@ -59,13 +58,13 @@ public class AddChargeStationTests(
     }
 
     [Fact]
-    internal async Task AddChargeStation_ToNonExistentGroup_Should_ThrowNotFoundException()
+    internal async Task AddChargeStation_WhenGroupDoesNotExist_ThrowsNotFoundException()
     {
         // Arrange
         var nonExistentGroupId = Guid.NewGuid();
         var newChargeStation = new ChargeStationFake(3).Generate();
 
-        var addChargeStation = SmartCharging.Groups.Features.AddChargeStation.v1.AddChargeStation.Of(
+        var addChargeStation = SmartChargingApi.Groups.Features.AddChargeStation.v1.AddChargeStation.Of(
             nonExistentGroupId,
             newChargeStation.Name.Value,
             newChargeStation.Connectors.ToConnectorsDto()

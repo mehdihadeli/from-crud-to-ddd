@@ -1,12 +1,10 @@
 using Microsoft.Extensions.Logging;
 using NSubstitute;
-using SmartCharging.Groups.Contracts;
-using SmartCharging.Groups.Features.UpdateGroup.v1;
-using SmartCharging.Groups.Models;
-using SmartCharging.Groups.Models.ValueObjects;
-using SmartCharging.Shared.Application.Contracts;
-using SmartCharging.Shared.Application.Data;
-using SmartCharging.Shared.BuildingBlocks.Exceptions;
+using SmartCharging.ServiceDefaults.Exceptions;
+using SmartChargingApi.Groups.Features.UpdateGroup.v1;
+using SmartChargingApi.Groups.Models;
+using SmartChargingApi.Groups.Models.ValueObjects;
+using SmartChargingApi.Shared.Contracts;
 
 namespace SmartCharging.UnitTests.Groups.Features.UpdateGroup.v1;
 
@@ -38,7 +36,7 @@ public class UpdateGroupHandlerTests
 
         _unitOfWorkMock.GroupRepository.GetByIdAsync(Arg.Is(groupId), Arg.Any<CancellationToken>()).Returns(group);
 
-        var updateGroup = new SmartCharging.Groups.Features.UpdateGroup.v1.UpdateGroup(
+        var updateGroup = new SmartChargingApi.Groups.Features.UpdateGroup.v1.UpdateGroup(
             groupId.Value,
             newName.Value,
             newCapacity.Value
@@ -72,7 +70,7 @@ public class UpdateGroupHandlerTests
             .GroupRepository.GetByIdAsync(Arg.Is(groupId), Arg.Any<CancellationToken>())
             .Returns((Group)null!);
 
-        var updateGroup = new SmartCharging.Groups.Features.UpdateGroup.v1.UpdateGroup(
+        var updateGroup = new SmartChargingApi.Groups.Features.UpdateGroup.v1.UpdateGroup(
             groupId.Value,
             newName.Value,
             newCapacity.Value

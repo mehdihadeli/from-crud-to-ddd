@@ -1,5 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <ItemGroup Label="Testing packages">
+  <!--For more information on Microsoft Testing Platform support in xUnit.net, please visit:-->
+  <!--https://xunit.net/docs/getting-started/v3/microsoft-testing-platform-->
+  <PropertyGroup>
+    <ExcludeFromCodeCoverage>true</ExcludeFromCodeCoverage>
+  </PropertyGroup>
+  <ItemGroup Label="Testing">
     <PackageReference Include="Bogus" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
@@ -9,15 +14,17 @@
     <PackageReference Include="Shouldly" />
     <PackageReference Include="Testcontainers" />
     <PackageReference Include="Testcontainers.PostgreSql" />
-  </ItemGroup>
-  <ItemGroup Label="Test Platforms">
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" />
-    <PackageReference Include="xunit" />
+    <PackageReference Include="RichardSzalay.MockHttp" />
+    <PackageReference Include="WireMock.Net" />
+    <PackageReference Include="xunit.v3" />
+  </ItemGroup>
+  <ItemGroup Label="Test Runners">
     <PackageReference Include="xunit.runner.visualstudio" />
-    <PackageReference Include="Microsoft.Testing.Extensions.HangDump" />
-    <PackageReference Include="Microsoft.Testing.Extensions.TrxReport" />
-    <PackageReference Include="Microsoft.Testing.Extensions.CrashDump" />
-    <PackageReference Include="Microsoft.Testing.Extensions.CodeCoverage" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Services\SmartChargingApi\SmartChargingApi.csproj" />
+    <ProjectReference Include="..\..\src\Services\SmartChargingStatisticsApi\SmartChargingStatisticsApi.csproj" />
   </ItemGroup>
 </Project>

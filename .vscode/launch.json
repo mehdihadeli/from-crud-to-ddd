@@ -1,0 +1,48 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      // Use IntelliSense to find out which attributes exist for C# debugging
+      // Use hover for the description of the existing attributes
+      // For further information visit https://github.com/dotnet/vscode-csharp/blob/main/debugger-launchjson.md
+      "name": "Launch Aspire Dashboard",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build",
+      // If you have changed target frameworks, make sure to update the program path.
+      "program": "${workspaceFolder}/src/Aspire/SmartCharging.AppHost/bin/Debug/net9.0/SmartCharging.AppHost.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/src/Aspire/SmartCharging.AppHost",
+      // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
+      "console": "internalConsole",
+      "stopAtEntry": false
+    },
+    {
+      "name": "Launch SmartChargingApi",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build",
+      "program": "${workspaceFolder}/src/Services/SmartChargingApi/bin/Debug/net9.0/SmartChargingApi.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/src/Services/SmartChargingApi",
+      "console": "internalConsole",
+      "stopAtEntry": false
+    },
+    {
+      "name": "Launch SmartChargingStatisticsApi",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build",
+      "program": "${workspaceFolder}/src/Services/SmartChargingStatisticsApi/bin/Debug/net9.0/SmartChargingStatisticsApi.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/src/Services/SmartChargingStatisticsApi",
+      "console": "internalConsole",
+      "stopAtEntry": false
+    },
+    {
+      "name": ".NET Core Attach",
+      "type": "coreclr",
+      "request": "attach"
+    }
+  ]
+}

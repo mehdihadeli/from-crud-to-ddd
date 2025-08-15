@@ -3,9 +3,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
-using Xunit.Abstractions;
 
 namespace SmartCharging.TestsShared;
 
@@ -19,25 +17,33 @@ public class CustomWebApplicationFactory<TRootMetadata>(Action<IWebHostBuilder>?
     private Action<IConfiguration>? _testConfiguration;
     private Action<WebHostBuilderContext, IConfigurationBuilder>? _testConfigureAppConfiguration;
     private readonly List<Type> _testHostedServicesTypes = new();
+    private readonly List<string> _overrideEnvKeysToDispose = [];
+    private string _environment = "test";
 
-    /// <summary>
-    /// Use for tracking occured log events for testing purposes
-    /// </summary>
-    public void WithTestConfigureServices(Action<IServiceCollection> services)
+    public CustomWebApplicationFactory<TRootMetadata> WithTestConfigureServices(Action<IServiceCollection> services)
     {
         _testConfigureServices += services;
+        return this;
     }
 
-    public void WithTestConfiguration(Action<IConfiguration> configurations)
+    public CustomWebApplicationFactory<TRootMetadata> WithTestConfiguration(Action<IConfiguration> configurations)
     {
         _testConfiguration += configurations;
+        return this;
     }
 
-    public void WithTestConfigureAppConfiguration(
+    public CustomWebApplicationFactory<TRootMetadata> WithTestConfigureAppConfiguration(
         Action<WebHostBuilderContext, IConfigurationBuilder> appConfigurations
     )
     {
         _testConfigureAppConfiguration += appConfigurations;
+        return this;
+    }
+
+    public CustomWebApplicationFactory<TRootMetadata> WithEnvironment(string environment)
+    {
+        _environment = environment;
+        return this;
     }
 
     public void AddTestHostedService<THostedService>()
@@ -48,7 +54,7 @@ public class CustomWebApplicationFactory<TRootMetadata>(Action<IWebHostBuilder>?
 
     protected override IHost CreateHost(IHostBuilder builder)
     {
-        builder.UseEnvironment("test");
+        builder.UseEnvironment(_environment);
         builder.UseContentRoot(".");
 
         builder.UseDefaultServiceProvider(
@@ -83,14 +89,22 @@ public class CustomWebApplicationFactory<TRootMetadata>(Action<IWebHostBuilder>?
 
         builder.ConfigureTestServices(services =>
         {
-            // services.RemoveAll<IHostedService>();
+            // https://andrewlock.net/converting-integration-tests-to-net-core-3/
+            // add test-hosted services
+            foreach (var hostedServiceType in _testHostedServicesTypes)
+            {
+                services.AddSingleton(typeof(IHostedService), hostedServiceType);
+            }
+
             _testConfigureServices?.Invoke(services);
         });
 
         base.ConfigureWebHost(builder);
     }
 
-    public void AddOverrideInMemoryConfig(Action<IDictionary<string, string>> inmemoryConfigsAction)
+    public CustomWebApplicationFactory<TRootMetadata> AddOverrideInMemoryConfig(
+        Action<IDictionary<string, string>> inmemoryConfigsAction
+    )
     {
         var inmemoryConfigs = new Dictionary<string, string>();
         inmemoryConfigsAction.Invoke(inmemoryConfigs);
@@ -103,17 +117,44 @@ public class CustomWebApplicationFactory<TRootMetadata>(Action<IWebHostBuilder>?
             // Use `TryAdd` for prevent adding repetitive elements because of using IntegrationTestBase
             _inMemoryConfigs.TryAdd(inmemoryConfig.Key, inmemoryConfig.Value);
         }
+
+        return this;
     }
 
-    public void AddOverrideEnvKeyValues(Action<IDictionary<string, string>> keyValuesAction)
+    public CustomWebApplicationFactory<TRootMetadata> AddOverrideEnvKeyValues(
+        Action<IDictionary<string, string>> keyValuesAction
+    )
     {
         var keyValues = new Dictionary<string, string>();
         keyValuesAction.Invoke(keyValues);
 
         foreach (var (key, value) in keyValues)
         {
+            _overrideEnvKeysToDispose.Add(key);
             // overriding app configs with using environments
             Environment.SetEnvironmentVariable(key, value);
+        }
+
+        return this;
+    }
+
+    public ValueTask InitializeAsync()
+    {
+        return ValueTask.CompletedTask;
+    }
+
+    public new async Task DisposeAsync()
+    {
+        CleanupOverrideEnvKeys();
+
+        await base.DisposeAsync();
+    }
+
+    private void CleanupOverrideEnvKeys()
+    {
+        foreach (string disposeEnvKey in _overrideEnvKeysToDispose)
+        {
+            Environment.SetEnvironmentVariable(disposeEnvKey, null);
         }
     }
 }

@@ -3,11 +3,12 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
-using SmartCharging.Groups.Contracts;
-using SmartCharging.Groups.Features.CreateGroup.v1;
-using SmartCharging.Groups.Models;
-using SmartCharging.Shared.Application.Contracts;
-using SmartCharging.Shared.BuildingBlocks.Exceptions;
+using SmartCharging.ServiceDefaults.Exceptions;
+using SmartChargingApi.Groups.Contracts;
+using SmartChargingApi.Groups.Features.CreateGroup.v1;
+using SmartChargingApi.Groups.Features.GetGroupById.v1;
+using SmartChargingApi.Groups.Models;
+using SmartChargingApi.Shared.Contracts;
 
 namespace SmartCharging.UnitTests.Groups.Features.CreateGroup.v1;
 
@@ -52,7 +53,7 @@ public class CreateGroupEndpointTests
 
         // Assert
         var createdRoute = result.Result.ShouldBeOfType<CreatedAtRoute<CreateGroupResponse>>();
-        createdRoute.RouteName.ShouldBe(nameof(GroupGetById));
+        createdRoute.RouteName.ShouldBe(nameof(GetGroupById));
         createdRoute.StatusCode.ShouldBe(StatusCodes.Status201Created);
         createdRoute.RouteValues.Values.First().ShouldNotBe(Guid.Empty);
         var createGroupResponse = createdRoute.Value.ShouldNotBeNull().ShouldBeOfType<CreateGroupResponse>();
@@ -84,7 +85,7 @@ public class CreateGroupEndpointTests
         var result = await InvokeHandleAsync(parameters);
 
         var createdRoute = result.Result.ShouldBeOfType<CreatedAtRoute<CreateGroupResponse>>();
-        createdRoute.RouteName.ShouldBe(nameof(GroupGetById));
+        createdRoute.RouteName.ShouldBe(nameof(GetGroupById));
         createdRoute.StatusCode.ShouldBe(StatusCodes.Status201Created);
         var createGroupResponse = createdRoute.Value.ShouldNotBeNull().ShouldBeOfType<CreateGroupResponse>();
         createGroupResponse.GroupId.ShouldNotBe(Guid.Empty);

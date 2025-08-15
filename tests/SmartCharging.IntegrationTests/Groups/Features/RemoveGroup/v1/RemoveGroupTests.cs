@@ -1,18 +1,17 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using SmartCharging.Groups.Features.RemoveGroup.v1;
 using SmartCharging.IntegrationTests.Groups.Mocks;
-using SmartCharging.Shared.Application.Data;
-using SmartCharging.Shared.BuildingBlocks.Exceptions;
+using SmartCharging.ServiceDefaults.Exceptions;
+using SmartCharging.Shared.Data;
 using SmartCharging.TestsShared.Fixtures;
-using Xunit.Abstractions;
+using SmartChargingApi;
+using SmartChargingApi.Groups.Features.RemoveGroup.v1;
+using SmartChargingApi.Shared.Data;
 
 namespace SmartCharging.IntegrationTests.Groups.Features.RemoveGroup.v1;
 
-public class RemoveGroupTests(
-    SharedFixture<SmartChargingMetadata, SmartChargingDbContext> sharedFixture,
-    ITestOutputHelper outputHelper
-) : SmartChargingIntegrationTestBase(sharedFixture, outputHelper)
+public class RemoveGroupTests(SharedFixture<SmartChargingMetadata, SmartChargingDbContext> sharedFixture)
+    : SmartChargingIntegrationTestBase(sharedFixture)
 {
     [Fact]
     internal async Task RemoveGroup_WithValidInputs_Should_RemoveGroupAndAssociatedEntities()
@@ -26,7 +25,7 @@ public class RemoveGroupTests(
             await db.SaveChangesAsync();
         });
 
-        var removeGroup = SmartCharging.Groups.Features.RemoveGroup.v1.RemoveGroup.Of(fakeGroup.Id.Value);
+        var removeGroup = SmartChargingApi.Groups.Features.RemoveGroup.v1.RemoveGroup.Of(fakeGroup.Id.Value);
         var handler = Scope.ServiceProvider.GetRequiredService<RemoveGroupHandler>();
 
         // Act
@@ -47,7 +46,7 @@ public class RemoveGroupTests(
         // Arrange
         var nonExistentGroupId = Guid.NewGuid();
 
-        var removeGroup = SmartCharging.Groups.Features.RemoveGroup.v1.RemoveGroup.Of(nonExistentGroupId);
+        var removeGroup = SmartChargingApi.Groups.Features.RemoveGroup.v1.RemoveGroup.Of(nonExistentGroupId);
         var handler = Scope.ServiceProvider.GetRequiredService<RemoveGroupHandler>();
 
         // Act & Assert
@@ -64,7 +63,8 @@ public class RemoveGroupTests(
         // Act & Assert
         var handler = Scope.ServiceProvider.GetRequiredService<RemoveGroupHandler>();
 
-        var exception = await Should.ThrowAsync<ValidationException>(() => handler.Handle(null!, CancellationToken.None)
+        var exception = await Should.ThrowAsync<ValidationException>(() =>
+            handler.Handle(null!, CancellationToken.None)
         );
 
         exception.Message.ShouldBe("removeGroup cannot be null or empty.");
@@ -84,7 +84,7 @@ public class RemoveGroupTests(
             await db.SaveChangesAsync();
         });
 
-        var removeGroup = SmartCharging.Groups.Features.RemoveGroup.v1.RemoveGroup.Of(fakeGroup.Id.Value);
+        var removeGroup = SmartChargingApi.Groups.Features.RemoveGroup.v1.RemoveGroup.Of(fakeGroup.Id.Value);
         var handler = Scope.ServiceProvider.GetRequiredService<RemoveGroupHandler>();
 
         // Act

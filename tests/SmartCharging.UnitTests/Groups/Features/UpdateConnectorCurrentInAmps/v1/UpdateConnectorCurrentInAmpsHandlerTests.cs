@@ -1,13 +1,11 @@
 using Microsoft.Extensions.Logging;
 using NSubstitute;
-using SmartCharging.Groups.Contracts;
-using SmartCharging.Groups.Features.UpdateConnectorCurrentInAmps.v1;
-using SmartCharging.Groups.Models;
-using SmartCharging.Groups.Models.ValueObjects;
-using SmartCharging.Shared.Application.Contracts;
-using SmartCharging.Shared.Application.Data;
-using SmartCharging.Shared.BuildingBlocks.Exceptions;
+using SmartCharging.ServiceDefaults.Exceptions;
 using SmartCharging.UnitTests.Groups.Mocks;
+using SmartChargingApi.Groups.Features.UpdateConnectorCurrentInAmps.v1;
+using SmartChargingApi.Groups.Models;
+using SmartChargingApi.Groups.Models.ValueObjects;
+using SmartChargingApi.Shared.Contracts;
 
 namespace SmartCharging.UnitTests.Groups.Features.UpdateConnectorCurrentInAmps.v1;
 
@@ -45,7 +43,7 @@ public class UpdateConnectorCurrentInAmpsHandlerTests
         _unitOfWorkMock.GroupRepository.GetByIdAsync(Arg.Is(groupId), Arg.Any<CancellationToken>()).Returns(group);
 
         var updateConnectorCurrentInAmps =
-            new SmartCharging.Groups.Features.UpdateConnectorCurrentInAmps.v1.UpdateConnectorCurrentInAmps(
+            new SmartChargingApi.Groups.Features.UpdateConnectorCurrentInAmps.v1.UpdateConnectorCurrentInAmps(
                 groupId.Value,
                 chargeStationId.Value,
                 connectorId.Value,
@@ -81,7 +79,7 @@ public class UpdateConnectorCurrentInAmpsHandlerTests
             .Returns((Group)null!);
 
         var updateConnectorCurrentInAmps =
-            new SmartCharging.Groups.Features.UpdateConnectorCurrentInAmps.v1.UpdateConnectorCurrentInAmps(
+            new SmartChargingApi.Groups.Features.UpdateConnectorCurrentInAmps.v1.UpdateConnectorCurrentInAmps(
                 groupId.Value,
                 chargeStationId.Value,
                 connectorId.Value,
@@ -120,7 +118,7 @@ public class UpdateConnectorCurrentInAmpsHandlerTests
         _unitOfWorkMock.GroupRepository.GetByIdAsync(Arg.Is(groupId), Arg.Any<CancellationToken>()).Returns(group);
 
         var updateConnectorCurrentInAmps =
-            new SmartCharging.Groups.Features.UpdateConnectorCurrentInAmps.v1.UpdateConnectorCurrentInAmps(
+            new SmartChargingApi.Groups.Features.UpdateConnectorCurrentInAmps.v1.UpdateConnectorCurrentInAmps(
                 groupId.Value,
                 chargeStationId.Value,
                 connectorId.Value,
@@ -163,7 +161,7 @@ public class UpdateConnectorCurrentInAmpsHandlerTests
         _unitOfWorkMock.GroupRepository.GetByIdAsync(Arg.Is(groupId), Arg.Any<CancellationToken>()).Returns(group);
 
         var updateConnectorCurrentInAmps =
-            new SmartCharging.Groups.Features.UpdateConnectorCurrentInAmps.v1.UpdateConnectorCurrentInAmps(
+            new SmartChargingApi.Groups.Features.UpdateConnectorCurrentInAmps.v1.UpdateConnectorCurrentInAmps(
                 groupId.Value,
                 chargeStationId.Value,
                 connectorId.Value,

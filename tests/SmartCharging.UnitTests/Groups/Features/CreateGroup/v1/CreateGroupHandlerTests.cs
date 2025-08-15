@@ -1,14 +1,12 @@
 using Microsoft.Extensions.Logging;
 using NSubstitute;
-using SmartCharging.Groups;
-using SmartCharging.Groups.Contracts;
-using SmartCharging.Groups.Features.CreateGroup.v1;
-using SmartCharging.Groups.Models;
-using SmartCharging.Groups.Models.ValueObjects;
-using SmartCharging.Shared.Application.Contracts;
-using SmartCharging.Shared.Application.Data;
-using SmartCharging.Shared.BuildingBlocks.Exceptions;
+using SmartCharging.ServiceDefaults.Exceptions;
 using SmartCharging.UnitTests.Groups.Mocks;
+using SmartChargingApi.Groups;
+using SmartChargingApi.Groups.Features.CreateGroup.v1;
+using SmartChargingApi.Groups.Models;
+using SmartChargingApi.Groups.Models.ValueObjects;
+using SmartChargingApi.Shared.Contracts;
 
 namespace SmartCharging.UnitTests.Groups.Features.CreateGroup.v1;
 
@@ -33,7 +31,7 @@ public class CreateGroupHandlerTests
         var capacityInAmps = 300;
         var chargeStation = new ChargeStationFake(numberOfConnectors: 3).Generate().ToChargeStationDto();
 
-        var createGroup = new SmartCharging.Groups.Features.CreateGroup.v1.CreateGroup(
+        var createGroup = new SmartChargingApi.Groups.Features.CreateGroup.v1.CreateGroup(
             Name: groupName,
             CapacityInAmps: capacityInAmps,
             ChargeStation: chargeStation
@@ -73,7 +71,7 @@ public class CreateGroupHandlerTests
         var capacityInAmps = 400;
         var chargeStation = new ChargeStationFake(numberOfConnectors: 1).Generate().ToChargeStationDto();
 
-        var createGroup = new SmartCharging.Groups.Features.CreateGroup.v1.CreateGroup(
+        var createGroup = new SmartChargingApi.Groups.Features.CreateGroup.v1.CreateGroup(
             Name: groupName,
             CapacityInAmps: capacityInAmps,
             ChargeStation: chargeStation
@@ -100,7 +98,7 @@ public class CreateGroupHandlerTests
     public async Task Handle_WithNullRequest_ThrowsValidationException()
     {
         // Arrange: Pass null as request
-        SmartCharging.Groups.Features.CreateGroup.v1.CreateGroup? nullRequest = null;
+        SmartChargingApi.Groups.Features.CreateGroup.v1.CreateGroup? nullRequest = null;
 
         // Act & Assert
         var exception = await Should.ThrowAsync<ValidationException>(() =>

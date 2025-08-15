@@ -1,7 +1,7 @@
-using SmartCharging.Groups.Models;
-using SmartCharging.Groups.Models.ValueObjects;
-using SmartCharging.Shared.BuildingBlocks.Exceptions;
+using SmartCharging.ServiceDefaults.Exceptions;
 using SmartCharging.UnitTests.Groups.Mocks;
+using SmartChargingApi.Groups.Models;
+using SmartChargingApi.Groups.Models.ValueObjects;
 
 namespace SmartCharging.UnitTests.Groups.Features.CreateGroup.v1;
 
@@ -57,7 +57,8 @@ public class CreateGroupTests
         var chargeStation = new ChargeStationFake(3).Generate();
 
         // Act & Assert
-        Should.Throw<ValidationException>(() => Group.Create(GroupId.New(), invalidName!, capacityInAmps, chargeStation)
+        Should.Throw<ValidationException>(() =>
+            Group.Create(GroupId.New(), invalidName!, capacityInAmps, chargeStation)
         );
     }
 }

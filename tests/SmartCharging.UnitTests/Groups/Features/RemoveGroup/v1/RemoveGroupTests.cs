@@ -1,4 +1,4 @@
-using SmartCharging.Shared.BuildingBlocks.Exceptions;
+using SmartCharging.ServiceDefaults.Exceptions;
 
 namespace SmartCharging.UnitTests.Groups.Features.RemoveGroup.v1;
 
@@ -11,7 +11,7 @@ public class RemoveGroupTests
         var groupId = Guid.NewGuid();
 
         // Act
-        var result = SmartCharging.Groups.Features.RemoveGroup.v1.RemoveGroup.Of(groupId);
+        var result = SmartChargingApi.Groups.Features.RemoveGroup.v1.RemoveGroup.Of(groupId);
 
         // Assert
         result.ShouldNotBeNull();
@@ -26,7 +26,9 @@ public class RemoveGroupTests
 
         // Act & Assert
         Should
-            .Throw<ValidationException>(() => SmartCharging.Groups.Features.RemoveGroup.v1.RemoveGroup.Of(nullGroupId))
+            .Throw<ValidationException>(() =>
+                SmartChargingApi.Groups.Features.RemoveGroup.v1.RemoveGroup.Of(nullGroupId)
+            )
             .Message.ShouldContain("groupId cannot be null or empty.");
     }
 }

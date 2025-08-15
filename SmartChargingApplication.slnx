@@ -11,22 +11,42 @@
     <File Path="global.json" />
     <File Path="Makefile" />
     <File Path="README.md" />
+    <File Path="Versions.props" />
   </Folder>
-  <Folder Name="/solution items/.vscode/" />
-  <Folder Name="/solution items/.vscode/instructions/">
-    <File Path=".vscode\instructions\coding-guidelines.instructions.md" />
-    <File Path=".vscode\instructions\testing-xunit.instructions.md" />
+  <Folder Name="/solution items/.github/">
+    <File Path=".github\copilot-instructions.md" />
+    <File Path=".github\labeler.yml" />
+    <File Path=".github\multi-labeler.yml" />
+    <File Path=".github\release.yml" />
+    <File Path=".github\release-drafter.yml" />
   </Folder>
-  <Folder Name="/solution items/.vscode/prompts/">
-    <File Path=".vscode\prompts\code-review.prompt.md" />
-    <File Path=".vscode\prompts\qa.prompt.md" />
+  <Folder Name="/solution items/.github/workflows/">
+    <File Path=".github\workflows\ci.yml" />
+    <File Path=".github\workflows\labeler.yml" />
+    <File Path=".github\workflows\release-drafter.yml" />
+  </Folder>
+  <Folder Name="/solution items/.husky/">
+    <File Path=".husky\commit-msg" />
+    <File Path=".husky\pre-commit" />
+  </Folder>
+  <Folder Name="/solution items/.vscode/">
+    <File Path=".vscode\extensions.json" />
+    <File Path=".vscode\launch.json" />
+    <File Path=".vscode\settings.json" />
+    <File Path=".vscode\tasks.json" />
   </Folder>
   <Folder Name="/solution items/deployments/" />
   <Folder Name="/solution items/deployments/docker-compose/">
     <File Path="deployments\docker-compose\docker-compose.yaml" />
   </Folder>
-  <Folder Name="/src/">
-    <Project Path="src\SmartCharging\SmartCharging.csproj" Type="Classic C#" />
+  <Folder Name="/src/" />
+  <Folder Name="/src/Aspire/">
+    <Project Path="src\Aspire\SmartCharging.AppHost\SmartCharging.AppHost.csproj" Type="Classic C#" />
+    <Project Path="src\Aspire\SmartCharging.ServiceDefaults\SmartCharging.ServiceDefaults.csproj" Type="Classic C#" />
+  </Folder>
+  <Folder Name="/src/Services/">
+    <Project Path="src\Services\SmartChargingApi\SmartChargingApi.csproj" Type="Classic C#" />
+    <Project Path="src\Services\SmartChargingStatisticsApi\SmartChargingStatisticsApi.csproj" Type="Classic C#" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests\SmartCharging.EndToEndTests\SmartCharging.EndToEndTests.csproj" Type="Classic C#" />

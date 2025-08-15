@@ -1,28 +1,32 @@
 using Bogus;
+using Microsoft.Extensions.Logging;
 using NSubstitute;
-using Shouldly;
-using SmartCharging.Groups.Contracts;
-using SmartCharging.Groups.Features.GroupGetById.v1;
-using SmartCharging.Groups.Models;
-using SmartCharging.Groups.Models.ValueObjects;
-using SmartCharging.Shared.Application.Contracts;
-using SmartCharging.Shared.Application.Data;
-using SmartCharging.Shared.BuildingBlocks.Exceptions;
+using SmartCharging.ServiceDefaults.Exceptions;
 using SmartCharging.UnitTests.Groups.Mocks;
-using ValidationException = SmartCharging.Shared.BuildingBlocks.Exceptions.ValidationException;
+using SmartChargingApi.Groups.Contracts;
+using SmartChargingApi.Groups.Dtos;
+using SmartChargingApi.Groups.Features.GetGroupById.v1;
+using SmartChargingApi.Groups.Models;
+using SmartChargingApi.Groups.Models.ValueObjects;
+using SmartChargingApi.Shared.Contracts;
+using ValidationException = Bogus.ValidationException;
 
 namespace SmartCharging.UnitTests.Groups.Features.GroupGetById.v1;
 
-public class GroupGetByIdHandlerTests
+public class GetGroupByIdHandlerTests
 {
     private readonly IUnitOfWork _unitOfWorkMock;
-    private readonly GroupGetByIdHandler _handler;
+    private readonly IGroupStatisticsExternalProvider _statsProviderMock;
+    private readonly ILogger<GetGroupByIdHandler> _loggerMock;
+    private readonly GetGroupByIdHandler _handler;
 
-    public GroupGetByIdHandlerTests()
+    public GetGroupByIdHandlerTests()
     {
-        // Mock the UnitOfWork and its GroupRepository
         _unitOfWorkMock = Substitute.For<IUnitOfWork>();
-        _handler = new GroupGetByIdHandler(_unitOfWorkMock);
+        _statsProviderMock = Substitute.For<IGroupStatisticsExternalProvider>();
+        _loggerMock = Substitute.For<ILogger<GetGroupByIdHandler>>();
+
+        _handler = new GetGroupByIdHandler(_unitOfWorkMock, _statsProviderMock, _loggerMock);
     }
 
     [Fact]
@@ -39,7 +43,15 @@ public class GroupGetByIdHandlerTests
         // Mock GetByIdAsync to return the fake group
         _unitOfWorkMock.GroupRepository.GetByIdAsync(Arg.Is(group.Id), Arg.Any<CancellationToken>()).Returns(group);
 
-        var groupGetById = SmartCharging.Groups.Features.GroupGetById.v1.GroupGetById.Of(group.Id.Value);
+        // Mock external statistics provider
+        _statsProviderMock
+            .GetCapacityStatisticsAsync(group.Id.Value)
+            .Returns(new GroupCapacityStatisticsDto(100, 200, 100));
+        _statsProviderMock
+            .GetEnergyConsumptionAsync(group.Id.Value)
+            .Returns(new GroupEnergyConsumptionDto(1500, DateTime.UtcNow.AddDays(-1), DateTime.UtcNow));
+
+        var groupGetById = GetGroupById.Of(group.Id.Value);
 
         // Act
         var result = await _handler.Handle(groupGetById, CancellationToken.None);
@@ -62,7 +74,7 @@ public class GroupGetByIdHandlerTests
             .GroupRepository.GetByIdAsync(Arg.Is(nonExistentGroupId), Arg.Any<CancellationToken>())
             .Returns((Group)null!);
 
-        var groupGetById = SmartCharging.Groups.Features.GroupGetById.v1.GroupGetById.Of(nonExistentGroupId.Value);
+        var groupGetById = GetGroupById.Of(nonExistentGroupId.Value);
 
         // Act & Assert
         var exception = await Should.ThrowAsync<NotFoundException>(() =>
@@ -93,7 +105,11 @@ public class GroupGetByIdHandlerTests
         // Mock GetByIdAsync to return the fake group
         _unitOfWorkMock.GroupRepository.GetByIdAsync(Arg.Is(group.Id), Arg.Any<CancellationToken>()).Returns(group);
 
-        var groupGetById = SmartCharging.Groups.Features.GroupGetById.v1.GroupGetById.Of(group.Id.Value);
+        // Mock statistics provider (not actually used in assertion, but can be provided)
+        _statsProviderMock.GetCapacityStatisticsAsync(group.Id.Value).Returns((GroupCapacityStatisticsDto?)null);
+        _statsProviderMock.GetEnergyConsumptionAsync(group.Id.Value).Returns((GroupEnergyConsumptionDto?)null);
+
+        var groupGetById = GetGroupById.Of(group.Id.Value);
 
         // Act
         await _handler.Handle(groupGetById, CancellationToken.None);

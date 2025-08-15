@@ -1,6 +1,5 @@
-using Shouldly;
-using SmartCharging.Groups.Models.ValueObjects;
-using ValidationException = SmartCharging.Shared.BuildingBlocks.Exceptions.ValidationException;
+using SmartCharging.ServiceDefaults.Exceptions;
+using SmartChargingApi.Groups.Models.ValueObjects;
 
 namespace SmartCharging.UnitTests.Groups.Models.ValueObjects;
 

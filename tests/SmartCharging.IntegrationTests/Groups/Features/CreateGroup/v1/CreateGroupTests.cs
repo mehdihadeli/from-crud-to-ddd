@@ -1,28 +1,27 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using SmartCharging.Groups;
-using SmartCharging.Groups.Features.CreateGroup.v1;
-using SmartCharging.Groups.Models.ValueObjects;
 using SmartCharging.IntegrationTests.Groups.Mocks;
-using SmartCharging.Shared.Application.Data;
+using SmartCharging.Shared.Data;
 using SmartCharging.TestsShared.Fixtures;
-using Xunit.Abstractions;
+using SmartChargingApi;
+using SmartChargingApi.Groups;
+using SmartChargingApi.Groups.Features.CreateGroup.v1;
+using SmartChargingApi.Groups.Models.ValueObjects;
+using SmartChargingApi.Shared.Data;
 
 namespace SmartCharging.IntegrationTests.Groups.Features.CreateGroup.v1;
 
-public class CreateGroupTests(
-    SharedFixture<SmartChargingMetadata, SmartChargingDbContext> sharedFixture,
-    ITestOutputHelper outputHelper
-) : SmartChargingIntegrationTestBase(sharedFixture, outputHelper)
+public class CreateGroupTests(SharedFixture<SmartChargingMetadata, SmartChargingDbContext> sharedFixture)
+    : SmartChargingIntegrationTestBase(sharedFixture)
 {
     [Fact]
-    internal async Task CreateGroup_WithValidData_Should_CreateGroupSuccessfully()
+    internal async Task CreateGroup_WhenDataIsValid_CreatesGroupSuccessfully()
     {
         // Arrange
         var fakeGroup = new GroupFake(numberOfConnectorsPerStation: 3).Generate();
         var dto = fakeGroup.ToGroupDto();
 
-        var createGroup = SmartCharging.Groups.Features.CreateGroup.v1.CreateGroup.Of(
+        var createGroup = SmartChargingApi.Groups.Features.CreateGroup.v1.CreateGroup.Of(
             dto.Name,
             dto.CapacityInAmps,
             dto.ChargeStations.First()
@@ -56,13 +55,13 @@ public class CreateGroupTests(
     }
 
     [Fact]
-    internal async Task CreateGroup_WithMaxConnectors_Should_PersistDataProperly()
+    internal async Task CreateGroup_WhenMaxConnectorsAreProvided_PersistsDataProperly()
     {
         // Arrange
         var fakeGroup = new GroupFake(numberOfConnectorsPerStation: 5).Generate();
         var dto = fakeGroup.ToGroupDto();
 
-        var createGroup = SmartCharging.Groups.Features.CreateGroup.v1.CreateGroup.Of(
+        var createGroup = SmartChargingApi.Groups.Features.CreateGroup.v1.CreateGroup.Of(
             dto.Name,
             dto.CapacityInAmps,
             dto.ChargeStations.First()

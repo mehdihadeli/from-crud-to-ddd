@@ -183,7 +183,7 @@ With these steps, you're ready to get started the project effectively.
 
 ## Application Structure
 
-In this project I used [vertical slice architecture](https://jimmybogard.com/vertical-slice-architecture/) and
+In this project, I used [vertical slice architecture](https://jimmybogard.com/vertical-slice-architecture/) and
 [feature folder structure](http://www.kamilgrzybek.com/design/feature-folders/):
 
 - We treat each request as a distinct use case or slice, encapsulating and grouping all concerns from front-end to back.
@@ -240,8 +240,6 @@ The project is organized into a folder structure that aligns with the principles
 - **Shared**: Contains reusable resources and infrastructure functionality.
   - **Application**: Data persistence and extension methods for the application.
   - **BuildingBlocks**: Cross-cutting concerns, such as database configurations, OpenAPI settings, and validation utilities.
-
-
 
 ## Domain Model
 

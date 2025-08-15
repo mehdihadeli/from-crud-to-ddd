@@ -1,5 +1,7 @@
-using SmartCharging.Shared.Application.Data;
+using SmartCharging.Shared.Data;
 using SmartCharging.TestsShared.Fixtures;
+using SmartChargingApi;
+using SmartChargingApi.Shared.Data;
 
 namespace SmartCharging.IntegrationTests;
 

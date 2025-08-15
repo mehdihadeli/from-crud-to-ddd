@@ -1,6 +1,6 @@
-using SmartCharging.Groups.Models;
-using SmartCharging.Groups.Models.ValueObjects;
-using SmartCharging.Shared.BuildingBlocks.Exceptions;
+using SmartCharging.ServiceDefaults.Exceptions;
+using SmartChargingApi.Groups.Models;
+using SmartChargingApi.Groups.Models.ValueObjects;
 
 namespace SmartCharging.UnitTests.Groups.Models;
 
@@ -95,7 +95,8 @@ public class ConnectorTests
 
         // Act & Assert
         Should
-            .Throw<ValidationException>(() => connector.UpdateCurrentInAmps(CurrentInAmps.Of(-5)) // Invalid current
+            .Throw<ValidationException>(() =>
+                connector.UpdateCurrentInAmps(CurrentInAmps.Of(-5)) // Invalid current
             )
             .Message.ShouldBe("Current `-5` must be greater than 0");
     }

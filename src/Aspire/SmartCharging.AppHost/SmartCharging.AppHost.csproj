@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--  https://learn.microsoft.com/en-us/dotnet/aspire/fundamentals/dotnet-aspire-sdk-->
+  <Sdk Name="Aspire.AppHost.Sdk" Version="$(AspireVersion)" />
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <UserSecretsId>eb13ea12-cd51-422f-a583-2bfd823d4c66</UserSecretsId>
+    <NoWarn>ASPIREINTERACTION001</NoWarn>
+  </PropertyGroup>
+  <ItemGroup Label="Integrations">
+    <PackageReference Include="Aspire.Hosting.AppHost" />
+    <PackageReference Include="Aspire.Hosting.PostgreSQL" />
+    <PackageReference Include="Scalar.Aspire" />
+  </ItemGroup>
+  <ItemGroup Label="Deployments">
+    <!--https://devblogs.microsoft.com/dotnet/dotnet-aspire-92-is-now-available-with-new-ways-to-deploy/#publish-to-docker-compose-with-your-first-publisher-integration-->
+    <!--https://learn.microsoft.com/en-us/dotnet/aspire/whats-new/dotnet-aspire-9.2#-deployment-improvements-->
+    <!--https://learn.microsoft.com/en-us/dotnet/aspire/whats-new/dotnet-aspire-9.3#deployment&#45;&#45;publish-->
+    <!--https://learn.microsoft.com/en-us/dotnet/aspire/whats-new/dotnet-aspire-9.4-->
+    <PackageReference Include="Aspire.Hosting.Docker" />
+    <PackageReference Include="Aspire.Hosting.Kubernetes" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Services\SmartChargingApi\SmartChargingApi.csproj" />
+    <ProjectReference Include="..\..\Services\SmartChargingStatisticsApi\SmartChargingStatisticsApi.csproj" />
+    <ProjectReference
+      Include="..\SmartCharging.ServiceDefaults\SmartCharging.ServiceDefaults.csproj"
+      IsAspireProjectResource="false"
+    />
+  </ItemGroup>
+</Project>

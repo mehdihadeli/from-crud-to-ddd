@@ -2,32 +2,29 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SmartCharging.ServiceDefaults.EF;
 using SmartCharging.TestsShared.Fixtures;
-using Xunit;
-using Xunit.Abstractions;
 
 namespace SmartCharging.TestsShared.TestBases;
 
+//https://bartwullems.blogspot.com/2019/09/xunit-async-lifetime.html
+//https://www.danclarke.com/cleaner-tests-with-iasynclifetime
+//https://xunit.net/docs/shared-context
 public abstract class IntegrationTestBase<TEntryPoint, TContext> : IAsyncLifetime
     where TEntryPoint : class
     where TContext : DbContext
 {
     private IServiceScope? _serviceScope;
 
-    protected CancellationToken CancellationToken => CancellationTokenSource.Token;
-    protected CancellationTokenSource CancellationTokenSource { get; }
-    protected int Timeout => 180;
+    protected CancellationToken CancellationToken => TestContext.Current.CancellationToken;
 
     // Build Service Provider here
     protected IServiceScope Scope => _serviceScope ??= SharedFixture.ServiceProvider.CreateScope();
     protected SharedFixture<TEntryPoint, TContext> SharedFixture { get; }
 
-    protected IntegrationTestBase(SharedFixture<TEntryPoint, TContext> sharedFixture, ITestOutputHelper outputHelper)
+    protected IntegrationTestBase(SharedFixture<TEntryPoint, TContext> sharedFixture)
     {
         SharedFixture = sharedFixture;
-        SharedFixture.SetOutputHelper(outputHelper);
-
-        CancellationTokenSource = new(TimeSpan.FromSeconds(Timeout));
         CancellationToken.ThrowIfCancellationRequested();
 
         // we should not build a factory service provider with getting ServiceProvider in SharedFixture construction to having capability for override
@@ -42,18 +39,24 @@ public abstract class IntegrationTestBase<TEntryPoint, TContext> : IAsyncLifetim
         SharedFixture.AddOverrideEnvKeyValues(OverrideEnvKeyValues);
         SharedFixture.AddOverrideInMemoryConfig(OverrideInMemoryConfig);
 
-        // Note: building service provider here
+        // Note: building service provider here or InitializeAsync
     }
 
     // we use IAsyncLifetime in xunit instead of constructor when we have an async operation
-    public virtual async Task InitializeAsync() { }
-
-    public virtual async Task DisposeAsync()
+    public virtual async ValueTask InitializeAsync()
     {
-        // it is better messages delete it first
-        await SharedFixture.ResetDatabasesAsync();
+        // Note: building service provider here
+        var testSeeders = SharedFixture.ServiceProvider.GetServices<ITestDataSeeder>();
+        foreach (var testDataSeeder in testSeeders)
+        {
+            await testDataSeeder.SeedAsync();
+        }
+    }
 
-        await CancellationTokenSource.CancelAsync();
+    public virtual async ValueTask DisposeAsync()
+    {
+        // cleanup data and messages in each test
+        await SharedFixture.CleanupAsync(CancellationToken);
 
         Scope.Dispose();
     }

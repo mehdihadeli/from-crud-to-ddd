@@ -5,16 +5,17 @@
     <TargetFramework>net9.0</TargetFramework>
     <LangVersion>latest</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
   <PropertyGroup Label="Product">
     <Product>SmartChargingApplication</Product>
   </PropertyGroup>
-  <PropertyGroup Label="Debug">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>embedded</DebugType>
-  </PropertyGroup>
   <PropertyGroup Label="Build">
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <WarnOnPackingNonPackableProject>false</WarnOnPackingNonPackableProject>
-    <Nullable>enable</Nullable>
   </PropertyGroup>
+  <ItemGroup Label="Testing Imports" Condition="$(MSBuildProjectFullPath.Contains('Tests'))">
+    <Using Include="Xunit" />
+    <Using Include="Shouldly" />
+  </ItemGroup>
 </Project>

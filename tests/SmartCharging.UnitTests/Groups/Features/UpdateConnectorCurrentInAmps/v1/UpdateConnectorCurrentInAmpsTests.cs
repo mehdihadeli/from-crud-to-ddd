@@ -1,4 +1,4 @@
-using SmartCharging.Shared.BuildingBlocks.Exceptions;
+using SmartCharging.ServiceDefaults.Exceptions;
 
 namespace SmartCharging.UnitTests.Groups.Features.UpdateConnectorCurrentInAmps.v1;
 
@@ -14,7 +14,7 @@ public class UpdateConnectorCurrentInAmpsTests
         var newCurrent = 25;
 
         // Act
-        var result = SmartCharging.Groups.Features.UpdateConnectorCurrentInAmps.v1.UpdateConnectorCurrentInAmps.Of(
+        var result = SmartChargingApi.Groups.Features.UpdateConnectorCurrentInAmps.v1.UpdateConnectorCurrentInAmps.Of(
             groupId,
             chargeStationId,
             connectorId,
@@ -41,7 +41,7 @@ public class UpdateConnectorCurrentInAmpsTests
         // Act & Assert
         Should
             .Throw<ValidationException>(() =>
-                SmartCharging.Groups.Features.UpdateConnectorCurrentInAmps.v1.UpdateConnectorCurrentInAmps.Of(
+                SmartChargingApi.Groups.Features.UpdateConnectorCurrentInAmps.v1.UpdateConnectorCurrentInAmps.Of(
                     nullGroupId,
                     chargeStationId,
                     connectorId,
@@ -63,7 +63,7 @@ public class UpdateConnectorCurrentInAmpsTests
         // Act & Assert
         Should
             .Throw<ValidationException>(() =>
-                SmartCharging.Groups.Features.UpdateConnectorCurrentInAmps.v1.UpdateConnectorCurrentInAmps.Of(
+                SmartChargingApi.Groups.Features.UpdateConnectorCurrentInAmps.v1.UpdateConnectorCurrentInAmps.Of(
                     groupId,
                     nullChargeStationId,
                     connectorId,
@@ -84,7 +84,7 @@ public class UpdateConnectorCurrentInAmpsTests
         // Act & Assert
         Should
             .Throw<ValidationException>(() =>
-                SmartCharging.Groups.Features.UpdateConnectorCurrentInAmps.v1.UpdateConnectorCurrentInAmps.Of(
+                SmartChargingApi.Groups.Features.UpdateConnectorCurrentInAmps.v1.UpdateConnectorCurrentInAmps.Of(
                     groupId,
                     chargeStationId,
                     connectorId,
@@ -106,7 +106,7 @@ public class UpdateConnectorCurrentInAmpsTests
         // Act & Assert
         Should
             .Throw<ValidationException>(() =>
-                SmartCharging.Groups.Features.UpdateConnectorCurrentInAmps.v1.UpdateConnectorCurrentInAmps.Of(
+                SmartChargingApi.Groups.Features.UpdateConnectorCurrentInAmps.v1.UpdateConnectorCurrentInAmps.Of(
                     groupId,
                     chargeStationId,
                     invalidConnectorId,

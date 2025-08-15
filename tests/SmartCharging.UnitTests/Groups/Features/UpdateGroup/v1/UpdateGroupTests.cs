@@ -1,4 +1,4 @@
-using SmartCharging.Shared.BuildingBlocks.Exceptions;
+using SmartCharging.ServiceDefaults.Exceptions;
 
 namespace SmartCharging.UnitTests.Groups.Features.UpdateGroup.v1;
 
@@ -13,7 +13,7 @@ public class UpdateGroupTests
         var capacityInAmps = 300;
 
         // Act
-        var result = SmartCharging.Groups.Features.UpdateGroup.v1.UpdateGroup.Of(groupId, name, capacityInAmps);
+        var result = SmartChargingApi.Groups.Features.UpdateGroup.v1.UpdateGroup.Of(groupId, name, capacityInAmps);
 
         // Assert
         result.ShouldNotBeNull();
@@ -33,7 +33,7 @@ public class UpdateGroupTests
         // Act & Assert
         Should
             .Throw<ValidationException>(() =>
-                SmartCharging.Groups.Features.UpdateGroup.v1.UpdateGroup.Of(nullGroupId, name, capacityInAmps)
+                SmartChargingApi.Groups.Features.UpdateGroup.v1.UpdateGroup.Of(nullGroupId, name, capacityInAmps)
             )
             .Message.ShouldContain("groupId cannot be null or empty.");
     }
@@ -49,7 +49,7 @@ public class UpdateGroupTests
         // Act & Assert
         Should
             .Throw<ValidationException>(() =>
-                SmartCharging.Groups.Features.UpdateGroup.v1.UpdateGroup.Of(groupId, nullName, capacityInAmps)
+                SmartChargingApi.Groups.Features.UpdateGroup.v1.UpdateGroup.Of(groupId, nullName, capacityInAmps)
             )
             .Message.ShouldContain("name cannot be null or empty.");
     }
@@ -65,7 +65,7 @@ public class UpdateGroupTests
         // Act & Assert
         Should
             .Throw<ValidationException>(() =>
-                SmartCharging.Groups.Features.UpdateGroup.v1.UpdateGroup.Of(groupId, name, invalidCapacity)
+                SmartChargingApi.Groups.Features.UpdateGroup.v1.UpdateGroup.Of(groupId, name, invalidCapacity)
             )
             .Message.ShouldContain("capacityInAmps cannot be negative or zero.");
     }

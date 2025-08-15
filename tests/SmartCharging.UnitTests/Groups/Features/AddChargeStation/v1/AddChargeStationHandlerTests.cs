@@ -1,12 +1,11 @@
 using Microsoft.Extensions.Logging;
 using NSubstitute;
-using SmartCharging.Groups.Dtos;
-using SmartCharging.Groups.Features.AddChargeStation.v1;
-using SmartCharging.Groups.Models;
-using SmartCharging.Groups.Models.ValueObjects;
-using SmartCharging.Shared.Application.Contracts;
-using SmartCharging.Shared.Application.Data;
-using SmartCharging.Shared.BuildingBlocks.Exceptions;
+using SmartCharging.ServiceDefaults.Exceptions;
+using SmartChargingApi.Groups.Dtos;
+using SmartChargingApi.Groups.Features.AddChargeStation.v1;
+using SmartChargingApi.Groups.Models;
+using SmartChargingApi.Groups.Models.ValueObjects;
+using SmartChargingApi.Shared.Contracts;
 
 namespace SmartCharging.UnitTests.Groups.Features.AddChargeStation.v1;
 
@@ -47,7 +46,7 @@ public class AddChargeStationHandlerTests
         // Mock repository behavior
         _unitOfWorkMock.GroupRepository.GetByIdAsync(Arg.Is(group.Id), Arg.Any<CancellationToken>()).Returns(group);
 
-        var addChargeStation = SmartCharging.Groups.Features.AddChargeStation.v1.AddChargeStation.Of(
+        var addChargeStation = SmartChargingApi.Groups.Features.AddChargeStation.v1.AddChargeStation.Of(
             groupId.Value,
             chargeStationName.Value,
             connectors.Select(c => new ConnectorDto(c.Id.Value, c.MaxCurrentInAmps.Value)).ToList()
@@ -85,7 +84,7 @@ public class AddChargeStationHandlerTests
             .ToList()
             .AsReadOnly();
 
-        var addChargeStation = SmartCharging.Groups.Features.AddChargeStation.v1.AddChargeStation.Of(
+        var addChargeStation = SmartChargingApi.Groups.Features.AddChargeStation.v1.AddChargeStation.Of(
             groupId.Value,
             chargeStationName.Value,
             connectors.Select(c => new ConnectorDto(c.Id.Value, c.MaxCurrentInAmps.Value)).ToList()
@@ -138,7 +137,7 @@ public class AddChargeStationHandlerTests
             .When(repo => repo.CommitAsync(Arg.Any<CancellationToken>()))
             .Do(x => throw new Exception("Commit failed."));
 
-        var addChargeStation = SmartCharging.Groups.Features.AddChargeStation.v1.AddChargeStation.Of(
+        var addChargeStation = SmartChargingApi.Groups.Features.AddChargeStation.v1.AddChargeStation.Of(
             groupId.Value,
             chargeStationName.Value,
             connectors.Select(c => new ConnectorDto(c.Id.Value, c.MaxCurrentInAmps.Value)).ToList()

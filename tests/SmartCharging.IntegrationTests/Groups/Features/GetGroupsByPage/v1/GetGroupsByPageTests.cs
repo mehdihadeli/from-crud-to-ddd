@@ -1,20 +1,18 @@
 using Microsoft.Extensions.DependencyInjection;
-using SmartCharging.Groups.Features.GetGroupsByPage.v1;
-using SmartCharging.Groups.Models.ValueObjects;
 using SmartCharging.IntegrationTests.Groups.Mocks;
-using SmartCharging.Shared.Application.Data;
+using SmartCharging.Shared.Data;
 using SmartCharging.TestsShared.Fixtures;
-using Xunit.Abstractions;
+using SmartChargingApi;
+using SmartChargingApi.Groups.Features.GetGroupsByPage.v1;
+using SmartChargingApi.Shared.Data;
 
 namespace SmartCharging.IntegrationTests.Groups.Features.GetGroupsByPage.v1;
 
-public class GetGroupsByPageTests(
-    SharedFixture<SmartChargingMetadata, SmartChargingDbContext> sharedFixture,
-    ITestOutputHelper outputHelper
-) : SmartChargingIntegrationTestBase(sharedFixture, outputHelper)
+public class GetGroupsByPageTests(SharedFixture<SmartChargingMetadata, SmartChargingDbContext> sharedFixture)
+    : SmartChargingIntegrationTestBase(sharedFixture)
 {
     [Fact]
-    internal async Task GetGroupsByPage_WithValidData_Should_ReturnExistingGroups()
+    internal async Task GetGroupsByPageAsync_WhenDataIsValid_ShouldReturnExistingGroups()
     {
         // Arrange
         var fakeGroups = new GroupFake().Generate(10);
@@ -22,7 +20,7 @@ public class GetGroupsByPageTests(
 
         // Act
         // Request page 1 with 5 groups per page
-        var getGroupsByPage = new SmartCharging.Groups.Features.GetGroupsByPage.v1.GetGroupsByPage(1, 5);
+        var getGroupsByPage = new SmartChargingApi.Groups.Features.GetGroupsByPage.v1.GetGroupsByPage(1, 5);
         var handler = Scope.ServiceProvider.GetRequiredService<GetGroupsByPageHandler>();
         var result = await handler.Handle(getGroupsByPage, CancellationToken.None);
 
@@ -36,14 +34,14 @@ public class GetGroupsByPageTests(
     }
 
     [Fact]
-    internal async Task GetGroupsByPage_WithExistingGroups_Should_ReturnCorrectlyMappedGroups()
+    internal async Task GetGroupsByPageAsync_WhenGroupsExist_ShouldReturnCorrectlyMappedGroups()
     {
         // Arrange
         var fakeGroups = new GroupFake().Generate(10).ToList();
 
         await SharedFixture.InsertEfDbContextAsync(fakeGroups.ToArray());
 
-        var getGroupsByPage = new SmartCharging.Groups.Features.GetGroupsByPage.v1.GetGroupsByPage(1, 5);
+        var getGroupsByPage = new SmartChargingApi.Groups.Features.GetGroupsByPage.v1.GetGroupsByPage(1, 5);
         var handler = Scope.ServiceProvider.GetRequiredService<GetGroupsByPageHandler>();
 
         // Act
@@ -66,10 +64,10 @@ public class GetGroupsByPageTests(
     }
 
     [Fact]
-    internal async Task GetGroupsByPage_WithEmptyDatabase_Should_ReturnEmptyPagedResult()
+    internal async Task GetGroupsByPageAsync_WhenDatabaseIsEmpty_ShouldReturnEmptyPagedResult()
     {
         // Act
-        var getGroupsByPage = new SmartCharging.Groups.Features.GetGroupsByPage.v1.GetGroupsByPage(1, 5); // Test on an empty database.
+        var getGroupsByPage = new SmartChargingApi.Groups.Features.GetGroupsByPage.v1.GetGroupsByPage(1, 5); // Test on an empty database.
         var handler = Scope.ServiceProvider.GetRequiredService<GetGroupsByPageHandler>();
         var result = await handler.Handle(getGroupsByPage, CancellationToken.None);
 
@@ -85,7 +83,7 @@ public class GetGroupsByPageTests(
     [InlineData(3, 3, 1)]
     [InlineData(10, 5, 2)]
     [InlineData(10, 1, 10)]
-    internal async Task GetGroupsByPage_WithCustomPageSize_Should_ReturnCorrectPagination(
+    internal async Task GetGroupsByPageAsync_WhenCustomPageSizeIsUsed_ShouldReturnCorrectPagination(
         int totalGroups,
         int pageSize,
         int expectedPageCount
@@ -96,7 +94,7 @@ public class GetGroupsByPageTests(
         await SharedFixture.InsertEfDbContextAsync(fakeGroups.ToArray());
 
         // Act
-        var getGroupsByPage = new SmartCharging.Groups.Features.GetGroupsByPage.v1.GetGroupsByPage(1, pageSize);
+        var getGroupsByPage = new SmartChargingApi.Groups.Features.GetGroupsByPage.v1.GetGroupsByPage(1, pageSize);
         var handler = Scope.ServiceProvider.GetRequiredService<GetGroupsByPageHandler>();
         var result = await handler.Handle(getGroupsByPage, CancellationToken.None);
 

@@ -1,9 +1,63 @@
-# Configuration
-PROJECT := src/SmartCharging/SmartCharging.csproj
+# Show help
+help:
+	@echo "Available targets:"
+	@echo "  prepare                    - Install Husky and .NET tools"
+	@echo "  install-dev-cert           - Install dev cert (Bash)"
+	@echo "  run                        - Run aspire dashboard"
+	@echo "  run-smart-charging-api     - Run SmartChargingApi"
+	@echo "  run-smart-charging-statistics-api - Run SmartChargingStatisticsApi"
+	@echo "  restore                    - Restore NuGet packages"
+	@echo "  build                      - Build the project"
+	@echo "  ci-build                   - CI build (without restore step)"
+	@echo "  clean                      - Clean build artifacts"
+	@echo "  unit-tests                 - Run unit tests"
+	@echo "  integration-tests          - Run integration tests"
+	@echo "  end-to-end-tests           - Run end-to-end tests"
+	@echo "  test                       - Run all tests (unit, integration, end-to-end)"
+	@echo "  upgrade-packages           - Upgrade .NET packages"
+	@echo "  run-docker-compose         - Run docker-compose"
+	@echo "  stop-docker-compose        - Stop docker-compose"
+	@echo "  check-format               - Check C# formatting"
+	@echo "  check-style                - Check C# style rules"
+	@echo "  check-analyzers            - Check C# analyzer rules"
+	@echo "  fix-format                 - Fix formatting and stage changes"
+	@echo "  fix-style                  - Fix style rules for all projects (error level)"
+	@echo "  fix-style-warn             - Fix style rules (warn level)"
+	@echo "  fix-style-info             - Fix style rules (info level)"
+	@echo "  fix-analyzers              - Fix analyzer rules (error level)"
+	@echo "  fix-analyzers-warn         - Fix analyzer rules (warn level)"
+	@echo "  fix-analyzers-info         - Fix analyzer rules (info level)"
+	@echo "  check-all                  - Run all validation checks"
+	@echo "  fix-all                    - Run all fixes"
+	@echo ""
+	@echo "Variables:"
+	@echo "  PROJECT_PATH - Path to project (default: \".\")"
 
-# Default target
-.PHONY: all
-all: build
+# Configuration
+SMART_CHARGING_API_PROJECT := src/Services/SmartChargingApi/SmartChargingApi.csproj
+SMART_CHARGING_STATISTICS_API_PROJECT := src/Services/SmartChargingStatisticsApi/SmartChargingStatisticsApi.csproj
+SOLUTION_ROOT := "."
+
+# Install Husky and .NET tools
+prepare:
+	husky
+	dotnet tool restore
+
+# Install dev cert (Bash)
+install-dev-cert:
+	curl -sSL https://aka.ms/getvsdbgsh | bash /dev/stdin -v vs2019 -l ~/vsdbg
+
+# Run aspire dashboard
+run:
+	aspire run
+
+# Run SmartChargingAPi
+run-smart-charging-api: 
+	dotnet run --project $(SMART_CHARGING_API_PROJECT)
+
+# Run SmartChargingStatisticsAPi
+run-smart-charging-statistics-api: 
+	dotnet run --project $(SMART_CHARGING_STATISTICS_API_PROJECT)
 
 # Restore NuGet packages
 .PHONY: restore
@@ -25,11 +79,6 @@ ci-build:
 clean:
 	dotnet clean 
 
-# Run the application
-.PHONY: run
-run: build
-	dotnet run --project $(PROJECT)
-
 # Run unit-tests
 .PHONY: unit-tests
 unit-tests: 
@@ -49,11 +98,9 @@ end-to-end-tests:
 .PHONY: test
 test: unit-tests integration-tests end-to-end-tests
 
-# Format code using CSharpier
-.PHONY: format
-format:
-	dotnet tool restore
-	dotnet csharpier .
+# Upgrade .NET packages
+upgrade-packages:
+	dotnet outdated -u
 
 # Run docker-compose
 .PHONY: run-docker-compose
@@ -65,13 +112,48 @@ run-docker-compose:
 stop-docker-compose:
 	docker-compose -f .\deployments\docker-compose\docker-compose.yaml down 
 
-# Generate development certificate for HTTPS
-.PHONY: cert
-cert:
-	dotnet dev-certs https --clean
-	@echo "Certificate generated"
+# Check C# formatting
+check-format:
+	dotnet csharpier check $(SOLUTION_ROOT)
 
-# Install tools
-.PHONY: install-csharpier
-install-tools:
-	dotnet tool install
+# Check C# style rules
+check-style:
+	dotnet format style $(SOLUTION_ROOT) --verify-no-changes --severity error --verbosity diagnostic
+
+# Check C# analyzer rules
+check-analyzers:
+	dotnet format analyzers $(SOLUTION_ROOT) --verify-no-changes --severity error --verbosity diagnostic
+
+# Fix formatting and stage changes
+fix-format:
+	dotnet csharpier format $(SOLUTION_ROOT)
+
+# Fix style rules for all projects (error level)
+fix-style:
+	dotnet format style $(SOLUTION_ROOT) --severity error --verbosity diagnostic
+
+# Fix style rules (warn level)
+fix-style-warn:
+	dotnet format style $(SOLUTION_ROOT) --severity warn --verbosity diagnostic
+
+# Fix style rules (info level)
+fix-style-info:
+	dotnet format style $(SOLUTION_ROOT) --severity info --verbosity diagnostic
+
+# Fix analyzer rules (error level)
+fix-analyzers:
+	dotnet format analyzers $(SOLUTION_ROOT) --severity error --verbosity diagnostic
+
+# Fix analyzer rules (warn level)
+fix-analyzers-warn:
+	dotnet format analyzers $(SOLUTION_ROOT) --severity warn --verbosity diagnostic
+
+# Fix analyzer rules (info level)
+fix-analyzers-info:
+	dotnet format analyzers $(SOLUTION_ROOT) --severity info --verbosity diagnostic
+
+# Run all validation checks
+check-all: check-analyzers check-format check-style
+
+# Run all fixes
+fix-all: fix-analyzers fix-format fix-style

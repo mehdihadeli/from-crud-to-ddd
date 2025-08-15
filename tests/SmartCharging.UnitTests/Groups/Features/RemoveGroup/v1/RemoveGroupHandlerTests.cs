@@ -1,13 +1,11 @@
 using Microsoft.Extensions.Logging;
 using NSubstitute;
-using SmartCharging.Groups.Contracts;
-using SmartCharging.Groups.Features.RemoveGroup.v1;
-using SmartCharging.Groups.Models;
-using SmartCharging.Groups.Models.ValueObjects;
-using SmartCharging.Shared.Application.Contracts;
-using SmartCharging.Shared.Application.Data;
-using SmartCharging.Shared.BuildingBlocks.Exceptions;
+using SmartCharging.ServiceDefaults.Exceptions;
 using SmartCharging.UnitTests.Groups.Mocks;
+using SmartChargingApi.Groups.Features.RemoveGroup.v1;
+using SmartChargingApi.Groups.Models;
+using SmartChargingApi.Groups.Models.ValueObjects;
+using SmartChargingApi.Shared.Contracts;
 
 namespace SmartCharging.UnitTests.Groups.Features.RemoveGroup.v1;
 
@@ -37,7 +35,7 @@ public class RemoveGroupHandlerTests
 
         _unitOfWorkMock.GroupRepository.GetByIdAsync(Arg.Is(groupId), Arg.Any<CancellationToken>()).Returns(group);
 
-        var removeGroup = SmartCharging.Groups.Features.RemoveGroup.v1.RemoveGroup.Of(groupId.Value);
+        var removeGroup = SmartChargingApi.Groups.Features.RemoveGroup.v1.RemoveGroup.Of(groupId.Value);
 
         // Act
         await _handler.Handle(removeGroup, CancellationToken.None);
@@ -61,7 +59,7 @@ public class RemoveGroupHandlerTests
             .GroupRepository.GetByIdAsync(Arg.Is(groupId), Arg.Any<CancellationToken>())
             .Returns((Group)null!);
 
-        var removeGroup = SmartCharging.Groups.Features.RemoveGroup.v1.RemoveGroup.Of(groupId.Value);
+        var removeGroup = SmartChargingApi.Groups.Features.RemoveGroup.v1.RemoveGroup.Of(groupId.Value);
 
         // Act & Assert
         var exception = await Should.ThrowAsync<NotFoundException>(() =>

@@ -1,11 +1,12 @@
 using Shouldly;
-using SmartCharging.Groups.Data;
-using SmartCharging.Groups.Models;
-using SmartCharging.Groups.Models.ValueObjects;
-using SmartCharging.Shared.Application.Data;
-using SmartCharging.Shared.BuildingBlocks.Exceptions;
+using SmartCharging.ServiceDefaults.Exceptions;
+using SmartCharging.Shared.Data;
 using SmartCharging.UnitTests.Groups.Mocks;
 using SmartCharging.UnitTests.TestHelpers;
+using SmartChargingApi.Groups.Data;
+using SmartChargingApi.Groups.Models;
+using SmartChargingApi.Groups.Models.ValueObjects;
+using SmartChargingApi.Shared.Data;
 
 namespace SmartCharging.UnitTests.Groups.Data;
 

@@ -1,21 +1,20 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using SmartCharging.Groups.Features.RemoveChargeStation.v1;
 using SmartCharging.IntegrationTests.Groups.Mocks;
-using SmartCharging.Shared.Application.Data;
-using SmartCharging.Shared.BuildingBlocks.Exceptions;
+using SmartCharging.ServiceDefaults.Exceptions;
+using SmartCharging.Shared.Data;
 using SmartCharging.TestsShared.Fixtures;
-using Xunit.Abstractions;
+using SmartChargingApi;
+using SmartChargingApi.Groups.Features.RemoveChargeStation.v1;
+using SmartChargingApi.Shared.Data;
 
 namespace SmartCharging.IntegrationTests.Groups.Features.RemoveChargeStation.v1;
 
-public class RemoveChargeStationTests(
-    SharedFixture<SmartChargingMetadata, SmartChargingDbContext> sharedFixture,
-    ITestOutputHelper outputHelper
-) : SmartChargingIntegrationTestBase(sharedFixture, outputHelper)
+public class RemoveChargeStationTests(SharedFixture<SmartChargingMetadata, SmartChargingDbContext> sharedFixture)
+    : SmartChargingIntegrationTestBase(sharedFixture)
 {
     [Fact]
-    internal async Task RemoveChargeStation_WithValidInputs_Should_RemoveChargeStationSuccessfully()
+    internal async Task RemoveChargeStation_WhenInputsAreValid_ShouldRemoveChargeStationSuccessfully()
     {
         // Arrange
         var fakeGroup = new GroupFake(numberOfConnectorsPerStation: 3).Generate();
@@ -27,7 +26,7 @@ public class RemoveChargeStationTests(
 
         // Get the existing charge station
         var targetChargeStation = fakeGroup.ChargeStations.First();
-        var removeChargeStation = SmartCharging.Groups.Features.RemoveChargeStation.v1.RemoveChargeStation.Of(
+        var removeChargeStation = SmartChargingApi.Groups.Features.RemoveChargeStation.v1.RemoveChargeStation.Of(
             fakeGroup.Id.Value,
             targetChargeStation.Id.Value
         );
@@ -59,13 +58,13 @@ public class RemoveChargeStationTests(
     }
 
     [Fact]
-    internal async Task RemoveChargeStation_FromNonExistentGroup_Should_ThrowNotFoundException()
+    internal async Task RemoveChargeStation_WhenGroupDoesNotExist_ShouldThrowNotFoundException()
     {
         // Arrange
         var nonExistentGroupId = Guid.NewGuid();
         var chargeStationId = Guid.NewGuid();
 
-        var removeChargeStation = SmartCharging.Groups.Features.RemoveChargeStation.v1.RemoveChargeStation.Of(
+        var removeChargeStation = SmartChargingApi.Groups.Features.RemoveChargeStation.v1.RemoveChargeStation.Of(
             nonExistentGroupId,
             chargeStationId
         );
@@ -81,7 +80,7 @@ public class RemoveChargeStationTests(
     }
 
     [Fact]
-    internal async Task RemoveChargeStation_ThatDoesNotExistInGroup_Should_ThrowDomainException()
+    internal async Task RemoveChargeStation_WhenChargeStationDoesNotExistInGroup_ShouldThrowDomainException()
     {
         // Arrange
         var fakeGroup = new GroupFake(numberOfConnectorsPerStation: 3).Generate();
@@ -93,7 +92,7 @@ public class RemoveChargeStationTests(
 
         var nonExistentChargeStationId = Guid.NewGuid();
 
-        var removeChargeStation = SmartCharging.Groups.Features.RemoveChargeStation.v1.RemoveChargeStation.Of(
+        var removeChargeStation = SmartChargingApi.Groups.Features.RemoveChargeStation.v1.RemoveChargeStation.Of(
             fakeGroup.Id.Value,
             nonExistentChargeStationId
         );
@@ -109,19 +108,20 @@ public class RemoveChargeStationTests(
     }
 
     [Fact]
-    internal async Task RemoveChargeStation_WithNullInputs_Should_ThrowValidationException()
+    internal async Task RemoveChargeStation_WhenInputsAreNull_ShouldThrowValidationException()
     {
         // Act & Assert
         var handler = Scope.ServiceProvider.GetRequiredService<RemoveChargeStationHandler>();
 
-        var exception = await Should.ThrowAsync<ValidationException>(() => handler.Handle(null!, CancellationToken.None)
+        var exception = await Should.ThrowAsync<ValidationException>(() =>
+            handler.Handle(null!, CancellationToken.None)
         );
 
         exception.Message.ShouldBe("removeChargeStation cannot be null or empty.");
     }
 
     [Fact]
-    internal async Task RemoveChargeStation_WhenGroupHasMultipleStations_Should_RemoveCorrectStation()
+    internal async Task RemoveChargeStation_WhenGroupHasMultipleStations_ShouldRemoveCorrectStation()
     {
         // Arrange
         var fakeGroup = new GroupFake(numberOfConnectorsPerStation: 3).Generate();
@@ -134,7 +134,7 @@ public class RemoveChargeStationTests(
             await db.SaveChangesAsync();
         });
 
-        var removeChargeStation = SmartCharging.Groups.Features.RemoveChargeStation.v1.RemoveChargeStation.Of(
+        var removeChargeStation = SmartChargingApi.Groups.Features.RemoveChargeStation.v1.RemoveChargeStation.Of(
             fakeGroup.Id.Value,
             additionalChargeStation.Id.Value
         );
@@ -160,7 +160,7 @@ public class RemoveChargeStationTests(
 
             // check db for the removed station and connectors
             var existingStationsOnDb = db.ChargeStations.Where(x => x.GroupId == fakeGroup.Id);
-            existingStationsOnDb.ShouldNotBeEmpty();
+            existingStationsOnDb.AsEnumerable().ShouldNotBeEmpty();
             existingStationsOnDb.Count().ShouldBe(1);
             existingStationsOnDb.FirstOrDefault(x => x.Id == additionalChargeStation.Id).ShouldBeNull();
 
