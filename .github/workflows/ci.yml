@@ -12,28 +12,6 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v4
-      - name: Conventional Commits Check
-        uses: amannn/action-semantic-pull-request@v5
-        # Only run on pull request events
-        if: github.event_name == 'pull_request'
-        id: check-pull-request-title-conventional-commits
-        env:
-          GITHUB_TOKEN: ${{ secrets.ci-github-token }}
-
-      - name: Job Info
-        if: success()
-        shell: bash
-        run: |
-          echo "pre-check is successful."
-          echo environment is: ${{ github.workspace }}
-          echo "is workflow_dispatch event? ${{ github.event_name == 'workflow_dispatch' }}"
-          echo "is push event? ${{ github.event_name == 'push' }}"
-          echo "is pull request event? ${{ github.event_name == 'pull_request' }}"
-          echo "pull_request.head.ref is: ${{ github.event.pull_request.head.ref }}"
-          echo "github.ref_name is: ${{ github.ref_name }}"
-          echo "github.ref is: ${{ github.ref }}"
-          echo "github.head_ref is: ${{ github.head_ref }}"
-          echo "should publish in dispatch mode? ${{ github.event.inputs.should-publish }}"
 
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v4
