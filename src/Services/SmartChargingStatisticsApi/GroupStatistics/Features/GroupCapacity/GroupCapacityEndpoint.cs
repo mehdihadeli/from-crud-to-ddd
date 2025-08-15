@@ -1,8 +1,8 @@
 using Bogus;
 using Humanizer;
-using SmartChargingStatisticsApi.Dtos;
+using SmartChargingStatisticsApi.GroupStatistics.Dtos;
 
-namespace SmartChargingStatisticsApi.GroupStatistics.GroupCapacity;
+namespace SmartChargingStatisticsApi.GroupStatistics.Features.GroupCapacity;
 
 public static class GroupCapacityEndpoint
 {

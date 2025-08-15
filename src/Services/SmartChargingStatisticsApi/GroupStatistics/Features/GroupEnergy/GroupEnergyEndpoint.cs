@@ -1,7 +1,7 @@
 using Bogus;
-using SmartChargingStatisticsApi.Dtos;
+using SmartChargingStatisticsApi.GroupStatistics.Dtos;
 
-namespace SmartChargingStatisticsApi.GroupStatistics.GroupEnergy;
+namespace SmartChargingStatisticsApi.GroupStatistics.Features.GroupEnergy;
 
 public static class GroupEnergyEndpoint
 {

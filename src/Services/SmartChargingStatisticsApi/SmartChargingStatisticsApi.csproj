@@ -2,4 +2,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Aspire\SmartCharging.ServiceDefaults\SmartCharging.ServiceDefaults.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="GroupStatistics\Features\" />
+  </ItemGroup>
 </Project>

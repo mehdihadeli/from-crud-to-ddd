@@ -1,4 +1,4 @@
-namespace SmartChargingStatisticsApi.Dtos;
+namespace SmartChargingStatisticsApi.GroupStatistics.Dtos;
 
 record GroupCapacityStatisticsClientResponse(
     Guid GroupId,

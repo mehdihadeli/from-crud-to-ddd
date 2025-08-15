@@ -1,6 +1,6 @@
 using Humanizer;
-using SmartChargingStatisticsApi.GroupStatistics.GroupCapacity;
-using SmartChargingStatisticsApi.GroupStatistics.GroupEnergy;
+using SmartChargingStatisticsApi.GroupStatistics.Features.GroupCapacity;
+using SmartChargingStatisticsApi.GroupStatistics.Features.GroupEnergy;
 
 namespace SmartChargingStatisticsApi.GroupStatistics;
 
